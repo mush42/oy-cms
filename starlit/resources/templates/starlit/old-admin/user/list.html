@@ -1,0 +1,5 @@
+{% extends 'admin/model/list.html' %}
+{% block model_menu_bar_before_filters %}
+{{super()}}
+<a href="{{url_for('.register') }}" class="btn btn-lg btn-info pull-right" style="margin-bottom:20px;"><span class="fa fa-plus"></span> {{_trans('Add A New User')}}</a>
+{% endblock %}

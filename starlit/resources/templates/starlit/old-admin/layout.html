@@ -1,0 +1,211 @@
+{% extends 'admin/base.html' %}
+{% import 'admin/layout.html' as layout with context -%}
+{% import 'starlit/admin/macros.html' as macros with context %}
+  {% block head_css %}
+      <!-- core css -->
+      <link href="{{ url_for('static', filename='starlit/admin/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ admin_static.url(filename='admin/css/bootstrap3/admin.css', v='1.1.1') }}" rel="stylesheet">
+  {% endblock %}
+{% block head_tail %}
+    {{super()}}
+    <!-- MetisMenu CSS -->
+    <link href="{{ url_for('static', filename='starlit/admin//vendor/metisMenu/metisMenu.min.css') }}" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='starlit/admin/vendor/animate.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='starlit/admin/css/sb-admin.css') }}" rel="stylesheet">
+
+    {% if rtl %}
+    <link href="{{ url_for('static', filename='starlit/admin/vendor/bootstrap-rtl/bootstrap-rtl.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='starlit/admin/css/sb-admin-rtl.css') }}" rel="stylesheet">
+    {% endif %}
+
+    <script src="{{ admin_static.url(filename='vendor/jquery.min.js', v='2.1.4') }}" type="text/javascript"></script>
+    <script src="{{ url_for('static', filename='starlit/admin/vendor/bootstrap/js/bootstrap.min.js') }}" type="text/javascript"></script>
+    <script src="{{ admin_static.url(filename='vendor/moment.min.js', v='2.9.0') }}" type="text/javascript"></script>
+    <script src="{{ admin_static.url(filename='vendor/select2/select2.min.js', v='3.5.2') }}" type="text/javascript"></script>
+  {% endblock %}
+  {% block tail_js %}{% endblock %}
+
+  {% block page_body %}
+    <div id="wrapper">
+
+        <!-- Navigation -->
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="fa fa-bars"></span>
+                </button>
+                <button type="button" class="navbar-toggle pull-right quick-access-btn" data-toggle="collapse" data-target=".navbar-ex2-collapse">
+                    <span class="sr-only">Toggle quick access toolbar</span>
+                    <span class="fa fa-cog"></span>
+                </button>
+                <a class="navbar-brand" href="{{admin_view.admin.url}}">{{admin_view.admin.name}}</a>
+            </div>
+            <!-- Top Menu Items -->
+            <ul class="collapse navbar-collapse navbar-ex2-collapse nav navbar-nav quick-access">
+                <li><a href="/"><i class="fa fa-home fa-fw"></i> {{_trans('View Site')}}</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-envelope"></i> {{_trans('Messages')}} <b class="caret"></b></a>
+                    <ul class="dropdown-menu message-dropdown">
+                        <li class="message-preview">
+                            <a href="#">
+                                <div class="media">
+                                    <span class="pull-left">
+                                        <img class="media-object" src="http://placehold.it/50x50" alt="">
+                                    </span>
+                                    <div class="media-body">
+                                        <h5 class="media-heading">
+                                            <strong>John Smith</strong>
+                                        </h5>
+                                        <p class="small text-muted"><i class="fa fa-clock-o"></i> Yesterday at 4:32 PM</p>
+                                        <p>Lorem ipsum dolor sit amet, consectetur...</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="message-preview">
+                            <a href="#">
+                                <div class="media">
+                                    <span class="pull-left">
+                                        <img class="media-object" src="http://placehold.it/50x50" alt="">
+                                    </span>
+                                    <div class="media-body">
+                                        <h5 class="media-heading">
+                                            <strong>John Smith</strong>
+                                        </h5>
+                                        <p class="small text-muted"><i class="fa fa-clock-o"></i> Yesterday at 4:32 PM</p>
+                                        <p>Lorem ipsum dolor sit amet, consectetur...</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="message-preview">
+                            <a href="#">
+                                <div class="media">
+                                    <span class="pull-left">
+                                        <img class="media-object" src="http://placehold.it/50x50" alt="">
+                                    </span>
+                                    <div class="media-body">
+                                        <h5 class="media-heading">
+                                            <strong>John Smith</strong>
+                                        </h5>
+                                        <p class="small text-muted"><i class="fa fa-clock-o"></i> Yesterday at 4:32 PM</p>
+                                        <p>Lorem ipsum dolor sit amet, consectetur...</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="message-footer">
+                            <a href="#">Read All New Messages</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-bell"></i> {{_trans('Notifications')}} <b class="caret"></b></a>
+                    <ul class="dropdown-menu alert-dropdown">
+                        <li>
+                            <a href="#">Alert Name <span class="label label-default">Alert Badge</span></a>
+                        </li>
+                        <li>
+                            <a href="#">Alert Name <span class="label label-primary">Alert Badge</span></a>
+                        </li>
+                        <li>
+                            <a href="#">Alert Name <span class="label label-success">Alert Badge</span></a>
+                        </li>
+                        <li>
+                            <a href="#">Alert Name <span class="label label-info">Alert Badge</span></a>
+                        </li>
+                        <li>
+                            <a href="#">Alert Name <span class="label label-warning">Alert Badge</span></a>
+                        </li>
+                        <li>
+                            <a href="#">Alert Name <span class="label label-danger">Alert Badge</span></a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#">View All</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    {% if not current_user.profile.image_path %}
+                    <i class="fa fa-user"></i>
+                    {% else %}
+                    <img class="img-circle" src="{{current_user.profile.image.src}}" style="max-width:25px;max-height:25px;" />
+                    {% endif %}
+                    {{' ' ~ current_user.profile.name}} <b class="caret"></b>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li class="message-preview">
+                        <div class="media">
+                          <div class="media-left">
+                              <img class="media-object img-rounded img-circle profile-dropdown" src="{% if current_user.profile.image_path %}{{current_user.profile.image.src}}{%endif%}" alt="Your Profile Picture">
+                          </div>
+                          <div class="media-body">
+                            <h5class="media-heading"><strong>{{current_user.profile.name}}</strong></h5>
+                          <p class="small">{{current_user.profile.bio}}</p>
+                          </div>
+                        </div>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('profile.edit_view', id=current_user.id) }}"><i class="fa fa-fw fa-user"></i> {{_trans('Edit Your Profile')}}</a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('user.edit_view', id=current_user.id)}}"><i class="fa fa-fw fa-gear"></i> {{_trans('Edit Your Account')}}</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="{{url_for('security.logout')}}"><i class="fa fa-fw fa-power-off"></i> {{ _trans('Log Out')}}</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
+            <aside class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav side-nav">
+                    {{ layout.menu() }}
+                    {{ layout.menu_links() }}
+                </ul>
+            </aside>
+            <!-- /.navbar-collapse -->
+        </nav>
+
+        <main id="page-wrapper">
+            <div class="container-fluid">
+                <!-- Page Heading -->
+                <div class="row">
+                    <div class="col-lg-10 col-lg-offset-1 col-md-10 col-md-offset-1 page-content-area">
+                      {% block brand %}<h1 class="page-header">{{admin_view.name|capitalize}}</h1>{% endblock %}
+                      {{ layout.messages() }}
+                      {% set render_ctx = h.resolve_ctx() %}
+                      {% block body %}{% endblock %}
+                    </div>
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.container-fluid -->
+        </main>
+        <!-- /#page-wrapper -->
+    </div>
+    <!-- /#wrapper -->
+    {% endblock %}
+    
+  {% block tail %}
+  {{ super() }}
+  {{macros.tinymce_scripts()}}
+  <!-- lity light box -->
+  <link href="{{ url_for('static', filename='starlit/admin/vendor/lity/lity.min.css') }}" rel="stylesheet">
+  <script src="{{ url_for('static', filename='starlit/admin/vendor/lity/lity.min.js') }}"></script>
+  <!-- extra scripts -->
+  <script src="{{ url_for('static', filename='starlit/admin/js/main.js') }}"></script>
+  {% if request.endpoint.startswith('media.') %}
+  <script src="{{ url_for('static', filename='starlit/admin/js/image-select.js') }}"></script>
+  {% else %}
+  <!-- core image browser -->
+  <script src="{{ url_for('static', filename='starlit/admin/js/image-browser.js') }}"></script>
+  {% endif %}
+{% endblock %}

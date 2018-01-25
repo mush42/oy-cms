@@ -1,0 +1,62 @@
+{% macro select_file(name, path) %}
+<button class="select-file" data-path="{{path}}"><span class="fa fa-check"></span> {{_trans('Select') ~ ' ' ~ name }}</button>
+{% endmacro %}
+
+{% macro tinymce_scripts() %}
+    <script>
+        var __file_browser_url = "{{ url_for('media.index')}}";
+        var __language = "{{lang}}";
+        var __lang_dir = "{{'rtl' if rtl else 'ltr'}}";
+        var __images_base_url = "{{ url_for('canella-files.media', filename='i.j')[:-3]}}";
+  </script>
+  <script src="{{ url_for('static', filename='canella/admin/vendor/tinymce/tinymce.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='canella/admin/js/tinymce-setup.js') }}"></script>
+{% endmacro %}
+
+{% macro render_field(field) %}
+{% if field.widget.input_type != 'hidden' %}
+  <div class="form-group">
+    <label for="{{field.html_id}}" class="control-label">{{field.label}}</label>
+    <div>
+      {{field(class="form-control")}}
+      <p class="help-block text-info">{{field.description}}</p>
+      {% for error in field.errors %}
+        <p class="help-block text-danger">{{error}}</p>
+      {% endfor %}
+    </div>
+  </div>
+  {% else %}
+    {{field}}
+{% endif %}
+{% endmacro %}
+
+
+{% macro render_form(form, action=None, title='', submit_text='Submit') %}
+<form class="form-horizontal" action="{{action or request.url}}" method="post">
+  <fieldset>
+    <legend><h3></h3>{{title}}</legend>
+    {% for field in form %}
+      {{render_field(field)}}
+    {% endfor %}
+    <div class="form-group">
+      <div class="col-lg-8 col-lg-offset-2">
+        <input type="submit" class="btn btn-info" value="{{submit_text}}" />
+      </div>
+    </div>
+  </fieldset>
+</form>
+{% endmacro %}
+
+{% macro load_editable() %}
+<link href="{{ url_for('static', filename='canella/admin/css/editable.css') }}" rel="stylesheet"/>
+<link href="{{ url_for('static', filename='canella/admin/vendor/bootstrap-daterangepicker/daterangepicker-bs3.css') }}" rel="stylesheet"/>
+<link href="{{ url_for('static', filename='canella/admin/vendor/animate.css') }}" rel="stylesheet" type="text/css">
+<script src="{{ url_for('static', filename='canella/admin/vendor/jeditable/jquery.jeditable.js') }}"></script>
+<script src="{{ url_for('static', filename='canella/admin/vendor/moment.min.js') }}"></script>
+<script src="{{ url_for('static', filename='canella/admin/vendor/bootstrap-daterangepicker/daterangepicker.js') }}"></script>
+<script src="{{ url_for('static', filename='canella/admin/vendor/bootstrap-switch/bootstrap-switch.min.js') }}"></script>
+{{tinymce_scripts()}}
+<script src="{{ url_for('static', filename='canella/admin/vendor/bootstrap-notify/bootstrap-notify.min.js') }}" type="text/javascript"></script>
+<script src="{{ url_for('static', filename='canella/admin/js/jeditable-inputs.js') }}"></script>
+<script src="{{ url_for('static', filename='canella/admin/js/editable.js') }}"></script>
+{% endmacro %}

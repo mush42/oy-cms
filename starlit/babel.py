@@ -1,0 +1,1 @@
+from starlit.boot.exts.babel import gettext, lazy_gettext, ngettext, gettext

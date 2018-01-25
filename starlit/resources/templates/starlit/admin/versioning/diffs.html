@@ -1,0 +1,55 @@
+{% extends 'admin/master.html' %}
+{% block title %}{{model.__class__.__name__}} - Version Change Set{%endblock%}
+{% block navlinks %}{% endblock %}
+{% block brand%}
+<h1>{{model.title}} Version ({{version.transaction_id}}) Change Set</h1>
+{%endblock%}
+{% block body %}
+<div class="col-md-10 col-sm-12">
+<div class="col-md-8 col-lg-6 col-sm-12">
+<h4>Version Meta</h4>
+<table class="table table-striped table-hover table-primary">
+<tbody>
+<tr>
+<td>Updated</td>
+<td>{{version.updated}}</td>
+</tr>
+<tr>
+<td>Changed By</td>
+<td>{{version.author.profile.name}}</td>
+</tr>
+<tr>
+<td>Previous Version</td>
+<td>{{version.previous.updated or 'None'}}</td>
+</tr>
+<tr>
+<td>Next Version</td>
+<td>{{version.next.updated or 'None'}}</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h4>Changes</h4>
+<table class="table table-striped table-hover table">
+<thead>
+<tr class="primary">
+<th>Attribute</th>
+<th>Old Value</th>
+<th>New Value</th>
+</tr>
+</thead>
+<tbody>
+{% for attr, values in version.changeset.items() %}
+<tr>
+<td>{{model.__mapper__.columns[attr].info['label'] or attr}}</td>
+<td>{{values[0]}}</td>
+<td>{{values[1]}}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+<div class="col-md-offset-3">
+<a href="#" role="button" class="btn btn-lg btn-danger"><span class="fa fa-warning"></span> APPLY TO THE CURRENT VERSION</a>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'starlit/admin/files/list.html' %}
+
+{% block list_header scoped %}
+<th>{{_trans('Preview')}}</th>
+{{super()}}
+{% endblock %}
+
+{% block list_row scoped %}
+<td>
+{% with image_url = url_for('starlit-files.files', filename=path) %}
+<a href="{{image_url}}" title="" data-lity>
+<img class="" src="{{image_url}}" style="max-width:75px;max-height:75px;" role="presentation" />
+</a>
+{% endwith %}
+</td>
+{{super()}}
+{% endblock %}

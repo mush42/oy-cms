@@ -1,0 +1,6 @@
+-r requirements.txt
+
+pytest==3.3.2
+waitress==1.1.0
+WebOb==1.7.4
+WebTest==2.0.29
