@@ -11,16 +11,36 @@ class UserRelated(SQLAEvent):
     """User Related"""
 
     @declared_attr
-    def user_id(cls):
+    def author_id(cls):
         return db.Column(
             db.Integer,
             db.ForeignKey('user.id'),
+            nullable=False,
             info=dict(label=lazy_gettext('Author'))
             )
 
     @declared_attr
     def author(cls):
-        return db.relationship('User',
+        return db.relationship(
+            'User',
+            foreign_keys=[cls.author_id],
+            info=dict(label=lazy_gettext('Author'), description=lazy_gettext(''))
+            )
+
+    @declared_attr
+    def editor_id(cls):
+        return db.Column(
+            db.Integer,
+            db.ForeignKey('user.id'),
+            nullable=True,
+            info=dict(label=lazy_gettext('Author'))
+            )
+
+    @declared_attr
+    def last_edited_by(cls):
+        return db.relationship(
+            'User',
+            foreign_keys=[cls.editor_id],
             info=dict(label=lazy_gettext('Author'), description=lazy_gettext(''))
             )
 

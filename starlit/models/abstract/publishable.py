@@ -1,29 +1,8 @@
 from datetime import datetime
 from sqlalchemy.ext.hybrid import hybrid_property
 from starlit.boot.exts.sqla import db
-from ._sqlaevent import SQLAEvent
+from .time_stampped import TimeStampped
 
-class TimeStampped(SQLAEvent):
-    created = db.Column(
-        db.DateTime,
-        default=datetime.utcnow,
-        nullable=False,
-        info=dict(
-            label='Creation Date'
-        )
-    )
-    updated = db.Column(
-        db.DateTime,
-        default=datetime.utcnow,
-        onupdate=datetime.utcnow,
-        nullable=False,
-        info=dict(
-            label='Last Updated'
-        )
-    )
-
-    def update(self):
-        self.updated = datetime.utcnow()
 
 
 class Publishable(TimeStampped):

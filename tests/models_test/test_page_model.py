@@ -2,7 +2,7 @@ import pytest
 from starlit.modules.page.models import Page
 
 def test_basic_page(db, user):
-    page = Page(title=u'A Page', content=u'a content', user_id=1)
+    page = Page(title=u'A Page', content=u'a content', author_id=user.id)
     db.session.add(page)
     db.session.commit()
     page = Page.query.one()
@@ -24,8 +24,8 @@ def test_basic_page(db, user):
     assert not Page.query.published.all()
 
 def test_parent_child_relation(db, user):
-    parent = Page(title=u'Parent', content=u'Parent content.', user_id=1)
-    child = Page(title=u'child', content=u'Child content.', user_id=1)
+    parent = Page(title=u'Parent', content=u'Parent content.', author_id=user.id)
+    child = Page(title=u'child', content=u'Child content.', author_id=user.id)
     parent.children.append(child)
     db.session.add(parent)
     db.session.add(child)
@@ -33,9 +33,9 @@ def test_parent_child_relation(db, user):
     child = Page.query.get(child.id)
     assert parent.slug_path == 'parent'
     assert child.slug_path == 'parent/child'
-    child2 = Page(title=u'Child2', content=u'C2 content.', user_id=1)
+    child2 = Page(title=u'Child2', content=u'C2 content.', author_id=user.id)
     child.children.append(child2)
-    child3 = Page(title=u'Child3', content=u'Child 3 content.', user_id=1)
+    child3 = Page(title=u'Child3', content=u'Child 3 content.', author_id=user.id)
     child3.parent = child2
     db.session.add(child)
     db.session.add(child2)

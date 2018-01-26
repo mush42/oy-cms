@@ -40,7 +40,7 @@ def test_timestammped(db):
     db.session.add(t)
     db.session.commit()
     assert t.created
-    assert t.updated
+    assert not t.updated
     t.title = u'That'
     db.session.commit()
     assert t.updated

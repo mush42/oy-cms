@@ -35,7 +35,7 @@ DISPLAYABEL_DEFAULTS = dict(
     column_default_sort = ("created", True),
     column_editable_list = ("title", ),
     form_rules = ("title", "status", "publish_date", 'expire_date', "slug", "meta_title", "meta_description", "should_auto_generate", "keywords", ),
-    form_excluded_columns=("site", "created", "updated", "versions", 'author'),
+    form_excluded_columns=("site", "created", "updated", "versions", 'author', "last_edited_by"),
     form_extra_fields={'status': SelectField(label=lazy_gettext('Status'), choices=Displayable.STATUS_CHOICES)}
 )
 
