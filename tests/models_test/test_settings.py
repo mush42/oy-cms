@@ -1,11 +1,10 @@
 import pytest
-from starlit.modules.core.models import Site
-from starlit.modules.editable_settings.models import Settings
+from starlit.modules.editable_settings.models import SettingsProfile
 
 
 def test_settings(db):
-    site = Site(name=u'Amam')
-    db.session.add(site)
+    sp = SettingsProfile(name=u'Test Settings Profile')
+    db.session.add(sp)
     db.session.commit()
-    assert site.settings is not None
-    assert site.settings['title'] == u'Starlit CMS'
+    assert sp.settings is not None
+    assert sp.settings['title'] == u'Starlit CMS'

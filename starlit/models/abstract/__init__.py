@@ -3,6 +3,6 @@ from .metadata import Metadata
 from .publishable import Publishable, TimeStampped
 from .displayable import Displayable, DisplayableQuery
 from .page import AbstractPage
-from starlit.models.abstract.polymorphic_prop import ProxiedDictMixin, DynamicProp
+from .polymorphic_prop import ProxiedDictMixin, DynamicProp
 from ._sqlaevent import SQLAEvent
 

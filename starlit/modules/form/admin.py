@@ -28,7 +28,7 @@ class FormAdmin(PageAdmin):
             ),),]
     column_extra_row_actions = list(PageAdmin.column_extra_row_actions)
     column_extra_row_actions.append(EndpointLinkRowAction(icon_class='fa fa-download', endpoint='.export_entries', title=lazy_gettext('Export Entries as CSV'), id_arg='pk'))
-    form_excluded_columns = ["children", "contenttype", "slug_path"]
+    form_excluded_columns = PageAdmin.form_excluded_columns + ["author", "created", "updated", "entries"]
     form_rules = list(PageAdmin.form_rules)
     form_rules.insert(6, 'fields')
     form_rules.insert(7, 'submit_text')

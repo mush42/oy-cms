@@ -68,7 +68,8 @@ class Starlit(Flask):
                 try:
                     import_module("%s.%s" %(package_name, feature))
                 except ImportError:
-                    warn(f"Skipping optional module: {package_name}.{feature}. Module does not exist.")
+                    if not self.testing:
+                        warn(f"Skipping optional module: {package_name}.{feature}. Module does not exist.")
                     continue
     
     def provided_settings(self):

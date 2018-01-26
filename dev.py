@@ -4,7 +4,8 @@ from tempfile import mkdtemp
 from starlit import create_app
 from starlit.boot.exts.security import user_datastore
 from starlit.boot.exts.sqla import db
-from starlit.modules.core.models import User, Role, Site
+from starlit.modules.core.models import User, Role
+from starlit.modules.editable_settings.models import SettingsProfile
 from starlit.modules.page.models import Page
 
 TEMP_DIR = mkdtemp()  
@@ -15,8 +16,8 @@ if not os.path.exists(UPLOADS_PATH):
     os.mkdir(UPLOADS_PATH)
 
 def create_defaults():
-    site = Site(name=u'Starlit Test')
-    db.session.add(site)
+    sp = SettingsProfile(name=u'Starlit Test', is_active=True)
+    db.session.add(sp)
     su_role = Role(name='admin')
     db.session.add(su_role)
     su = user_datastore.create_user(

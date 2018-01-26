@@ -4,7 +4,7 @@ class SQLAEvent(object):
     """Contains methods to be called during
         diffrent session lifecycle events
     """
-    
+
     def before_flush(self, session, is_modified):
         """Called before the session is flushed"""
         raise NotImplementedError

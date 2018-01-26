@@ -26,7 +26,7 @@ class Settings(ProxiedDictMixin, db.Model, SQLAEvent):
     id =  db.Column(db.Integer, primary_key=True)
     options = db.relationship("Setting", collection_class=attribute_mapped_collection('key'))
     _proxied = association_proxy("options", "value")
-    site_id = db.Column(db.Integer, db.ForeignKey('site.id'), nullable=False)
+    profile_id = db.Column(db.Integer, db.ForeignKey('settings_profile.id'), nullable=False)
 
     def on_init(self):
         self.populate(current_app.provided_settings())

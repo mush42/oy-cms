@@ -2,6 +2,7 @@ from flask import current_app
 from werkzeug.local import LocalProxy
 from starlit.boot.exts.sqla import db
 from starlit.wrappers import StarlitModule
+from .models import SettingsProfile
 
 
 editable_settings = StarlitModule(__name__, 'editable_settings')
@@ -23,18 +24,17 @@ class Settings(object):
         db.session.commit()
 
 
-def get_active_site():
-    from starlit.modules.core.models import Site
-    active_site = Site.query.filter(Site.is_active==True).one()
-    return active_site
+def get_active_settings_profile():
+    active_settings_profile = SettingsProfile.query.filter(SettingsProfile.is_active==True).one()
+    return active_settings_profile
 
-current_site = LocalProxy(lambda: get_active_site())
-current_settings = LocalProxy(lambda: Settings(get_active_site().settings))
+current_settings_profile= LocalProxy(lambda: get_active_settings_profile())
+current_settings = LocalProxy(lambda: Settings(get_active_settings_profile().settings))
 
 
 @editable_settings.app_context_processor
-def inject_site():
+def inject_settings():
     return dict(
-        site=current_site,
+        settings_profile=current_settings_profile,
         settings=current_settings
     )

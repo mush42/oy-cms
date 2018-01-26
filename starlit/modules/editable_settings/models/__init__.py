@@ -1,28 +1,28 @@
-from starlit.models.abstract import  Slugged
-from starlit.modules.editable_settings.models import Settings
+from starlit.models.abstract import  SQLAEvent
 from starlit.boot.exts.sqla import db
+from .settings import Settings
 
-class Site(Slugged, db.Model):
-    __slugcolumn__ = 'name'
+
+class SettingsProfile(SQLAEvent, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(
         db.Unicode(255),
         unique=True,
         nullable=False,
         info=dict(
-            label='Site Name',
-            description='Unique name to identify this site.'
+            label='Profile Name:',
+            description='A Unique name for this settings profile.'
         )
     )
     is_active = db.Column(
         db.Boolean,
-        default=True,
+        default=False,
         info=dict(
-            label='Active By Default',
-            description='The default site for urls'
+            label='Active',
+            description='Sets or unsets this settings profile as the default profile'
         )
     )
-    settings = db.relationship('Settings', backref="site", uselist=False)
+    settings = db.relationship('Settings', backref="profile", uselist=False)
 
     def on_init(self):
         if self.settings is None:
@@ -38,4 +38,4 @@ class Site(Slugged, db.Model):
         return self.name
 
     def __repr__(self):
-        return "Site(name='{}')".format(self.name)
+        return "SettingsProfile(name='{}')".format(self.name)

@@ -1,13 +1,20 @@
 import pytest
 import starlit
+from flask import _request_ctx_stack
+from flask_principal import Identity, identity_changed
 from webtest import TestApp
 from flask_security import login_user
 from starlit.boot.exts.sqla import db as sqla_db
-from starlit.modules.core.models import Site
+from starlit.boot.exts.admin import admin
+from starlit.modules.editable_settings.models import SettingsProfile
 from starlit.boot.exts.security import user_datastore
+
 
 @pytest.fixture(scope="function")
 def app():
+    # Flask-Admin bug, see: https://stackoverflow.com/a/31712050
+    admin._views = []
+
     app = starlit.create_app(config=dict(
         TESTING=True,
         DEBUG=True,
@@ -31,11 +38,15 @@ def db(app):
 
 @pytest.fixture
 def user(app, db):
-    site = Site(name=u'Starlit')
-    db.session.add(site)
-    usr = user_datastore.create_user(
+    sp = SettingsProfile(name=u'Starlit', is_active=True)
+    db.session.add(sp)
+    user = user_datastore.create_user(
         user_name=u'admin',
         email=u'admin@localhost',
         password=u'admin')
     db.session.commit()
-    app.before_request(lambda: login_user(usr))
+    def set_user():
+        _request_ctx_stack.top.user = user
+        identity_changed.send(app, identity=Identity(user.id))
+    app.before_request(set_user)
+    yield user

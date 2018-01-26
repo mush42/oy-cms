@@ -8,7 +8,7 @@ def test_page(client, db, user):
     db.session.commit()
     res = client.get('/my-page')
     assert res.status_code == 200
-    assert p.title in res.data
+    assert p.title in res.text
     p1 = Page(title=u'1', content=u'thanks')
     p2 = Page(title=u'2', content=u'thanks')
     p1.parent= p
@@ -17,4 +17,4 @@ def test_page(client, db, user):
     db.session.commit()
     res = client.get('/my-page/1/2')
     assert res.status_code == 200
-    assert p2.title in res.data
+    assert p2.title in res.text
