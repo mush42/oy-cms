@@ -41,11 +41,10 @@ def test_timestammped(db):
     db.session.commit()
     assert t.created
     assert t.updated
-    assert t.created == t.updated
     t.title = u'That'
     db.session.commit()
     assert t.updated
-    assert t.updated != t.created
+    assert t.updated > t.created
 
 def test_metadata(app, db):
     class Content(Titled):

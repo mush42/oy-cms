@@ -25,11 +25,6 @@ class UserRelated(SQLAEvent):
             )
 
     def before_flush(self, session, is_modified):
-        if self.user_id is None:
-            if not current_app.testing:
-                self.user_id = current_user.id
-            else:
-                self.user_id = 1
-        if is_modified:
-            if not current_app.testing:
-                self.user_id = current_user.id
+        if current_app.config['DEBUG'] and current_app.testing:
+            return
+        self.user_id = current_user.id
