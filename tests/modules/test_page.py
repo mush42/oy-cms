@@ -2,7 +2,8 @@ from starlit.modules.page.models import Page
 
 
 
-def test_page(client, db, user):
+def test_page(client, db, user_factory):
+    user = user_factory()
     p = Page(title=u'My Page', content=u'A great content', author_id=user.id)
     db.session.add(p)
     db.session.commit()

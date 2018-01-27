@@ -1,7 +1,8 @@
 import pytest
 from starlit.modules.page.models import Page
 
-def test_basic_page(db, user):
+def test_basic_page(db, user_factory):
+    user = user_factory()
     page = Page(title=u'A Page', content=u'a content', author_id=user.id)
     db.session.add(page)
     db.session.commit()
@@ -23,7 +24,8 @@ def test_basic_page(db, user):
     db.session.commit()
     assert not Page.query.published.all()
 
-def test_parent_child_relation(db, user):
+def test_parent_child_relation(db, user_factory):
+    user = user_factory()
     parent = Page(title=u'Parent', content=u'Parent content.', author_id=user.id)
     child = Page(title=u'child', content=u'Child content.', author_id=user.id)
     parent.children.append(child)
@@ -48,4 +50,16 @@ def test_parent_child_relation(db, user):
     db.session.commit()
     assert len(child.children)==0
     assert child3.slug_path == 'parent/mychild2/child3'
-    
+
+
+def test_editor_assigned_after_editing(db, user_factory):
+    original_author = user_factory(name="author")
+    p = Page(title="A Page", content="Page content.", author=original_author)
+    db.session.add(p)
+    db.session.commit()
+    assert p.author == original_author
+    editor = user_factory(name="Editor", email="edit@localhost")
+    p.title = "New Title"
+    p.last_edited_by = editor
+    db.session.commit()
+    assert p.last_edited_by == editor

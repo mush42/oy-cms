@@ -6,6 +6,7 @@ from webtest import TestApp
 from flask_security import login_user
 from starlit.boot.exts.sqla import db as sqla_db
 from starlit.boot.exts.admin import admin
+from starlit.modules.core.models import Role
 from starlit.modules.editable_settings.models import SettingsProfile
 from starlit.boot.exts.security import user_datastore
 
@@ -32,21 +33,29 @@ def client(app):
 def db(app):
     with app.app_context():
         sqla_db.create_all()
+        sp = SettingsProfile(name=u'Starlit', is_active=True)
+        sqla_db.session.add(sp)
+        sqla_db.session.commit()
         yield sqla_db
         sqla_db.drop_all()
 
 
 @pytest.fixture
-def user(app, db):
-    sp = SettingsProfile(name=u'Starlit', is_active=True)
-    db.session.add(sp)
-    user = user_datastore.create_user(
-        user_name=u'admin',
-        email=u'admin@localhost',
-        password=u'admin')
-    db.session.commit()
-    def set_user():
-        _request_ctx_stack.top.user = user
-        identity_changed.send(app, identity=Identity(user.id))
-    app.before_request(set_user)
-    yield user
+def user_factory(app, db):
+    def wrapped_user_factory(name="test_user", email='test@localhost', roles=None):
+        if not roles:
+            roles = ["admin"]        
+        user = user_datastore.create_user(
+            user_name=name,
+            email=email,
+            password=u'admin',
+        )
+        for role in roles:
+            user.roles.append(user_datastore.find_or_create_role(name=role))
+        db.session.commit()
+        def set_user():
+            _request_ctx_stack.top.user = user
+            identity_changed.send(app, identity=Identity(user.id))
+        app.before_request(set_user)
+        return user
+    yield wrapped_user_factory
