@@ -29,13 +29,13 @@ class AdminPlugin(StarlitPlugin):
         name="starlit_admin",
         import_name="starlit_admin",
         static_folder="static",
-        static_url_path="/starlit-admin",
         template_folder="templates",
     )
 
     def init_app(self, app, *args, **kwargs):
         admin = self.setup_flaskadmin(app)
         app.admin = admin
+        self.static_url_path = "/{}".format(self.name.replace("_", "-"))
         app.context_processor(security_ctp_with_aadmin(admin))
         app.context_processor(lambda: {"admin_plugin_static": self.admin_plugin_static})
         for func in self.setupmethods:
@@ -62,4 +62,4 @@ class AdminPlugin(StarlitPlugin):
         return admin
 
     def admin_plugin_static(self, filename):
-        return url_for("starlit_admin.static", filename="starlit-admin/{}".format(filename))
+        return url_for("{}.static".format(self.name), filename="starlit-admin/{}".format(filename))

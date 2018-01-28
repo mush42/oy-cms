@@ -1,4 +1,3 @@
-from flask_admin.form import SecureForm
 from starlit.boot.exts.sqla import db
 from starlit.babel import gettext, lazy_gettext
 from starlit.modules.editable_settings.models import SettingsProfile
@@ -18,7 +17,6 @@ class SettingsProfileAdmin(StarlitModelView):
     edit_modal = True
     details_modal = True
     # Enable CSRF protection.
-    form_base_class = SecureForm
     form_excluded_columns = ['settings']
     # How many entries to display per page?
     page_size = 5
