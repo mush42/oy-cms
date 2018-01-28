@@ -13,7 +13,7 @@ from datetime import date
 from starlit.boot.exts.sqla import db
 from starlit.models.abstract import Displayable
 from starlit.babel import gettext, lazy_gettext
-from starlit.boot.exts.admin import admin, StarlitModelView
+from starlit_admin.core import StarlitModelView
 from starlit.util.helpers import date_column_formatter
 
 

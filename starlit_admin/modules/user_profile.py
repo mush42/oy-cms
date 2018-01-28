@@ -11,13 +11,13 @@ from jinja2 import Markup
 
 from starlit.boot.exts.sqla import db
 from starlit.boot.exts.security import user_datastore
-from starlit.boot.exts.admin import StarlitModelView, admin
+from starlit_admin.plugin import AdminPlugin
+from starlit_admin.core import StarlitModelView
 from starlit.babel import gettext, lazy_gettext
 from starlit.modules.core.models.user import User, Role
 from starlit.util.wtf import FileSelectorField
 from starlit.util.dynamicform import DynamicForm
-from .models import Profile
-from . import user_profile
+from starlit.modules.user_profile.models import Profile
 
 
 class BaseUserAdmin(StarlitModelView):
@@ -25,7 +25,7 @@ class BaseUserAdmin(StarlitModelView):
         return current_user.has_role('admin')
 
 class UserAdmin(BaseUserAdmin):
-    list_template = 'starlit/admin/user/list.html'
+    list_template = 'starlit_admin/user/list.html'
     can_create = False
     column_exclude_list = ['password', 'slug', 'profile']
     form_excluded_columns = ['password', 'posts', 'profile', 'confirmed_at', 'slug']
@@ -91,8 +91,8 @@ class RoleAdmin(BaseUserAdmin):
     column_exclude_list = ['user']
 
 
-@user_profile.after_setup
-def register_admin_pages(app):
+@AdminPlugin.setupmethod
+def register_admin_pages(app, admin):
     with app.app_context():
         admin.add_view(UserAdmin(User, db.session, name=lazy_gettext('User Accounts'), category=lazy_gettext('Users'), menu_icon_type='fa', menu_icon_value='fa-shield'))
         admin.add_view(ProfileAdmin(Profile, db.session, name=lazy_gettext('Profiles'), category=lazy_gettext('Users'), menu_icon_type='fa', menu_icon_value='fa-user'))

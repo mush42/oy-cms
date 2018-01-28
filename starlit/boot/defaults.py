@@ -5,11 +5,6 @@ SECRET_KEY = 'my-secret-key'
 EXCLUDED_MODULES = []
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-
-ENABLED_FEATURES = ('api', 'admin',)
-FEATURE_DISABLE = {}
-
-
 SECURITY_PASSWORD_HASH = 'pbkdf2_sha512'
 LOGIN_USER_TEMPLATE = 'starlit/security/login.html'
 SECURITY_USER_IDENTITY_ATTRIBUTES = ['email', 'user_name']

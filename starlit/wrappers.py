@@ -46,6 +46,7 @@ class Starlit(Flask):
     def __init__(self, *args, **kwargs):
         super(Starlit, self).__init__(*args, **kwargs)
         self.blueprint_packages = []
+        self.plugins = {}
 
     def find_blueprints(self, basemodule):
         for module in import_modules(basemodule):
@@ -58,20 +59,6 @@ class Starlit(Flask):
             for bp in starlit_modules:
                 yield bp
 
-    def setup_features(self):
-        enabled = self.config['ENABLED_FEATURES']
-        disable_opts = self.config['FEATURE_DISABLE']
-        for package_name in self.blueprint_packages:
-            for feature in enabled:
-                if package_name in disable_opts and feature_name in disable_opts['package_name']:
-                    continue
-                try:
-                    import_module("%s.%s" %(package_name, feature))
-                except ImportError:
-                    if not self.testing:
-                        warn(f"Skipping optional module: {package_name}.{feature}. Module does not exist.")
-                    continue
-    
     def provided_settings(self):
         opts = []
         for bp in self.blueprints.values():
@@ -84,3 +71,9 @@ class Starlit(Flask):
                 opts.extend(provided)
         return opts
 
+    def use(self, plugin, *args, **kwargs):
+        plugin = plugin()
+        self.plugins[plugin.identifier] = plugin
+        plugin.init_app(self, *args, **kwargs)
+        if plugin.needs_blueprint_registration:
+            self.register_blueprint(plugin)

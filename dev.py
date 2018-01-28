@@ -1,5 +1,5 @@
 import os 
-from flask_security import login_user
+from flask import _request_ctx_stack
 from tempfile import mkdtemp
 from starlit import create_app
 from starlit.boot.exts.security import user_datastore
@@ -7,6 +7,8 @@ from starlit.boot.exts.sqla import db
 from starlit.modules.core.models import User, Role
 from starlit.modules.editable_settings.models import SettingsProfile
 from starlit.modules.page.models import Page
+from starlit_admin.plugin import AdminPlugin
+
 
 TEMP_DIR = mkdtemp()  
 DB_FILE = os.path.join(TEMP_DIR, 'data.db')
@@ -36,11 +38,12 @@ config = dict(
 )
 
 app = create_app(config=config)
+app.use(AdminPlugin)
 
 
 @app.before_first_request
-def do_this():
-    login_user(User.query.one())
+def add_some_pages():
+    _request_ctx_stack.top.user = User.query.one()
     db.session.add(Page(title='My Page', content='hey'))
     db.session.add(Page(title='Home', content='Home', slug='index'))
     db.session.commit()

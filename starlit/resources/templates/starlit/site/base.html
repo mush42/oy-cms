@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 {% import 'starlit/site/macros.html' as macros with context %}
-{% import 'starlit/admin/macros.html' as admin with context %}
 <html lang="{% block html_lang %}{{lang}}{% endblock %}">
 {% block html_head %}
 <head>
@@ -103,10 +102,6 @@
     <script src="{{ url_for('static', filename='starlit/site/vendor/bootstrap/js/bootstrap.min.js') }}"></script>
     {% endblock core_js %}
     {% block extra_js %}{% endblock extra_js %}
-    {% if should_enable_inline_editing %}
-      {{ admin.load_editable() }}
-      {{ macros.ajax_csrf_enabler() }}
-    {% endif %}
 </body>
 {% endblock html_body %}
 </html>

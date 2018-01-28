@@ -2,7 +2,9 @@ from flask_admin.form import SecureForm
 from starlit.boot.exts.sqla import db
 from starlit.babel import gettext, lazy_gettext
 from starlit.modules.editable_settings.models import SettingsProfile
-from starlit.boot.exts.admin import admin, StarlitModelView
+from starlit_admin.plugin import AdminPlugin
+from starlit_admin.core import StarlitModelView
+
 
 def active_formatter(view, context, model, name):
     if getattr(model, name):
@@ -25,4 +27,7 @@ class SettingsProfileAdmin(StarlitModelView):
     column_default_sort = ("is_active", True)
     column_editable_list = ["name"]
 
-admin.add_view(SiteAdmin(SettingsProfileAdmin, db.session, name=lazy_gettext('Settings Profiles'), menu_icon_type='fa', menu_icon_value='fa-flag'))
+
+@AdminPlugin.setupmethod
+def reg_settings_profile(app, admin):
+    admin.add_view(SettingsProfileAdmin(SettingsProfile, db.session, name=lazy_gettext('Settings Profiles'), menu_icon_type='fa', menu_icon_value='fa-flag'))

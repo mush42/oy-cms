@@ -12,13 +12,13 @@ from wtforms.fields import IntegerField, SelectField
 from wtforms.widgets import HiddenInput
 
 from starlit.boot.exts.sqla import db
-from starlit.boot.exts.admin import admin, AuthenticationViewMixin
-
-from starlit.modules.page.admin import PageAdmin
+from starlit_admin.plugin import AdminPlugin
+from starlit_admin.core import AuthenticationViewMixin
+from starlit_admin.modules.page import PageAdmin
 from starlit.babel import lazy_gettext
 from starlit.util.wtf import RichTextAreaField
 from starlit.util.helpers import date_stamp
-from .models import Form, Field
+from starlit.modules.form.models import Form, Field
 
 
 class FormAdmin(PageAdmin):
@@ -68,4 +68,7 @@ class FormAdmin(PageAdmin):
             mimetype='text/csv'
         )
 
-admin.add_view(FormAdmin(Form, db.session, name=lazy_gettext('Form'), category=lazy_gettext('Pages')))
+
+@AdminPlugin.setupmethod
+def reg_form_admin(app, admin):
+    admin.add_view(FormAdmin(Form, db.session, name=lazy_gettext('Form'), category=lazy_gettext('Pages')))

@@ -5,9 +5,10 @@ from flask_wtf import Form
 
 from starlit.boot.exts.sqla import db
 from starlit.util.dynamicform import DynamicForm
-from starlit.boot.exts.admin import admin, AuthenticationViewMixin
+from starlit_admin.core import AuthenticationViewMixin
+from starlit_admin.plugin import AdminPlugin
 from starlit.babel import gettext, lazy_gettext
-from . import editable_settings, current_settings
+from starlit.modules.editable_settings import current_settings
 
 
 def make_settings_form_for_category(category):
@@ -27,8 +28,8 @@ def update_settings_from_form(data):
         current_settings.edit(k, v)
 
 
-@editable_settings.after_setup
-def add_settings_categories(app):
+@AdminPlugin.setupmethod
+def add_settings_categories(app, admin):
     categories = []
     for i in app.provided_settings():
         categories.append(i.category)
@@ -42,7 +43,7 @@ def add_settings_categories(app):
                     update_settings_from_form(form.data)
                     flash("Settings were successfully saved")
                     return redirect(request.url)
-                return self.render('starlit/admin/settings.html', form=form)
+                return self.render('starlit_admin/settings.html', form=form)
         category_details = app.config["DEFAULT_SETTINGS_CATEGORIES"][category]
         admin.add_view(SettingsAdmin(
             name=category_details["label"],

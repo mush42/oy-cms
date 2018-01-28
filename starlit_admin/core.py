@@ -53,16 +53,6 @@ class StarlitIndexView(AuthenticationViewMixin, AdminIndexView):
         return super(StarlitIndexView, self).index()
 
 
-index_view = StarlitIndexView(
-    menu_icon_type='fa', menu_icon_value='fa-home',
-    template='starlit/admin/index.html')
 
-
-admin = Admin(
-    name=lazy_gettext('Dashboard'),
-    template_mode='bootstrap3', base_template='starlit/admin/layout.html',
-    index_view=index_view,
-    category_icon_classes={'Settings': 'fa fa-cog', 'Pages':'fa fa-file-text-o', 'Users': 'fa fa-users', 'Blog': 'fa fa-link'}
-)
 
 

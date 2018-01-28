@@ -5,7 +5,6 @@ from flask_principal import Identity, identity_changed
 from webtest import TestApp
 from flask_security import login_user
 from starlit.boot.exts.sqla import db as sqla_db
-from starlit.boot.exts.admin import admin
 from starlit.modules.core.models import Role
 from starlit.modules.editable_settings.models import SettingsProfile
 from starlit.boot.exts.security import user_datastore
@@ -13,9 +12,6 @@ from starlit.boot.exts.security import user_datastore
 
 @pytest.fixture(scope="function")
 def app():
-    # Flask-Admin bug, see: https://stackoverflow.com/a/31712050
-    admin._views = []
-
     app = starlit.create_app(config=dict(
         TESTING=True,
         DEBUG=True,
@@ -53,9 +49,10 @@ def user_factory(app, db):
         for role in roles:
             user.roles.append(user_datastore.find_or_create_role(name=role))
         db.session.commit()
+        app.test_user = user
         def set_user():
             _request_ctx_stack.top.user = user
             identity_changed.send(app, identity=Identity(user.id))
         app.before_request(set_user)
         return user
-    yield wrapped_user_factory
+    return wrapped_user_factory

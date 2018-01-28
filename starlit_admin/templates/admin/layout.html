@@ -1,27 +1,27 @@
 {% extends 'admin/base.html' %}
 {% import 'admin/layout.html' as layout with context -%}
-{% import 'starlit/admin/macros.html' as macros with context %}
+{% import 'starlit_admin/macros.html' as macros with context %}
   {% block head_css %}
       <!-- core css -->
-      <link href="{{ url_for('static', filename='starlit/admin/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+      <link href="{{ url_for('static', filename='starlit_admin/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ admin_static.url(filename='admin/css/bootstrap3/admin.css', v='1.1.1') }}" rel="stylesheet">
   {% endblock %}
 {% block head_tail %}
     {{super()}}
     <!-- MetisMenu CSS -->
-    <link href="{{ url_for('static', filename='starlit/admin//vendor/metisMenu/metisMenu.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='starlit_admin//vendor/metisMenu/metisMenu.min.css') }}" rel="stylesheet">
 
     <!-- Custom CSS -->
-    <link href="{{ url_for('static', filename='starlit/admin/vendor/animate.css') }}" rel="stylesheet">
-    <link href="{{ url_for('static', filename='starlit/admin/css/sb-admin.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='starlit_admin/vendor/animate.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='starlit_admin/css/sb-admin.css') }}" rel="stylesheet">
 
     {% if rtl %}
-    <link href="{{ url_for('static', filename='starlit/admin/vendor/bootstrap-rtl/bootstrap-rtl.min.css') }}" rel="stylesheet">
-    <link href="{{ url_for('static', filename='starlit/admin/css/sb-admin-rtl.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='starlit_admin/vendor/bootstrap-rtl/bootstrap-rtl.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='starlit_admin/css/sb-admin-rtl.css') }}" rel="stylesheet">
     {% endif %}
 
     <script src="{{ admin_static.url(filename='vendor/jquery.min.js', v='2.1.4') }}" type="text/javascript"></script>
-    <script src="{{ url_for('static', filename='starlit/admin/vendor/bootstrap/js/bootstrap.min.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('static', filename='starlit_admin/vendor/bootstrap/js/bootstrap.min.js') }}" type="text/javascript"></script>
     <script src="{{ admin_static.url(filename='vendor/moment.min.js', v='2.9.0') }}" type="text/javascript"></script>
     <script src="{{ admin_static.url(filename='vendor/select2/select2.min.js', v='3.5.2') }}" type="text/javascript"></script>
   {% endblock %}
@@ -198,14 +198,14 @@
   {{ super() }}
   {{macros.tinymce_scripts()}}
   <!-- lity light box -->
-  <link href="{{ url_for('static', filename='starlit/admin/vendor/lity/lity.min.css') }}" rel="stylesheet">
-  <script src="{{ url_for('static', filename='starlit/admin/vendor/lity/lity.min.js') }}"></script>
+  <link href="{{ url_for('static', filename='starlit_admin/vendor/lity/lity.min.css') }}" rel="stylesheet">
+  <script src="{{ url_for('static', filename='starlit_admin/vendor/lity/lity.min.js') }}"></script>
   <!-- extra scripts -->
-  <script src="{{ url_for('static', filename='starlit/admin/js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='starlit_admin/js/main.js') }}"></script>
   {% if request.endpoint.startswith('media.') %}
-  <script src="{{ url_for('static', filename='starlit/admin/js/image-select.js') }}"></script>
+  <script src="{{ url_for('static', filename='starlit_admin/js/image-select.js') }}"></script>
   {% else %}
   <!-- core image browser -->
-  <script src="{{ url_for('static', filename='starlit/admin/js/image-browser.js') }}"></script>
+  <script src="{{ url_for('static', filename='starlit/_dmin/js/image-browser.js') }}"></script>
   {% endif %}
 {% endblock %}

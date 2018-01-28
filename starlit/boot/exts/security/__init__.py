@@ -1,9 +1,7 @@
 from werkzeug.local import LocalProxy
 from flask import current_app, request, url_for, session
 from flask_security import Security, SQLAlchemyUserDatastore
-from flask_admin import helpers as admin_helpers
 from starlit.boot.exts.sqla import db
-from starlit.boot.exts.admin import admin
 from starlit.modules.core.models import User, Role
 from starlit.babel import gettext, lazy_gettext
 from .forms.login import StarlitLoginForm

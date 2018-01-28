@@ -1,6 +1,6 @@
 from starlit.boot.context_processors import register_context_processors
 from starlit.boot.templating import register_template_filters
-from starlit.boot.exts import initialize_core_exts
+from starlit.boot.exts.extension_registry import initialize_core_exts
 from starlit.boot.exts.jinja import  EditableExtension
 from starlit import models
 from starlit.wrappers import Starlit
@@ -21,7 +21,6 @@ def create_app(app_class=Starlit, config=None, *args, **kwargs):
     for blueprint in app.find_blueprints('starlit.modules'):
         app.register_blueprint(blueprint)
         app.modules.append(blueprint)
-    app.setup_features()
     for m in app.modules:
         for f in m.finalize_funcs:
             f(app)
