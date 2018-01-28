@@ -79,3 +79,4 @@ class Starlit(Flask):
         plugin.init_app(self, *args, **kwargs)
         if plugin.needs_blueprint_registration:
             self.register_blueprint(plugin)
+        return plugin
