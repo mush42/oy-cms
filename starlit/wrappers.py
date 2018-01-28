@@ -17,9 +17,11 @@ class StarlitConfig(Config):
 
 class StarlitModule(Blueprint):
 
-    def __init__(self, *args, **kwargs):
-        args = list(args)
-        super(StarlitModule, self).__init__("starlit-%s" %args.pop(0), *args, **kwargs)
+    def __init__(self, name, import_name, builtin=True, *args, **kwargs):
+        self.name = name
+        if builtin:
+            self.name = "starlit-{}" .format(self.name)
+        super(StarlitModule, self).__init__(self.name, import_name, *args, **kwargs)
         self.settings_providers = []
         self.finalize_funcs = []
 

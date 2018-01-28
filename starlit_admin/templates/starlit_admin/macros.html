@@ -9,8 +9,8 @@
         var __lang_dir = "{{'rtl' if rtl else 'ltr'}}";
         var __images_base_url = "#";
   </script>
-  <script src="{{ url_for('static', filename='starlit_admin/vendor/tinymce/tinymce.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='starlit_admin/js/tinymce-setup.js') }}"></script>
+  <script src="{{ url_for('starlit_admin.static', filename='starlit_admin/vendor/tinymce/tinymce.min.js') }}"></script>
+  <script src="{{ url_for('starlit_admin.static', filename='starlit_admin/js/tinymce-setup.js') }}"></script>
 {% endmacro %}
 
 {% macro render_field(field) %}
@@ -61,17 +61,17 @@ beforeSend: function(xhr, settings) {
 {% endmacro %}
 
 {% macro load_inline_edit_preqs() %}
-<link href="{{ url_for('static', filename='starlit_admin/css/editable.css') }}" rel="stylesheet"/>
-<link href="{{ url_for('static', filename='starlit_admin/vendor/bootstrap-daterangepicker/daterangepicker-bs3.css') }}" rel="stylesheet"/>
-<link href="{{ url_for('static', filename='starlit_admin/vendor/animate.css') }}" rel="stylesheet" type="text/css">
-<script src="{{ url_for('static', filename='starlit_admin/vendor/jeditable/jquery.jeditable.js') }}"></script>
-<script src="{{ url_for('static', filename='starlit_admin/vendor/moment.min.js') }}"></script>
-<script src="{{ url_for('static', filename='starlit_admin/vendor/bootstrap-daterangepicker/daterangepicker.js') }}"></script>
-<script src="{{ url_for('static', filename='starlit_admin/vendor/bootstrap-switch/bootstrap-switch.min.js') }}"></script>
+<link href="{{ url_for('starlit_admin.static', filename='starlit_admin/css/editable.css') }}" rel="stylesheet"/>
+<link href="{{ url_for('starlit_admin.static', filename='starlit_admin/vendor/bootstrap-daterangepicker/daterangepicker-bs3.css') }}" rel="stylesheet"/>
+<link href="{{ url_for('starlit_admin.static', filename='starlit_admin/vendor/animate.css') }}" rel="stylesheet" type="text/css">
+<script src="{{ url_for('starlit_admin.static', filename='starlit_admin/vendor/jeditable/jquery.jeditable.js') }}"></script>
+<script src="{{ url_for('starlit_admin.static', filename='starlit_admin/vendor/moment.min.js') }}"></script>
+<script src="{{ url_for('starlit_admin.static', filename='starlit_admin/vendor/bootstrap-daterangepicker/daterangepicker.js') }}"></script>
+<script src="{{ url_for('starlit_admin.static', filename='starlit_admin/vendor/bootstrap-switch/bootstrap-switch.min.js') }}"></script>
 {{tinymce_scripts()}}
-<script src="{{ url_for('static', filename='starlit_admin/vendor/bootstrap-notify/bootstrap-notify.min.js') }}" type="text/javascript"></script>
-<script src="{{ url_for('static', filename='starlit_admin/js/jeditable-inputs.js') }}"></script>
-<script src="{{ url_for('static', filename='starlit_admin/js/editable.js') }}"></script>
+<script src="{{ url_for('starlit_admin.static', filename='starlit_admin/vendor/bootstrap-notify/bootstrap-notify.min.js') }}" type="text/javascript"></script>
+<script src="{{ url_for('starlit_admin.static', filename='starlit_admin/js/jeditable-inputs.js') }}"></script>
+<script src="{{ url_for('starlit_admin.static', filename='starlit_admin/js/editable.js') }}"></script>
 {{ ajax_csrf_enabler() }}
 {% endmacro %}
 
