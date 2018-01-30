@@ -5,5 +5,5 @@ class StarlitException(Exception):
         self.help_message = help_message
 
 
-class FeatureIsDisabled(StarlitException):
+class StarlitConfigurationError(StarlitException):
     """Raised when trying to initialize a disabled feature"""

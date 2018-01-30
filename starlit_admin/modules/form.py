@@ -11,6 +11,7 @@ from wtforms_alchemy import ModelForm
 from wtforms.fields import IntegerField, SelectField
 from wtforms.widgets import HiddenInput
 
+from starlit.exceptions import StarlitConfigurationError
 from starlit.boot.exts.sqla import db
 from starlit_admin.plugin import AdminPlugin
 from starlit_admin.core import AuthenticationViewMixin
@@ -71,4 +72,10 @@ class FormAdmin(PageAdmin):
 
 @AdminPlugin.setupmethod
 def reg_form_admin(app, admin):
+    uploads_path = app.config.get('UPLOADS_PATH')
+    if not app.config.get('FORM_UPLOADS_PATH')
+        if uploads_path:
+            app.config['FORM_UPLOADS_PATH'] = os.path.join(uploads_path, "forms")
+        else:
+            raise StarlitConfigurationError(help_message="Neither the `FORM_UPLOADS_PATH` is defined, nor the `UPLOADS_PATH` is defined. Please add one of these to your application config, for the file admin to start.")
     admin.add_view(FormAdmin(Form, db.session, name=lazy_gettext('Form'), category=lazy_gettext('Pages')))
