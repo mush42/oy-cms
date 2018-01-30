@@ -25,3 +25,7 @@ SUPPORTED_LOCALES = OrderedDict((
     ('ar', 'Arabic')
 ))
 DEFAULT_LOCALE = 'en'
+
+# Images
+IMAGES_URL = '/images'
+IMAGES_PATH = 'static'
