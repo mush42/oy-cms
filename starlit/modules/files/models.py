@@ -6,18 +6,34 @@ from starlit.boot.exts.sqla import db
 from starlit.babel import gettext, lazy_gettext
 
 
-class ImageMixin(object):
+class FileMixin(object):
+    """
+    Where to upload this file cateogry
+    """
+    upload_to = ""
+
     @declared_attr
-    def image_path(cls):
+    def name(cls):
+        return db.Column(db.UnicodeText,
+            info=dict(name=lazy_gettext("Upload name"), label="")
+        )
+
+    @declared_attr
+    def path(cls):
         return db.Column(db.UnicodeText)
     
     @declared_attr
-    def image_description(cls):
+    def description(cls):
         return db.Column(db.UnicodeText,
-            info=dict(label=lazy_gettext('Image Description'), description=lazy_gettext('If supplying an image please provide a description for the purposes  of ACCESSIBILITY and SEO'))
+            info=dict(
+                label=lazy_gettext('File description'),
+                description=""
+            )
         )
 
     @property
-    def image(self):
-        info = namedtuple('info', 'src description')
-        return info(url_for('canella-files.files', filename=self.image_path), self.image_description)
+    def path(self):
+        path = self.path
+        if self.upload_to:
+            return url_for("starlit-files.serve_file", filename=self.path, path=self.upload_to)
+        return url_for("starlit-files.serve_file", filename=path)

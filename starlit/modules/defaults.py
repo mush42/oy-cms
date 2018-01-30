@@ -9,11 +9,11 @@ DEFAULT_SETTINGS_CATEGORIES = dict(
 HOME_SLUG = u'index'
 
 # Forms
-FORM_UPLOADS_PATH = "uploads"
+FORM_UPLOADS_PATH = ""
 
 # User Profile
 PROFILE_EXTRA_FIELDS = []
 
 # Files
-UPLOADS_PATH = ""
+FILE_UPLOADS_PATH = ""
 ALLOWED_EXTENSIONS = {'jpg', 'png', 'gif', 'svg', 'ico', 'mp3', 'mp4', 'webma', 'm4a', 'flv', 'doc', 'docx', 'pdf'}
