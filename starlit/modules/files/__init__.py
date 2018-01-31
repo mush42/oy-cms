@@ -3,7 +3,7 @@ from starlit.wrappers import StarlitModule
 from .models import *
 
 
-files = StarlitModule(__name__, 'files')
+files = StarlitModule(__name__, 'files', builtin=True)
 
 
 def serve_file(filename, path=None):

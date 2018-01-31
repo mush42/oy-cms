@@ -1,3 +1,3 @@
 from starlit.wrappers import StarlitModule
 
-core = StarlitModule(__name__, 'core')
+core = StarlitModule(__name__, 'core', builtin=True)

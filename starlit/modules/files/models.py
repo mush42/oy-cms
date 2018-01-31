@@ -8,7 +8,7 @@ from starlit.babel import gettext, lazy_gettext
 
 class FileMixin(object):
     """
-    Where to upload this file cateogry
+    Where to upload this file category
     """
     upload_to = ""
 
@@ -32,7 +32,7 @@ class FileMixin(object):
         )
 
     @property
-    def path(self):
+    def url(self):
         path = self.path
         if self.upload_to:
             return url_for("starlit-files.serve_file", filename=self.path, path=self.upload_to)

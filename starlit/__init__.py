@@ -13,17 +13,12 @@ def create_app(app_class=Starlit, config=None, *args, **kwargs):
     )
     [kwargs.setdefault(k, v) for k,v in default_kwargs.items()]
     app = app_class('starlit', *args, **kwargs)
-    app.config.from_package_defaults('starlit')
+    app.config.defaults_from_pkg_dir(__name__)
     app.config.from_envvar('STARLIT_CONFIG', True)
     app.config.from_mapping(config or dict())
     initialize_core_exts(app)
-    app.modules = []
-    for blueprint in app.find_blueprints('starlit.modules'):
-        app.register_blueprint(blueprint)
-        app.modules.append(blueprint)
-    for m in app.modules:
-        for f in m.finalize_funcs:
-            f(app)
+    for module in app.find_starlit_modules('starlit.modules'):
+        app.register_module(module)
     register_context_processors(app)
     register_template_filters(app)
     app.jinja_env.extensions['starlit.boot.exts.jinja.EditableExtension'] = EditableExtension(app.jinja_env)

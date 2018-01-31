@@ -2,9 +2,9 @@ from starlit.wrappers import StarlitModule
 
 class StarlitPlugin(StarlitModule):
     """The base class for all starlit plugins"""
+    needs_module_registration = False
 
     def __init__(self):
-        self.needs_blueprint_registration = getattr(self, 'needs_blueprint_registration', False) 
         self.blueprint_opts = getattr(self, 'blueprint_opts', None) or {}
         if not self.blueprint_opts:
             self.blueprint_opts['name'] = self.identifier

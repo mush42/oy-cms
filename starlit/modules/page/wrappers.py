@@ -8,9 +8,10 @@ def get_page(slug_path):
 
 
 class PageModule(StarlitModule):
-    _page_handlers = {}
+    _page_handlers = None
     def __init__(self, *args, **kwargs):
         super(PageModule, self).__init__(*args, **kwargs)
+        self._page_handlers = {}
         self.before_request(self.set_g_page)
 
     def add_handler(self, func, contenttype, methods):
