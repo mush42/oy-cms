@@ -1,3 +1,4 @@
+import os
 import csv
 from flask import Response, stream_with_context
 from flask_admin import expose
@@ -73,7 +74,7 @@ class FormAdmin(PageAdmin):
 @AdminPlugin.setupmethod
 def reg_form_admin(app, admin):
     uploads_path = app.config.get('UPLOADS_PATH')
-    if not app.config.get('FORM_UPLOADS_PATH')
+    if not app.config.get('FORM_UPLOADS_PATH', None):
         if uploads_path:
             app.config['FORM_UPLOADS_PATH'] = os.path.join(uploads_path, "forms")
         else:

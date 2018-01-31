@@ -1,3 +1,5 @@
+from starlit.exceptions import StarlitException
+from starlit.boot import defaults as boot_config
 from starlit.boot.context_processors import register_context_processors
 from starlit.boot.templating import register_template_filters
 from starlit.boot.exts.extension_registry import initialize_core_exts
@@ -6,14 +8,25 @@ from starlit import models
 from starlit.wrappers import Starlit
 
 
-def create_app(app_class=Starlit, config=None, *args, **kwargs):
-    default_kwargs = dict(
-        template_folder='resources/templates',
-        static_folder='resources/static'
-    )
-    [kwargs.setdefault(k, v) for k,v in default_kwargs.items()]
-    app = app_class('starlit', *args, **kwargs)
-    app.config.defaults_from_pkg_dir(__name__)
+def _prepare_app(app_class, app_instance, *args, **kwargs):
+    if not app_class or app_instance:
+        raise TypeError("You should pass either an application class or instance.")
+    if app_instance:
+        if args or kwargs:
+            raise StarlitException("You have supplied an already initialized app, hense you can not pass initialization arguments.")
+        return app_instance
+    else:
+        default_kwargs = dict(
+            template_folder='resources/templates',
+            static_folder='resources/static'
+        )
+        [kwargs.setdefault(k, v) for k,v in default_kwargs.items()]
+        return app_class('starlit', *args, **kwargs)
+
+
+def create_app(app_class=Starlit, app_instance=None, config=None, *args, **kwargs):
+    app = _prepare_app(app_class=app_class, app_instance=app_instance, *args, **kwargs)
+    app.config.from_object(boot_config)
     app.config.from_envvar('STARLIT_CONFIG', True)
     app.config.from_mapping(config or dict())
     initialize_core_exts(app)

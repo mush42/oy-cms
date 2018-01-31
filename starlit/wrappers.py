@@ -1,3 +1,4 @@
+import sys
 from importlib import import_module
 from warnings import warn
 from werkzeug import import_string
@@ -7,13 +8,13 @@ from starlit.util.helpers import find_modules, import_modules
 
 
 class StarlitConfig(Config):
-    def defaults_from_pkg_dir(self, package_name):
-        for modname in find_modules(package_name):
-            try:
-                imported = import_module("%s.defaults" %(modname))
-                self.from_object(imported)
-            except ImportError:
-                continue
+    def from_module_defaults(self, import_name):
+        pymod = sys.modules[import_name]
+        if not pymod.__file__.endswith("__init__.py"):
+            # A module, try to get the parent package
+            import_name = ".".join(import_name.rsplit(".")[:-1])
+        defaults_mod = import_string(import_name + ".defaults", silent=True)
+        self.from_object(defaults_mod)
 
 
 class StarlitModule(Blueprint):
@@ -31,13 +32,7 @@ class StarlitModule(Blueprint):
 
     def register(self, app, *args, **kwargs):
         super(StarlitModule, self).register(app, *args, **kwargs)
-        import_name = self.import_name
-        pymod = import_string(import_name)
-        if not pymod.__file__.endswith("__init__.py"):
-            # A module, try to get the parent package
-            import_name = ".".join(import_name.rsplit(".")[:-1])
-        defaults_mod = import_string(import_name + ".defaults", silent=True)
-        app.config.from_object(defaults_mod)
+        app.config.from_module_defaults(self.import_name)
         # Run the finalization functions
         for f in self.finalize_funcs:
             f(app)
@@ -67,22 +62,20 @@ class Starlit(Flask):
 
     def __init__(self, *args, **kwargs):
         super(Starlit, self).__init__(*args, **kwargs)
-        self.modules = self.blueprints
+        self.modules = {}
         self.plugins = {}
 
     def register_module(self, module, **options):
         super(Starlit, self).register_blueprint(blueprint=module, **options)
+        self.modules[module.name] = module
 
     def find_starlit_modules(self, pkg):
-        found_modules = set()
         for module in import_modules(pkg):
             modname = module.__name__
             if modname in self.config['EXCLUDED_MODULES']:
                 continue
-            starlit_modules = (v for k,v in module.__dict__.items() if isinstance(v, StarlitModule))
-            if starlit_modules:
-                found_modules.add(modname)
-            for mod in starlit_modules:
+            starlit_modules = (v for v in module.__dict__.values() if isinstance(v, StarlitModule))
+            for mod in set(starlit_modules):
                 yield mod
 
     def provided_settings(self):
