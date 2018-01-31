@@ -13,7 +13,7 @@ def _prepare_app(app_class, app_instance, *args, **kwargs):
         raise TypeError("You should pass either an application class or instance.")
     if app_instance:
         if args or kwargs:
-            raise StarlitException("You have supplied an already initialized app, hense you can not pass initialization arguments.")
+            raise TypeError("You have supplied an already initialized app, hense you can not pass initialization arguments.")
         return app_instance
     else:
         default_kwargs = dict(
