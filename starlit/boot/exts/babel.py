@@ -26,7 +26,7 @@ except ImportError:
         def ngettext(self, singular, plural, n):
             return singular if n == 1 else plural
 else:
-    from starlit.resources import translations
+    from starlit import translations
 
     class CustomDomain(Domain):
         def __init__(self):

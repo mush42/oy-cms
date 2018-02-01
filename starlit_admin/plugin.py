@@ -23,10 +23,9 @@ def security_ctp_with_aadmin(admin):
 class AdminPlugin(StarlitPlugin):
     """Provides integration with Flask-Admin"""
     setupmethods = set()
-    identifier = "starlit_admin"
-    needs_blueprint_registration = True
+    name="starlit_admin",
+    needs_module_registration = True
     blueprint_opts = dict(
-        name="starlit_admin",
         import_name="starlit_admin",
         static_folder="static",
         template_folder="templates",
@@ -35,9 +34,9 @@ class AdminPlugin(StarlitPlugin):
     def init_app(self, app, *args, **kwargs):
         admin = self.setup_flaskadmin(app)
         app.admin = admin
-        self.static_url_path = "/{}".format(self.name.replace("_", "-"))
         app.context_processor(security_ctp_with_aadmin(admin))
         app.context_processor(lambda: {"admin_plugin_static": self.admin_plugin_static})
+        app.config['SECURITY_POST_LOGIN_VIEW'] = '/admin'
         for func in self.setupmethods:
             func(app, admin)
 

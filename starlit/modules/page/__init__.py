@@ -9,7 +9,12 @@ from .wrappers import PageModule, get_page
 from .models import Page
 
 
-page = PageModule(__name__, 'page', builtin=True)
+page = PageModule('page',
+    __name__,
+    static_folder="static",
+    template_folder="templates",
+    builtin=True
+  )
 
 @page.record
 def add_slug_url_convertor(state):

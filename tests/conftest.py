@@ -12,7 +12,7 @@ from starlit.boot.exts.security import user_datastore
 
 @pytest.fixture(scope="function")
 def app():
-    app = starlit.create_app(config=dict(
+    app = starlit.create_app(__name__, config=dict(
         TESTING=True,
         DEBUG=True,
         SQLALCHEMY_DATABASE_URI='sqlite:///:memory:',

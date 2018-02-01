@@ -1,0 +1,12 @@
+{% extends 'starlit/site/base.html' %}
+{% import 'starlit/site/macros.html' as macros %}
+
+{% block meta_desc %}{{page.meta_description}}{% endblock %}
+{% block meta_author %}{{page.author.profile.name}}{% endblock %}
+{% block meta_keywords %}{{page.keywords}}{% endblock %}
+
+{% block title %}{{page.title}}{%endblock%}
+
+{% block content %}
+{% editable page.content %}{{page.content|safe}}{% endeditable %}
+{% endblock %}

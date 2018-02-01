@@ -1,5 +1,5 @@
 from flask import request, redirect, url_for, abort
-from flask_admin import Admin, expose
+from flask_admin import Admin, expose, BaseView
 from flask_admin.base import BaseView, AdminIndexView
 from flask_admin.form import SecureForm
 from flask_admin.contrib.sqla import ModelView, form
@@ -54,5 +54,6 @@ class StarlitIndexView(AuthenticationViewMixin, AdminIndexView):
 
 
 
-
-
+class StarlitBaseView(BaseView):
+    def create_blueprint(self, admin):
+        return super(StarlitBaseView, self).create_blueprint(admin)

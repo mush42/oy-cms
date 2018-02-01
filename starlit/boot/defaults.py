@@ -11,9 +11,7 @@ SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 # Flask security
 SECURITY_PASSWORD_HASH = 'pbkdf2_sha512'
-LOGIN_USER_TEMPLATE = 'starlit/security/login.html'
 SECURITY_USER_IDENTITY_ATTRIBUTES = ['email', 'user_name']
-SECURITY_POST_LOGIN_VIEW = '/admin'
 SECURITY_CONFIRMABLE = False
 SECURITY_RECOVERABLE = True
 SECURITY_RESET_URL = '/reset-password/'

@@ -1,9 +1,12 @@
 import sys
+import os
 from importlib import import_module
 from warnings import warn
 from werkzeug import import_string
+from jinja2 import ChoiceLoader, FileSystemLoader
 from flask import Flask, Blueprint
 from flask.config import Config
+from flask.helpers import locked_cached_property, get_root_path
 from starlit.util.helpers import find_modules, import_modules
 
 
@@ -24,9 +27,14 @@ class StarlitModule(Blueprint):
         self.import_name = import_name
         if kwargs.pop('builtin', False):
             self.name = "starlit-{}" .format(self.name)
-            if not import_name.startswith("starlit."):
-                self.import_name = "starlit.modules.{}".format(import_name)
-        super(StarlitModule, self).__init__(self.name, self.import_name, *args, **kwargs)
+        # flask wouldn't serve static files if this is not set 
+        if not getattr(self, 'static_url_path', None):
+            self.static_url_path="/static/" + self.name
+        super(StarlitModule, self).__init__(
+            self.name,
+            self.import_name,
+            static_url_path=self.static_url_path,
+            *args, **kwargs)
         self.settings_providers = []
         self.finalize_funcs = []
 
@@ -50,8 +58,6 @@ class StarlitModule(Blueprint):
             return func(*a, **kw)
         return wrapped
 
-
-
     def get_provided_settings(self):
         for provider in self.settings_providers:
             yield provider()
@@ -64,6 +70,19 @@ class Starlit(Flask):
         super(Starlit, self).__init__(*args, **kwargs)
         self.modules = {}
         self.plugins = {}
+
+    @locked_cached_property
+    def jinja_loader(self):
+        """Starlit modules should have higher priority"""
+        mod_templates = [
+            FileSystemLoader(self.template_folder),
+            super(Starlit, self).jinja_loader,
+        ]
+        for mod in self.modules.values():
+            if mod.template_folder:
+                templates_dir = os.path.join(get_root_path(mod.import_name), mod.template_folder)
+                mod_templates.append(FileSystemLoader(templates_dir))
+        return ChoiceLoader(mod_templates)
 
     def register_module(self, module, **options):
         super(Starlit, self).register_blueprint(blueprint=module, **options)
@@ -92,7 +111,7 @@ class Starlit(Flask):
 
     def use(self, plugin, *args, **kwargs):
         plugin = plugin()
-        self.plugins[plugin.identifier] = plugin
+        self.plugins[plugin.name] = plugin
         plugin.init_app(self, *args, **kwargs)
         if plugin.needs_module_registration:
             self.register_module(plugin)

@@ -32,12 +32,13 @@ def create_defaults():
 
 config = dict(
     DEBUG=True,
+    EXPLAIN_TEMPLATE_LOADING=True,
     SQLALCHEMY_DATABASE_URI="sqlite:///%s" %DB_FILE,
     SECURITY_PASSWORD_SALT = '540SDW4426HCAER56546aDrw213d2a6b9a94e15b5d',
     UPLOADS_PATH=UPLOADS_PATH,
 )
 
-app = create_app(config=config)
+app = create_app('dev', config=config)
 app.use(AdminPlugin)
 
 

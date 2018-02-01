@@ -5,7 +5,7 @@ from starlit.wrappers import StarlitModule
 from .models import SettingsProfile
 
 
-editable_settings = StarlitModule(__name__, 'editable_settings', builtin=True)
+editable_settings = StarlitModule('editable_settings', __name__, builtin=True)
 
 
 class Settings(object):
