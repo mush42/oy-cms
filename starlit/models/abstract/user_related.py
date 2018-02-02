@@ -39,8 +39,8 @@ class UserRelated(SQLAEvent):
         return db.Column(
             db.Integer,
             db.ForeignKey('user.id'),
-            onupdate=lambda: current_user.id,
             nullable=True,
+            #onupdate=lambda: current_user.id,
             info=dict(label=lazy_gettext('Author'))
             )
 

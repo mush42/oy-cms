@@ -45,7 +45,6 @@ class StarlitModule(Blueprint):
         for f in self.finalize_funcs:
             f(app)
 
-
     def settings_provider(self, func):
         self.settings_providers.append(func)
         def wrapped(*a, **kw):

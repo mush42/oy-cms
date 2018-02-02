@@ -7,6 +7,7 @@ from starlit.util.option import Option
 from starlit.babel import lazy_gettext
 from .wrappers import PageModule, get_page
 from .models import Page
+from .cli import install_fixtures_factory
 
 
 page = PageModule('page',
@@ -16,9 +17,14 @@ page = PageModule('page',
     builtin=True
   )
 
+
 @page.record
 def add_slug_url_convertor(state):
     state.app.url_map.converters['slug'] = PathToSlugConvertor
+
+@page.after_setup
+def add_cli_command(app):
+    app.cli.command(name='install-fixtures')(install_fixtures_factory(page.root_path))
 
 @page.before_app_first_request
 def warn_if_home_does_not_exist():

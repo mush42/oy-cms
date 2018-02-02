@@ -40,7 +40,7 @@ def db(app):
 def user_factory(app, db):
     def wrapped_user_factory(name="test_user", email='test@localhost', roles=None):
         if not roles:
-            roles = ["admin"]        
+            roles = ["admin"]
         user = user_datastore.create_user(
             user_name=name,
             email=email,
