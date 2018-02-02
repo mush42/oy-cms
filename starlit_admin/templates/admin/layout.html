@@ -26,11 +26,11 @@
         {% else -%}
         <li>
         {%- endif %}
-          {% with unique_html_id = unique_string() %}
-          <a href="javascript:;" data-toggle="collapse" data-target="#{{unique_html_id}}" aria-expanded='false'>
+          {% with unique_html_id = item.name|unique_string %}
+          <a href="javascript:;" role="button" aria-haspopup="true" data-toggle="collapse" data-target="#{{unique_html_id}}" aria-expanded="false" aria-controls="{{unique_html_id}}">
             {% if item.class_name %}<span class="{{ item.class_name }}"></span> {% endif %}{{ item.name }} <i class="fa fa-chevron-down menu-indicator"></i>
           </a>
-          <ul id="{{unique_html_id}}" class="collapse">
+          <ul id="{{unique_html_id}}" class="collapse list-unstyled">
           {% endwith %}
           {%- for child in children -%}
             {% set class_name = child.get_class_name() %}

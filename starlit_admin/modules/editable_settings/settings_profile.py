@@ -28,4 +28,11 @@ class SettingsProfileAdmin(StarlitModelView):
 
 @AdminPlugin.setupmethod
 def reg_settings_profile(app, admin):
-    admin.add_view(SettingsProfileAdmin(SettingsProfile, db.session, name=lazy_gettext('Settings Profiles'), menu_icon_type='fa', menu_icon_value='fa-flag'))
+    admin.add_view(SettingsProfileAdmin(
+        SettingsProfile,
+        db.session,
+        name=lazy_gettext('Settings Profiles'),
+        category=gettext("Settings"),
+        menu_icon_type='fa',
+        menu_icon_value='fa-flag'
+      ))
