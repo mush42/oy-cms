@@ -2,12 +2,12 @@ from collections import namedtuple
 from flask_wtf import FlaskForm
 from starlit.babel import lazy_gettext
 from wtforms.fields import (
-    StringField, SelectField,
+    StringField, SelectField, RadioField,
     BooleanField, TextAreaField, FileField
 )
 from wtforms.fields.html5 import (
     IntegerField, DateField, DateTimeField,
-    EmailField, TelField, URLField, 
+    EmailField, TelField, URLField,
 )
 from wtforms.validators import (
     data_required, email,
@@ -24,6 +24,7 @@ FIELD_MAP = dict(
     number=info(lazy_gettext('Number input'), IntegerField),
     select=info(lazy_gettext('Select Box'), SelectField),
     checkbox=info(lazy_gettext('Check Box'), BooleanField),
+    radio=info(lazy_gettext('Radio List'), RadioField),
     textarea=info(lazy_gettext('Multi-line text input'), TextAreaField),
     email=info(lazy_gettext('Email Input'), EmailField),
     date=info(lazy_gettext('Date input'), DateField),
@@ -99,7 +100,7 @@ class DynamicForm(object):
             kwargs['render_kw'] = {}
             if getattr(field, 'field_options', None) is not None:
                 kwargs['render_kw'].update(field.field_options.get('render_kw', {}))
-            if field.type == 'select':
+            if field.type == 'select' or field.type == 'radio':
                 kwargs['choices'] = self.parse_choices(field.choices)
             if getattr(field, 'required', False):
                 kwargs['validators'].append(data_required())

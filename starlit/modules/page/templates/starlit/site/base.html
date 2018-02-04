@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+<!doctype html>
 {% import 'starlit/site/macros.html' as macros with context %}
 <html lang="{% block html_lang %}{{lang}}{% endblock %}">
-{% block html_head %}
-<head>
-  {% block html_meta %}
+  {% block html_head %}
+  <head>
+    {% block html_meta %}
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,62 +14,42 @@
     {% endblock content_meta %}
     <meta name="csrf-token" content="{{ csrf_token() }}">
     {% block extra_meta %}{% endblock %}
-  {% endblock html_meta %}
-  {% block html_title %}
+    {% endblock html_meta %}
+    {% block html_title %}
     <title>{% block title %}{% endblock title %} - {{settings.title}}</title>
     {% endblock html_title %}
-    
+    <link rel="icon" href="../../../../favicon.ico">  
     {% block core_css %}
     <!-- Bootstrap Core CSS -->
     <link href="{{ url_for('starlit-page.static', filename='starlit/site/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
     <!-- Custom CSS -->
-    <link href="{{ url_for('starlit-page.static', filename='starlit/site/css/style.css') }}" rel="stylesheet">
-    {% if rtl %}
-    <link href="{{ url_for('starlit-page.static', filename='starlit/site/vendor/bootstrap-rtl/bootstrap-rtl.min.css') }}" rel="stylesheet" type="text/css">
-    {% endif %}
+    <link href="{{ url_for('starlit-page.static', filename='starlit/site/css/style.tempcss') }}" rel="stylesheet">
     {% endblock core_css %}
     {% block extra_css %}{% endblock extra_css %}
-
     {% block extra_head %}{% endblock extra_head %}
-    
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
-
-</head>
-{% endblock html_head %}
-
-{% block html_body %}
-<body {% if rtl %}dir="rtl"{%endif%}>
-{% block header %}
-  {% block navigation %}
-      <!-- Navigation -->
-    <nav class="navbar navbar-fixed-top navbar-inverse">
-        <div class="container-fluid">
-            <!-- Brand and toggle get grouped for better mobile display -->
-            <div class="navbar-header page-scroll">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="false">
-                    <span class="sr-only">{{_trans('Toggle navigation menu')}}}</span>
-                    <i class="fa fa-bars"></i>
-                </button>
-                <a class="navbar-brand" href="/">{{settings.title}}</a>
-            </div>
-
-            <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse" id="navbar-collapse">
-                <ul class="nav navbar-nav">
-                    <li>
-                        <a href="/"><i class="fa fa-home"></i> Home</a>
-                    </li>
-                    {{macros.page_menu(pages, g.page)}}
-                </ul>
-            </div>
-            <!-- /.navbar-collapse -->
-        </div>
-        <!-- /.container -->
+  </head>
+  {% endblock html_head %}
+  {% block html_body %}
+  <body id="{%block body_id %}{% endblock %}">
+    {% block header %}
+    {% block navigation %}
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+    <a class="navbar-brand" href="/">{{settings.title}}</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="{{_trans('Toggle navigation menu') }}">
+    <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+    <ul class="navbar-nav mr-auto">
+    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+    {{macros.page_menu(pages, g.page)}}
+    </ul>
+    </div>
     </nav>
     {% endblock navigation %}
     {% endblock header %}
@@ -78,30 +58,30 @@
     <aside class="container-fluid">
       <div class="row">
         <div class="col-md-8 col-md-offset-4">
-          {{macros.messages()}}
+        {{macros.messages()}}
         </div>
       </div>
     </aside>
-  {% endblock %}
+    {% endblock %}
   
-  <div class="container-fluid">
-    <main id="wrapper" class="wrapper">
+    <div class="container-fluid">
+      <main id="wrapper" class="wrapper">
       {% block content %}{% endblock %}
-    </main>
-  </div>
-  <hr>
+      </main>
+    </div>
+      <hr>
 
     {% block footer %}
-      {% include 'starlit/site/includes/footer.html' with context %}
+    {% include 'starlit/site/includes/footer.html' with context %}
     {% endblock footer %}
 
     {% block core_js %}
     <!-- jQuery -->
-    <script src="{{ url_for('static', filename='starlit/site/vendor/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('starlit-page.static', filename='starlit/site/vendor/jquery/jquery.min.js') }}"></script>
     <!-- Bootstrap Core JavaScript -->
-    <script src="{{ url_for('static', filename='starlit/site/vendor/bootstrap/js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('starlit-page.static', filename='starlit/site/vendor/bootstrap/js/bootstrap.min.js') }}"></script>
     {% endblock core_js %}
     {% block extra_js %}{% endblock extra_js %}
-</body>
+  </body>
 {% endblock html_body %}
 </html>

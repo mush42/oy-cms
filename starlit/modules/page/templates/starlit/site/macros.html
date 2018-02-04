@@ -1,19 +1,19 @@
-
 {% macro render_page(page, active_page) %}
 {% with active_class='active' if (page==active_page or active_page in page.children) or ''%}
+{% with page_html_id=page.slug|unique_string %}
 {% if page.children %}
-<li class="dropdown {{active_class}}">
-<a class="dropdown-toggle" href="#" data-toggle="dropdown" aria-expanded="false">{{page.title}} <i class="fa fa-caret-down"></i></a>
-<ul class="dropdown-menu">
-<li class="{{active_class}}"><a href="{{page.url}}">{{page.title}}</a></li>
+<li class="nav-item dropdown {{active_class}}">
+<a class="nav-link dropdown-toggle" href="{{page.slug_path}}" id="{{ page_html_id }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{page.title}} <i class="fa fa-caret-down"></i></a>
+<div class="dropdown-menu" aria-labelledby="{{ page_html_id }}">
 {% for child in page.children %}
-<li  class="{{active_class}}"><a href="{{child.url}}">{{child.title}}</a></li>
+<a class="dropdown-item {{active_class}}" href="{{child.url}}">{{child.title}}</a>
 {% endfor %}
-</ul>
+</div>
 </li>
 {% else %}
-<li  class="{{active_class}}"><a href="{{page.url}}">{{page.title}}</a></li>
+<li  class="nav-item {{active_class}}"><a class="nav-link" href="{{page.url}}">{{page.title}}</a></li>
 {% endif %}
+{% endwith %}
 {% endwith %}
 {% endmacro %}
 
@@ -24,72 +24,89 @@
 {% endmacro %}
 
 {% macro render_errors_and_description(field) %}
-<div id="{{field.id+"desc"}}">
-<p class="help-block text-info">{{field.description}}</p>
+<div id="{{field.id|unique_string ~ 'desc' }}">
+<small class="form-text text-muted">{{field.description}}</small>
 {% for error in field.errors %}
-  <p class="help-block text-danger">{{error}}</p>
+<div class="invalid-feedback">
+  {{error}}
+</div>
 {% endfor %}
 </div>
 {% endmacro %}
 
 {% macro render_field(field) %}
-<div class="form-group {% if field.errors%}has-error{%endif%}">
-  <label for="{{field.id}}" class="control-label">{{field.label.text}}</label>
-  <div >
-    {{field(**{"class":"form-control", "aria-describedby": field.id+"desc"}) }}
+  <div class="form-group">
+  <label for="{{field.id}}">{{field.label.text}}</label>
+    {{field(**{"class":"form-control", "aria-describedby": field.id|unique_string ~ 'desc'}) }}
     {{render_errors_and_description(field) }}
-  </div>
 </div>
 {% endmacro %}
 
 {% macro render_checkbox(checkbox) %}
-<div class="checkbox">
-  <label>{{checkbox(**{"aria-describedby": checkbox.id+"desc"})}} {{checkbox.label.text}}</label>
+<div class="form-group">
+  <div class="custom-control custom-checkbox">
+    {% with check_html_id=checkbox.id|unique_string %}
+    <input type="checkbox" class="custom-control-input" name={{checkbox.name}} id="{{ check_html_id }}">
+    <label class="custom-control-label" for="{{ check_html_id }}">{{checkbox.label.text}}</label>
+    {{render_errors_and_description(checkbox)}}
+    {% endwith %}
+  </div>
 </div>
-  {{render_errors_and_description(checkbox)}}
 {% endmacro %}
 
 {% macro render_radio(radio) %}
+<fieldset>
+<legend>{{radio.label}}</legend>
 <div class="form-group">
-  <fieldset>
-  <legend class="control-label h5" >{{radio.label.text}}</legend>
-  <div class="col-md-offset-1">
-  {% for r in radio %}
-    <div class="radio">
-      <label>
-        {{r}} {{r.label.text}}
-      </label>
-    </div>
-  {% endfor %}
-  {{render_errors_and_description(radio)}}
+{% for input in radio %}
+{% with input_html_id=input.id|unique_string %}
+  <div class="custom-control custom-radio">
+  <input class="custom-control-input" type="radio" name="{{ input.name }}" id="{{input_html_id}}" value="{{ input.value}}">
+  <label class="custom-control-label" for="{{input_html_id}}">{{ input.label }}</label>
 </div>
+{% endwith %}
+{% endfor %}
 </div>
 </fieldset>
 {% endmacro %}
 
+{% macro render_select(select) %}
+{% with select_id=select.id|unique_string %}
+<div class="form-group">
+  <label for="{{select_id}}">{{select.label}}</label>
+  <select class="custom-select" id="{{select_id}}">
+  {% for val, label, selected in select.iter_choices() %}
+    <option value="{{ val }}">{{label}}</option>
+  {% endfor %}
+  </select>
+</div>
+{% endwith %}
+{% endmacro %}
+
+
 {% macro render_form(form, action=None, title='', submit_text='Submit') %}
-<form class="form-horizontal" action="{{action or request.url}}" method="post" enctype="multipart/form-data">
-  <fieldset>
+<form role="form" action="{{action or request.url}}" method="post" enctype="multipart/form-data">
     <legend>{{title|safe}}</legend>
     {% for field in form %}
       {% if field.widget.input_type == 'hidden' %}
         {{field}}
       {% else %}
-      {% if field.widget.input_type=='checkbox' %}
+      {% if field.type=='BooleanField' %}
         {{render_checkbox(field) }}
-      {% elif field.option_widget %}
+      {% elif field.type == 'RadioField' %}
         {{render_radio(field) }}
+      {% elif field.type == 'SelectField' %}
+        {{render_select(field) }}
       {% else %}
       {{ render_field(field) }}
     {% endif %}
     {% endif %}
     {% endfor %}
-    <div class="form-group">
-      <div class="col-lg-8">
+    <div class="form-row py-3">
+      <div class="form-group">
         <input type="submit" class="btn btn-info" value="{{submit_text}}" />
       </div>
     </div>
-  </fieldset>
 </form>
 {% endmacro %}
 
