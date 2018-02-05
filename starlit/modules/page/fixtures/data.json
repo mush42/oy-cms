@@ -8,7 +8,7 @@
     {
       "id": 2,
       "name": "Special Settings",
-      "is_active": "false"
+      "is_active": true
     }
   ]},
   {"starlit.modules.core.models.Role": [
