@@ -36,23 +36,13 @@ class StarlitModule(Blueprint):
             static_url_path=self.static_url_path,
             *args, **kwargs)
         self.settings_providers = []
-        self.finalize_funcs = []
 
     def register(self, app, *args, **kwargs):
         super(StarlitModule, self).register(app, *args, **kwargs)
         app.config.from_module_defaults(self.import_name)
-        # Run the finalization functions
-        for f in self.finalize_funcs:
-            f(app)
 
     def settings_provider(self, func):
         self.settings_providers.append(func)
-        def wrapped(*a, **kw):
-            return func(*a, **kw)
-        return wrapped
-
-    def after_setup(self, func):
-        self.finalize_funcs.append(func)
         def wrapped(*a, **kw):
             return func(*a, **kw)
         return wrapped

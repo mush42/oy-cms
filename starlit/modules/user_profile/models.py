@@ -54,6 +54,6 @@ def add_user_profile(target, *args, **kwargs):
         target.profile = Profile()
 
 
-@user_profile.after_setup
-def register_user_profiles_event_listener(app):
+@user_profile.record_once
+def register_user_profiles_event_listener(state):
     event.listen(mapper, 'init', add_user_profile)
