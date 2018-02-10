@@ -1,5 +1,5 @@
 <!doctype html>
-{% import 'starlit/site/macros.html' as macros with context %}
+{% import 'site/macros.html' as macros with context %}
 <html lang="{% block html_lang %}{{lang}}{% endblock %}">
   {% block html_head %}
   <head>
@@ -72,7 +72,7 @@
       <hr>
 
     {% block footer %}
-    {% include 'starlit/site/includes/footer.html' with context %}
+    {% include 'site/includes/footer.html' with context %}
     {% endblock footer %}
 
     {% block core_js %}
