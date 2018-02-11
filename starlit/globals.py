@@ -1,10 +1,11 @@
+import sys
 from werkzeug import import_string
 from werkzeug.local import LocalProxy
 from flask import g, current_app, request, _request_ctx_stack
 
 
 def _get_page_cls():
-    cls_import_name = app.config['PARENT_PAGE_CLASS']
+    cls_import_name = current_app.config['PARENT_PAGE_CLASS']
     if cls_import_name in sys.modules:
         return sys.modules[cls_import_name]
     return import_string(cls_import_name)

@@ -1,21 +1,14 @@
-from flask import current_app, request, g, abort
-from starlit.modules.page.templating import render_page_template
+from starlit.wrappers import StarlitModule
 from starlit.util.option import Option
 from starlit.babel import lazy_gettext
-from .wrappers import PageModule
-from .cli import install_fixtures_factory
 
 
-page = PageModule('page',
+page = StarlitModule('page',
     __name__,
     static_folder="static",
     template_folder="templates",
     builtin=True
   )
-
-@page.record_once
-def add_cli_command(state):
-    state.app.cli.command(name='install-fixtures')(install_fixtures_factory(page.root_path))
 
 
 @page.settings_provider

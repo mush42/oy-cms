@@ -1,5 +1,6 @@
 import sys
 import os
+from collections import namedtuple
 from importlib import import_module
 from warnings import warn
 from werkzeug import import_string
@@ -9,6 +10,8 @@ from flask.config import Config
 from flask.helpers import locked_cached_property, get_root_path
 from starlit.util.helpers import find_modules, import_modules
 
+
+handler_opts = namedtuple('PageContentTypeHandler', 'view_func methods module')
 
 class StarlitConfig(Config):
     def from_module_defaults(self, import_name):
@@ -36,10 +39,24 @@ class StarlitModule(Blueprint):
             static_url_path=self.static_url_path,
             *args, **kwargs)
         self.settings_providers = []
+        self._content_type_handlers = {}
 
     def register(self, app, *args, **kwargs):
         super(StarlitModule, self).register(app, *args, **kwargs)
         app.config.from_module_defaults(self.import_name)
+        for contenttype, opts in self._content_type_handlers.items():
+            app._add_contenttype_handler(contenttype, **opts._asdict())
+
+    def contenttype_handler(self, contenttype, methods):
+        def wrapper(func):
+            self._content_type_handlers[contenttype] = handler_opts(
+                func,
+                methods,
+                module=self.name)
+            def wrapped(*a, **kw):
+                return func(*a, **kw)
+            return wrapped
+        return wrapper
 
     def settings_provider(self, func):
         self.settings_providers.append(func)
@@ -59,6 +76,7 @@ class Starlit(Flask):
         super(Starlit, self).__init__(*args, **kwargs)
         self.modules = {}
         self.plugins = {}
+        self._page_contenttype_handlers = {}
 
     @locked_cached_property
     def jinja_loader(self):
@@ -72,6 +90,24 @@ class Starlit(Flask):
                 templates_dir = os.path.join(get_root_path(mod.import_name), mod.template_folder)
                 mod_templates.append(FileSystemLoader(templates_dir))
         return ChoiceLoader(mod_templates)
+
+    def _add_contenttype_handler(self, contenttype, view_func, methods=('GET',), module=None):
+        self._page_contenttype_handlers[contenttype] = handler_opts(
+            view_func,
+            methods,
+            module
+            )
+
+    def contenttype_handler(self, contenttype, methods):
+        def wrapper(func):
+            self._add_contenttype_handler(func, contenttype, methods)
+            def wrapped(*a, **kw):
+                return func(*a, **kw)
+            return wrapped
+        return wrapper
+
+    def get_handler_for(self, contenttype):
+        return self._page_contenttype_handlers.get(contenttype)
 
     def register_module(self, module, **options):
         super(Starlit, self).register_blueprint(blueprint=module, **options)

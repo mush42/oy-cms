@@ -1,20 +1,34 @@
 import time
 import os.path
-from flask import current_app, request, make_response, redirect, g, render_template, url_for, abort, flash
+from flask import (
+    current_app, request,
+    make_response, redirect,
+    render_template, url_for,
+    abort, flash
+  )
 from werkzeug import secure_filename
 from flask_wtf import Form as HtmlForm
+from starlit.wrappers import StarlitModule
+from starlit.globals import current_page
 from starlit.boot.exts.sqla import db
-from starlit.modules.page import page
 
 from starlit.util.dynamicform import DynamicForm
 from starlit.util.helpers import date_stamp
 from .models import FormEntry, FieldEntry, Form, Field
 
+form = StarlitModule('form',
+    __name__,
+    static_folder="static",
+    template_folder="templates",
+    builtin=True
+  )
+
+
 
 def store_form(form):
-    entry = FormEntry(form_id=g.page.id)
+    entry = FormEntry(form_id=current_page.id)
     for f in form:
-        field = Field.query.filter_by(form_id=g.page.id).filter_by(name=f.name).one_or_none()
+        field = Field.query.filter_by(form_id=current_page.id).filter_by(name=f.name).one_or_none()
         if field is None:
             continue
         field_entry = FieldEntry(field_id=field.id)
@@ -32,9 +46,9 @@ def store_form(form):
     db.session.commit()
 
 
-@page.handler('form', methods=['GET', 'POST'])
+@form.contenttype_handler('form', methods=['GET', 'POST'])
 def form_view():
-    form = DynamicForm(g.page.fields).form
+    form = DynamicForm(current_page.fields).form
     if form.validate_on_submit():
         store_form(form)
         return redirect(request.path + '?submited=1')

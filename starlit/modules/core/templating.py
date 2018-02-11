@@ -1,4 +1,5 @@
-from flask import request, g, render_template
+from flask import request, render_template
+from starlit.globals import current_page
 
 def templates_for_page(page):
     if page.is_home:
@@ -14,7 +15,7 @@ def templates_for_page(page):
     
 
 def render_page_template(page=None, context=None, template=None):
-    page = page or g.page
+    page = page or current_page
     context = context or dict()
     context.setdefault('page', page)
     if not template:
