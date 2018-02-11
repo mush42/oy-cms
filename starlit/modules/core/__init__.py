@@ -1,9 +1,9 @@
-from sqlalchemy.orm.exc import NoResultFound
+from werkzeug.exceptions import NotFound
 from flask import _request_ctx_stack, current_app, request
 from starlit.globals import current_page, parent_page_class
 from starlit.wrappers import StarlitModule
 from starlit.util.slugging import PathToSlugConvertor
-#from .cli import install_fixtures
+from .cli import install_fixtures, createsuperuser
 from .templating import render_page_template
 
 
@@ -31,7 +31,7 @@ def add_slug_url_convertor(state):
 
 def set_page_and_response_if_appropriate():
     _request_ctx_stack.top.requested_slug_path = request.path.strip('/')
-    if request.routing_exception is not None and current_page:
+    if isinstance(request.routing_exception, NotFound) and current_page:
         return page_view()
 
 
@@ -42,8 +42,8 @@ def add_slug_path(state):
 
 @core.record_once
 def add_cli_command(state):
-    pass
-    #state.app.cli.command(name='install-fixtures')(install_fixtures)
+    state.app.cli.command(name='install-fixtures')(install_fixtures)
+    state.app.cli.command(name='create-super-user')(createsuperuser)
 
 
 @core.app_context_processor

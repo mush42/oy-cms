@@ -1,0 +1,14 @@
+{
+  "starlit.modules.editable_settings.models.SettingsProfile": [
+    {
+      "id": 1,
+      "name": "Starlit Settings",
+      "is_active": true
+    },
+    {
+      "id": 2,
+      "name": "Special Settings",
+      "is_active": true
+    }
+  ]
+}
