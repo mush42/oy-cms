@@ -9,6 +9,7 @@ from flask import Flask, Blueprint
 from flask.config import Config
 from flask.helpers import locked_cached_property, get_root_path
 from starlit.util.helpers import find_modules, import_modules
+from starlit.util.fixtures import _Fixtured
 
 
 handler_opts = namedtuple('PageContentTypeHandler', 'view_func methods module')
@@ -23,7 +24,7 @@ class StarlitConfig(Config):
         self.from_object(defaults_mod)
 
 
-class StarlitModule(Blueprint):
+class StarlitModule(Blueprint, _Fixtured):
 
     def __init__(self, name, import_name, *args, **kwargs):
         self.name = name

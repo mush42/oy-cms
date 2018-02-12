@@ -1,7 +1,7 @@
 import sys
 from werkzeug import import_string
 from werkzeug.local import LocalProxy
-from flask import g, current_app, request, _request_ctx_stack
+from flask import g, current_app, request
 
 
 def _get_page_cls():
@@ -16,12 +16,12 @@ parent_page_class = LocalProxy(lambda: _get_page_cls())
 
 def _get_page_for_request():
     cls = parent_page_class
-    ctx = _request_ctx_stack.top
-    if ctx is None:
+    if request is None:
         raise RuntimeError("Working outside of request context.")
-    elif getattr(ctx, 'requested_slug_path', None) is None:
+    requested_slug_path = request.path.strip('/')
+    if requested_slug_path is None:
         return
-    requested_slug_path = ctx.requested_slug_path or current_app.config['HOME_SLUG']
+    requested_slug_path = requested_slug_path or current_app.config['HOME_SLUG']
     return cls.query.filter(cls.slug_path==requested_slug_path).one()
 
 current_page = LocalProxy(lambda: _get_page_for_request())

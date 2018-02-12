@@ -7,3 +7,7 @@ class StarlitException(Exception):
 
 class StarlitConfigurationError(StarlitException):
     """Raised when trying to initialize a disabled feature"""
+
+
+class BadlyFormattedFixture(StarlitException):
+    """Raised when a json.JSONDecodeError exception is raised."""

@@ -1,5 +1,5 @@
 from werkzeug.exceptions import NotFound
-from flask import _request_ctx_stack, current_app, request
+from flask import current_app, request
 from starlit.globals import current_page, parent_page_class
 from starlit.wrappers import StarlitModule
 from starlit.util.slugging import PathToSlugConvertor
@@ -30,7 +30,6 @@ def add_slug_url_convertor(state):
 
 
 def set_page_and_response_if_appropriate():
-    _request_ctx_stack.top.requested_slug_path = request.path.strip('/')
     if isinstance(request.routing_exception, NotFound) and current_page:
         return page_view()
 
