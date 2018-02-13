@@ -61,6 +61,7 @@ def createsuperuser(user_name=None, email=None):
         roles=[admin_role]
     )
     db.session.commit()
+    click.echo()
     click.echo("User created successfully.")
 
 
@@ -75,12 +76,11 @@ def install_fixtures():
     click.echo('Installing fixtures in the database')
     click.echo('~~~~~~~~~~~~~~~~~')
     click.echo()
-    for mod_name, mod in current_app.modules.items():
-        if not mod.fixtures:
+    for module in current_app.modules.values():
+        if not module.fixtures:
             continue
-        click.echo("Installing fixtures for module: " + mod_name)
-        for model in mod.install_fixtures():
-            click.echo("\t* model: " + model)
+        click.echo("Installing fixtures for module: " + module.import_name)
+        module.install_fixtures()
     click.echo()
     click.echo("===============")
     click.echo("Finished installing all available fixtures.")

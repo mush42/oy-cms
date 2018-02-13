@@ -8,7 +8,7 @@ from .displayable import Displayable, DisplayableQuery
 class PageQuery(DisplayableQuery):
     @property
     def viewable(self):
-        return self.published.filter_by(must_show_in_menu=True)
+        return self.published.filter_by(is_live=True)
 
 class AbstractPage(Displayable):
     __abstract__ = True
@@ -28,6 +28,17 @@ class AbstractPage(Displayable):
             info=dict(
                 label='Show in menu',
                 description='Show this page in the navigation menus.'
+            )
+        )
+
+    @declared_attr
+    def is_live(cls):
+        return db.Column(
+            db.Boolean,
+            default=True,
+            info=dict(
+                label='Go Live',
+                description='If the page is live, the visitors can view this page, otherwise they will get a page not found error.'
             )
         )
 

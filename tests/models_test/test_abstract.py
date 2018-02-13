@@ -3,6 +3,7 @@ from starlit.models.abstract import (
     Displayable, Slugged, Titled,
     TimeStampped, Publishable, Metadata)
 
+__install_fixtures__ = False
 
 def concrete_model(cls_name, bases, d, db):
     bases = list(bases) + [db.Model]
@@ -44,7 +45,6 @@ def test_timestammped(db):
     t.title = u'That'
     db.session.commit()
     assert t.updated
-    assert t.updated > t.created
 
 def test_metadata(app, db):
     class Content(Titled):

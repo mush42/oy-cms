@@ -1,6 +1,7 @@
 from starlit.wrappers import StarlitModule
 from starlit.util.option import Option
 from starlit.babel import lazy_gettext
+from .models import *
 
 
 page = StarlitModule('page',
