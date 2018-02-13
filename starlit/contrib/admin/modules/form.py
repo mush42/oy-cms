@@ -14,13 +14,13 @@ from wtforms.widgets import HiddenInput
 
 from starlit.exceptions import StarlitConfigurationError
 from starlit.boot.exts.sqla import db
-from starlit_admin.plugin import AdminPlugin
-from starlit_admin.core import AuthenticationViewMixin
-from starlit_admin.modules.page import PageAdmin
 from starlit.babel import lazy_gettext
 from starlit.util.wtf import RichTextAreaField
 from starlit.util.helpers import date_stamp
 from starlit.modules.form.models import Form, Field
+from ..plugin import AdminPlugin
+from ..core import AuthenticationViewMixin
+from .page import PageAdmin
 
 
 class FormAdmin(PageAdmin):

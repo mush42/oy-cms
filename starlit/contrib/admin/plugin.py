@@ -1,7 +1,7 @@
 from flask import request, url_for
 from flask_admin import Admin, helpers as admin_helpers
 from starlit.plugin import StarlitPlugin 
-from starlit_admin.core import StarlitIndexView
+from .core import StarlitIndexView
 from starlit.babel import lazy_gettext, gettext, ngettext
 
 
@@ -23,10 +23,10 @@ def security_ctp_with_aadmin(admin):
 class AdminPlugin(StarlitPlugin):
     """Provides integration with Flask-Admin"""
     setupmethods = set()
-    name="starlit_admin",
+    name="starlit-admin",
     needs_module_registration = True
     blueprint_opts = dict(
-        import_name="starlit_admin",
+        import_name="starlit.contrib.admin",
         static_folder="static",
         template_folder="templates",
     )

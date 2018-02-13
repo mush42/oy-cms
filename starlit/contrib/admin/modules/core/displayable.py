@@ -13,8 +13,8 @@ from datetime import date
 from starlit.boot.exts.sqla import db
 from starlit.models.abstract import Displayable
 from starlit.babel import gettext, lazy_gettext
-from starlit_admin.core import StarlitModelView
 from starlit.util.helpers import date_column_formatter
+from ...core import StarlitModelView
 
 
 def status_formatter(view, context, model, name):

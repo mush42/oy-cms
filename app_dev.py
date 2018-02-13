@@ -2,7 +2,7 @@ import os
 from tempfile import mkdtemp
 from starlit import create_app
 from starlit.boot.exts.sqla import db
-from starlit_admin.plugin import AdminPlugin
+from starlit.contrib.admin import AdminPlugin
 
 
 TEMP_DIR = mkdtemp()  

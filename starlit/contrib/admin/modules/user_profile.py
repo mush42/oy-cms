@@ -11,13 +11,13 @@ from jinja2 import Markup
 
 from starlit.boot.exts.sqla import db
 from starlit.boot.exts.security import user_datastore
-from starlit_admin.plugin import AdminPlugin
-from starlit_admin.core import StarlitModelView
 from starlit.babel import gettext, lazy_gettext
 from starlit.modules.core.models.user import User, Role
 from starlit.util.wtf import FileSelectorField
 from starlit.util.dynamicform import DynamicForm
 from starlit.modules.user_profile.models import Profile
+from ..plugin import AdminPlugin
+from ..core import StarlitModelView
 
 
 class BaseUserAdmin(StarlitModelView):

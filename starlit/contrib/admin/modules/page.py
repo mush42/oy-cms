@@ -1,10 +1,10 @@
 from flask import url_for
 from starlit.boot.exts.sqla import db
-from starlit_admin.plugin import AdminPlugin
 from starlit.babel import gettext, lazy_gettext
 from starlit.util.wtf import RichTextAreaField
-from starlit_admin.modules.core import DisplayableAdmin
 from starlit.modules.page.models import Page
+from ..plugin import AdminPlugin
+from .core import DisplayableAdmin
 
 class PageAdmin(DisplayableAdmin):
     form_rules = [(4, "content"), (5, "parent"), (6, "is_live"), (7, "must_show_in_menu"),]

@@ -5,10 +5,10 @@ from flask_wtf import Form
 
 from starlit.boot.exts.sqla import db
 from starlit.util.dynamicform import DynamicForm
-from starlit_admin.core import AuthenticationViewMixin, StarlitBaseView
-from starlit_admin.plugin import AdminPlugin
 from starlit.babel import gettext, lazy_gettext
 from starlit.modules.editable_settings import current_settings
+from ...plugin import AdminPlugin
+from ...core import AuthenticationViewMixin, StarlitBaseView
 
 
 def make_settings_form_for_category(category):
