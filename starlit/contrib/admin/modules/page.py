@@ -7,7 +7,7 @@ from starlit_admin.modules.core import DisplayableAdmin
 from starlit.modules.page.models import Page
 
 class PageAdmin(DisplayableAdmin):
-    form_rules = [(4, "content"), (5, "parent"), (6, "must_show_in_menu")]
+    form_rules = [(4, "content"), (5, "parent"), (6, "is_live"), (7, "must_show_in_menu"),]
     form_excluded_columns = ["children", "contenttype", "slug_path"]
     column_list = [(1, "parent")]
     form_overrides = {
