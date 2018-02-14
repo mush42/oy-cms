@@ -37,7 +37,7 @@ def db(request, app):
         user = create_user()
         sqla_db.session.commit()
         app.test_user = user
-        if getattr(request, '__install_fixtures__', True):
+        if getattr(request.module, '__install_fixtures__', True):
             for mod in app.modules.values():
                 mod.install_fixtures()
         yield sqla_db

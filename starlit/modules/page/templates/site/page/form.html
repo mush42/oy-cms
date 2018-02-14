@@ -7,6 +7,6 @@
 {% endif %}
 <hr />
 {{super()}}
-{{macros.render_form(form, title=page.title, submit_text=current_page.submit_text or _trans('Submit'))}}
+{{macros.render_form(form, title=page.title, submit_text=current_page.submit_text, id=current_page.slug)}}
 
 {% endblock %}

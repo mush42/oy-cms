@@ -84,8 +84,8 @@
 {% endmacro %}
 
 
-{% macro render_form(form, action=None, title='', submit_text='Submit') %}
-<form role="form" action="{{action or request.url}}" method="post" enctype="multipart/form-data">
+{% macro render_form(form, action=None, title='', submit_text=_trans('Submit'), id='') %}
+<form role="form" id="{{ id }}" action="{{action or request.url}}" method="post" enctype="multipart/form-data">
     <legend>{{title|safe}}</legend>
     {% for field in form %}
       {% if field.widget.input_type == 'hidden' %}
