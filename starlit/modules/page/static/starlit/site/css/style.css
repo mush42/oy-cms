@@ -1,14 +1,10 @@
-.navbar-right {
-	margin-right: 1rem;
+.navbar {
+  height: 4rem;
 }
 #wrapper {
-	margin: 60px 6px 18px 6px;
+  margin: 1rem;
 }
-@media (min-width: 768px) {
-	#wrapper {
-		margin: 6rem 1rem 0 1rem;
-	}
-}
+
 footer {
   background: rgb(116, 50, 124);
   padding: 50px 0 65px;
@@ -25,13 +21,6 @@ footer .copyright {
   font-size: 14px;
   text-align: center;
   margin-bottom: 0;
-}
-img.author-profile-picture {
-	max-width: 120px;
-	max-height: 90px;
-}
-.post-content {
-	margin-top: -5em;
 }
 .footer-tree li a {
 	color: rgb(251, 225, 255);

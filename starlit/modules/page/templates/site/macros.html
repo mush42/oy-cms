@@ -74,7 +74,7 @@
 {% with select_id=select.id|unique_string %}
 <div class="form-group">
   <label for="{{select_id}}">{{select.label}}</label>
-  <select class="custom-select" id="{{select_id}}">
+  <select class="custom-select" id="{{select_id}}" name="{{ select.name }}">
   {% for val, label, selected in select.iter_choices() %}
     <option value="{{ val }}">{{label}}</option>
   {% endfor %}
@@ -85,8 +85,7 @@
 
 
 {% macro render_form(form, action=None, title='', submit_text=_trans('Submit'), id='') %}
-<form role="form" id="{{ id }}" action="{{action or request.url}}" method="post" enctype="multipart/form-data">
-    <legend>{{title|safe}}</legend>
+<form role="form" id="{{ id }}" action="{{action or request.url}}" method="post" enctype="multipart/form-data" aria-label="{{ current_page.title}}">
     {% for field in form %}
       {% if field.widget.input_type == 'hidden' %}
         {{field}}
@@ -113,25 +112,30 @@
 {% macro messages() %}
   {% with messages = get_flashed_messages(with_categories=True) %}
     {% if messages %}
+      <div class="card-deck">
       {% for category, m in messages %}
         {% if category %}
-        {% set mapping = {'message': 'info', 'error': 'danger'} %}
-        <div class="alert alert-{{ mapping.get(category, category) }} alert-dismissable">
+        {% set mapping={'message': 'info', 'error': 'danger', 'success':'success'} %}
+        <div class="card card-outline-{{ mapping.get(category, category) }} text-center">
         {% else %}
-        <div class="alert alert-dismissable">
+        <div class="card card-outline-primary text-center">
         {% endif %}
-          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-          {{ m }}
+        <div class="card-block">
+          <p class="card-text">
+          {{ m|safe if category=='markup' else m }}
+          </p>
+        </div>
         </div>
       {% endfor %}
+    </div>
     {% endif %}
   {% endwith %}
 {% endmacro %}
 
 {% macro render_tree_branch(branch) %}
-<li><a href="{{branch.url}}">{{branch.title}}</a></li>
+<a href="{{branch.url}}" class="list-group-item list-group-item-action">{{branch.title}}</a>
 {% if branch.children %}
-<ul class=list-unstyled">
+<ul class="list-group list-group-flush">
 {% for b in branch.children %}
 {{render_tree_branch(b)}}
 {% endfor %}
@@ -140,18 +144,14 @@
 {% endmacro %}
 
 {% macro render_footer_tree(pages) %}
+<div class="container-fluid">
+<div class="row justify-content-md-center">
 {% for page in pages %}
-<div class="col-lg-3 col-md-4">
-  <ul class="list-unstyled footer-tree">
-    <li><a href="#">{{page.title}}</a></li>
-    {% if page.children %}
-    <ul class="list-unstyled">
-    {% for branch in page.children %}
-      {{render_tree_branch(branch) }}
-    {% endfor %}
-    </ul>
-    {% endif %}
-  </ul>
+<div class="col-sm-3">
+  <div class="list-group list-group-flush">
+  {{ render_tree_branch(page) }}
 </div>
 {% endfor %}
+</div>
+</div>
 {% endmacro %}

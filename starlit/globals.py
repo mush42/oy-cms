@@ -1,7 +1,7 @@
 import sys
 from werkzeug import import_string
 from werkzeug.local import LocalProxy
-from flask import g, current_app, request
+from flask import current_app, request
 
 
 def _get_page_cls():
@@ -22,6 +22,6 @@ def _get_page_for_request():
     if requested_slug_path is None:
         return
     requested_slug_path = requested_slug_path or current_app.config['HOME_SLUG']
-    return cls.query.filter(cls.slug_path==requested_slug_path).one()
+    return cls.query.filter(cls.slug_path==requested_slug_path).one_or_none()
 
 current_page = LocalProxy(lambda: _get_page_for_request())

@@ -51,6 +51,7 @@ def form_view():
     form = DynamicForm(current_page.fields).form
     if form.validate_on_submit():
         store_form(form)
-        return redirect(request.path + '?submited=1')
+        flash(current_page.submit_message, 'markup')
+        return redirect(request.path)
     return dict(form=form)
     

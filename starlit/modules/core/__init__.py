@@ -1,5 +1,5 @@
 from werkzeug.exceptions import NotFound
-from flask import current_app, request
+from flask import current_app, request, _request_ctx_stack
 from starlit.globals import current_page, parent_page_class
 from starlit.wrappers import StarlitModule
 from starlit.util.slugging import PathToSlugConvertor
@@ -14,6 +14,7 @@ def page_view():
     handler = current_app.get_handler_for(current_page.contenttype)
     template_args = {}
     if handler is not None:
+        _request_ctx_stack.top.module = handler.module
         if request.method not in handler.methods:
             abort(405)
         rv = handler.view_func()

@@ -23,7 +23,7 @@
     <!-- Bootstrap Core CSS -->
     <link href="{{ url_for('starlit-page.static', filename='starlit/site/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
     <!-- Custom CSS -->
-    <link href="{{ url_for('starlit-page.static', filename='starlit/site/css/style.tempcss') }}" rel="stylesheet">
+    <link href="{{ url_for('starlit-page.static', filename='starlit/site/css/style.css') }}" rel="stylesheet">
     {% endblock core_css %}
     {% block extra_css %}{% endblock extra_css %}
     {% block extra_head %}{% endblock extra_head %}
@@ -47,25 +47,25 @@
     <div class="collapse navbar-collapse" id="navbarCollapse">
     <ul class="navbar-nav mr-auto">
     <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-    {{macros.page_menu(pages, g.page)}}
+    {{macros.page_menu(pages, current_page)}}
     </ul>
     </div>
     </nav>
     {% endblock navigation %}
     {% endblock header %}
-
-    {% block flash_messages %}
-    <aside class="container-fluid">
-      <div class="row">
-        <div class="col-md-8 col-md-offset-4">
-        {{macros.messages()}}
-        </div>
-      </div>
-    </aside>
-    {% endblock %}
   
     <div class="container-fluid">
       <main id="wrapper" class="wrapper">
+        {% block flash_messages %}
+        <aside class="container-fluid">
+          <div class="row">
+            <div class="col-md-8 p-4">
+            {{macros.messages()}}
+            </div>
+          </div>
+        </aside>
+        {% endblock %}
+      
       {% block content %}{% endblock %}
       </main>
     </div>
