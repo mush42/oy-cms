@@ -29,6 +29,6 @@ def create_db():
         db.create_all()
 
 @app.cli.command(name='drop-db', help="Drop database tables")
-def create_db():
+def drop_db():
     with app.app_context():
         db.drop_all()
