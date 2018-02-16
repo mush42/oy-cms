@@ -1,6 +1,6 @@
 import os
 import csv
-from flask import Response, stream_with_context
+from flask import request, Response, stream_with_context
 from flask_admin import expose
 from flask_admin.model.template import EndpointLinkRowAction
 from flask_admin.model.form import InlineFormAdmin
@@ -21,6 +21,22 @@ from starlit.modules.form.models import Form, Field
 from ..plugin import AdminPlugin
 from ..core import AuthenticationViewMixin
 from .page import PageAdmin
+
+
+def _process_field_value(field):
+    """Used in the csv writing task to return an
+    appropriate representation 
+    """
+    if field.value == '':
+        return '[empty]'
+    if field.type == 'boolean':
+        return 'yes' if field.value else 'no'
+    return field.value
+
+
+def _gen_csv_file_name(form):
+    form_updated = date_stamp(form.updated)
+    return '-'.join((request.host, form.slug, form_updated)) + '.csv'
 
 
 class FormAdmin(PageAdmin):
@@ -44,7 +60,7 @@ class FormAdmin(PageAdmin):
     def export_entries(self, pk):
         """Taken from Flask-Admin with some modifications, no shame!"""
         form = self.get_one(str(pk))
-        filename = "attachment; filename=%s.csv" %("%s-%s" %(form.slug, date_stamp(form.updated)))
+        filename = "attachment; filename=%s" %_gen_csv_file_name(form)
         class Echo(object):
             """
             An object that implements just the write method of the file-like
@@ -62,7 +78,7 @@ class FormAdmin(PageAdmin):
             titles = [csv_encode('date')] + [csv_encode(field.name) for field in form.fields]
             yield writer.writerow(titles)
             for entry in form.entries:
-                vals = [csv_encode(entry.created.isoformat())] + [csv_encode(field.value) for field in entry.fields]
+                vals = [csv_encode(entry.created.isoformat())] + [csv_encode(_process_field_value(field)) for field in entry.fields]
                 yield writer.writerow(vals)
         return Response(
             stream_with_context(generate()),
