@@ -30,4 +30,3 @@ validators==0.12.0
 WTForms==2.1
 WTForms-Alchemy==0.16.5
 WTForms-Components==0.10.3
-gunicorn
