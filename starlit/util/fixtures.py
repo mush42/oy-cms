@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+from sqlalchemy.exc import IntegrityError
 from dateutil.parser import parse
 from werkzeug import import_string
 from werkzeug.utils import cached_property
@@ -42,11 +43,11 @@ class _Fixtured(object):
             return
         for model_import_path, objs in self.fixtures.items():
             model = import_string(model_import_path)
-            # Continue gracefully if there is some data in the table
-            if model.query.count():
-                print("Skipping the installation of %s fixtures. Table is not empty." %model_import_path,)
-                continue
             for obj in objs:
                 instance = self.deserialize_instance(model, **obj)
-                db.session.add(instance)
-                db.session.commit()
+                try:
+                    db.session.add(instance)
+                    db.session.commit()
+                except IntegrityError:
+                    db.session.rollback()
+                    continue
