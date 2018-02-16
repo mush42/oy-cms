@@ -22,5 +22,13 @@ config = dict(
 app = create_app('dev', config=config)
 app.use(AdminPlugin)
 
-with app.app_context():
-    db.create_all()
+
+@app.cli.command(name='create-db', help="Create database tables")
+def create_db():
+    with app.app_context():
+        db.create_all()
+
+@app.cli.command(name='drop-db', help="Drop database tables")
+def create_db():
+    with app.app_context():
+        db.drop_all()

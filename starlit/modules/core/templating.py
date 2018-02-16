@@ -10,7 +10,7 @@ def templates_for_page(page):
     templates.reverse()
     built_tpl_path = lambda prefix: [prefix + '{}.html'.format(t) for t in templates]
     rv = []
-    if _request_ctx_stack.top.module:
+    if getattr(_request_ctx_stack.top, 'module', None):
         rv.extend(built_tpl_path(_request_ctx_stack.top.module + '/'))
     return rv + built_tpl_path('site/page/')
     

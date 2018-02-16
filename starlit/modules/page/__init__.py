@@ -21,6 +21,13 @@ def provide_page_settings():
             category='general',
             type='text',
             default=u'Starlit CMS'
-        )
+        ),
+        Option('show_footer_tree',
+            label=lazy_gettext('Show the page tree in the site footer'),
+            description='',
+            category='general',
+            type='checkbox',
+            default=True
+        ),
     ]
 

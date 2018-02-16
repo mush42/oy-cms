@@ -4,6 +4,7 @@ from collections import namedtuple
 from importlib import import_module
 from warnings import warn
 from werkzeug import import_string
+from werkzeug.utils import cached_property
 from jinja2 import ChoiceLoader, FileSystemLoader
 from flask import Flask, Blueprint
 from flask.config import Config
@@ -78,6 +79,7 @@ class Starlit(Flask):
         self.modules = {}
         self.plugins = {}
         self._page_contenttype_handlers = {}
+        self._provided_settings = {}
 
     @locked_cached_property
     def jinja_loader(self):
@@ -123,8 +125,7 @@ class Starlit(Flask):
             for mod in set(starlit_modules):
                 yield mod
 
-    def provided_settings(self):
-        opts = []
+    def _collect_provided_settings(self):
         for mod in self.modules.values():
             provider = getattr(mod, 'get_provided_settings', None)
             if provider is None:
@@ -132,8 +133,13 @@ class Starlit(Flask):
             for provided in  provider():
                 for p in provided:
                     p.module = mod
-                opts.extend(provided)
-        return opts
+                    self._provided_settings[p.name] = p
+
+    @property
+    def provided_settings(self):
+        if not self._provided_settings:
+            self._collect_provided_settings()
+        return self._provided_settings.values()
 
     def use(self, plugin, *args, **kwargs):
         plugin = plugin()

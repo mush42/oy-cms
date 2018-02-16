@@ -19,8 +19,7 @@ Please create at least one super user before attempting to install fixdtures.
 """
 
 
-def createsuperuser(user_name=None, email=None):
-    """Create a new super-user account"""
+def _prompt_for_user_details(user_name=None, email=None):
     from starlit.boot.exts.security import user_datastore
     if user_name is None:
         user_name = click.prompt(
@@ -30,29 +29,48 @@ def createsuperuser(user_name=None, email=None):
         )
         if user_datastore.find_user(user_name=user_name):
             click.echo("Error: A user with the same username already exists.")
-            return createsuperuser()
+            return _prompt_for_user_details()
     if email is None:
         email = click.prompt(text="email address")
         if user_datastore.find_user(email=email):
             click.echo("Error: A user with the same email already address exists.")
-            return createsuperuser(user_name=user_name)
+            return _prompt_for_user_details(user_name=user_name)
         elif _email_re.match(email) is None:
             click.echo("Invalid email address! Please try again.")
-            return createsuperuser(user_name=user_name)
+            return _prompt_for_user_details(user_name=user_name)
     password = click.prompt(
         text="password",
         hide_input=True,
     )
     if not len(password) >= 6:
         click.echo("Passwords should be at least 6 characters.")
-        return createsuperuser(user_name, email)
+        return _prompt_for_user_details(user_name, email)
     password_confirm = click.prompt(
         text="confirm password",
         hide_input=True,
     )
     if password != password_confirm:
         click.echo("Passwords do not match")
-        return createsuperuser(user_name, email)
+        return _prompt_for_user_details(user_name, email)
+    return user_name, email, password
+
+
+@click.option(
+    '--noinput', '-n',
+    help="Create a new user with a username of 'admin' and a password of 'adminpassword'",
+    is_flag=True)
+def createsuperuser(noinput=False):
+    """Create a new super-user account"""
+    from starlit.boot.exts.security import user_datastore
+    if not noinput:
+        user_name, email, password = _prompt_for_user_details()
+    else:
+        user_name = 'admin'
+        email = 'admin@local.host'
+        password = 'adminpassword'
+        if user_datastore.find_user(user_name=user_name):
+            click.echo("User already exists.")
+            return
     admin_role = user_datastore.find_or_create_role('admin')
     user_datastore.create_user(
         user_name=user_name,

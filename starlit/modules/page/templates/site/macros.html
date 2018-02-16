@@ -112,46 +112,43 @@
 {% macro messages() %}
   {% with messages = get_flashed_messages(with_categories=True) %}
     {% if messages %}
-      <div class="card-deck">
       {% for category, m in messages %}
         {% if category %}
         {% set mapping={'message': 'info', 'error': 'danger', 'success':'success'} %}
-        <div class="card card-outline-{{ mapping.get(category, category) }} text-center">
-        {% else %}
-        <div class="card card-outline-primary text-center">
+          {% set raw_cat=mapping.get(category, category) %}
+          {% if '.' in raw_cat %}
+            {% set cat = raw_cat.split('.')[0] %}
+          {% else %}
+            {% set cat = raw_cat %}
+          {% endif %}
+          <div class="alert alert-{{ cat }} alert-dismissible fade show" role="alert">
+          {{ m|safe if 'markup' in raw_cat else m }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         {% endif %}
-        <div class="card-block">
-          <p class="card-text">
-          {{ m|safe if category=='markup' else m }}
-          </p>
-        </div>
-        </div>
       {% endfor %}
-    </div>
     {% endif %}
   {% endwith %}
 {% endmacro %}
 
 {% macro render_tree_branch(branch) %}
-<a href="{{branch.url}}" class="list-group-item list-group-item-action">{{branch.title}}</a>
+<a href="{{branch.url}}" class="list-group-item list-group-item-action footer-tree-link text-white">{{branch.title}}</a>
 {% if branch.children %}
-<ul class="list-group list-group-flush">
+<div class="list-group list-group-flush submenu">
 {% for b in branch.children %}
 {{render_tree_branch(b)}}
 {% endfor %}
-</ul>
+</div>
 {% endif %}
 {% endmacro %}
 
 {% macro render_footer_tree(pages) %}
-<div class="container-fluid">
-<div class="row justify-content-md-center">
+<div class="row m-2">
 {% for page in pages %}
 <div class="col-sm-3">
   <div class="list-group list-group-flush">
   {{ render_tree_branch(page) }}
 </div>
-{% endfor %}
 </div>
+{% endfor %}
 </div>
 {% endmacro %}

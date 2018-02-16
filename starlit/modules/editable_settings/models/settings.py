@@ -1,7 +1,7 @@
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.ext.associationproxy import association_proxy
-from flask import current_app
+from flask import current_app, _app_ctx_stack
 from starlit.boot.exts.sqla import db
 from starlit.models.abstract import SQLAEvent, ProxiedDictMixin, DynamicProp
 
@@ -29,18 +29,13 @@ class Settings(ProxiedDictMixin, db.Model, SQLAEvent):
     profile_id = db.Column(db.Integer, db.ForeignKey('settings_profile.id'), nullable=False)
 
     def on_init(self):
-        self.populate(current_app.provided_settings())
-
-    def populate(self, opts):
-        for option in opts:
+        ctx = _app_ctx_stack.top
+        if not getattr(ctx, 'app_categories', None):
+            ctx.app_categories = {}
+            for opt in current_app.provided_settings:
+                ctx.app_categories[opt.category] = SettingCategory(name=opt.category)
+        for option in current_app.provided_settings:
             setting = Setting(key=option.name)
             setting.value = option.default
-            setting.category = self.get_category(option.category)
+            setting.category = ctx.app_categories[option.category]
             self.options[option.name] = setting
-
-    def get_category(self, cat_name):
-        with db.session.no_autoflush:
-            try:
-                return SettingCategory.query.filter_by(name=cat_name).one()
-            except NoResultFound:
-                return SettingCategory(name=cat_name)

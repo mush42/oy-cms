@@ -13,7 +13,7 @@ from ...core import AuthenticationViewMixin, StarlitBaseView
 
 def make_settings_form_for_category(category):
     fields = []
-    for option in current_app.provided_settings():
+    for option in current_app.provided_settings:
         if option.category != category:
             continue
         option.default = getattr(current_settings, option.name)
@@ -30,9 +30,9 @@ def update_settings_from_form(data):
 
 @AdminPlugin.setupmethod
 def add_settings_categories(app, admin):
-    categories = []
-    for i in app.provided_settings():
-        categories.append(i.category)
+    categories = set()
+    for i in app.provided_settings:
+        categories.add(i.category)
     for category in categories:
         class SettingsAdmin(StarlitBaseView):
             settings_category = category

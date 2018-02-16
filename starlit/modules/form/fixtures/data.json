@@ -1,4 +1,18 @@
 {
+  "starlit.modules.form.models.Form": [
+    {
+      "id": 141,
+      "title": "Contact Us",
+      "slug": "contact-us",
+      "content": "<h1>Contact Us</h1>",
+      "author_id": 2,
+      "status": "published",
+      "publish_date": "2012-01-12 00:00:00",
+      "must_show_in_menu": true,
+      "submit_text": "Send Message",
+      "submit_message": "<h1>Your message has been received. Thanks a bundle!</h1>"
+    }
+  ],
   "starlit.modules.form.models.Field": [
     {
       "id": 1,
@@ -41,20 +55,6 @@
       "label": "Your message",
       "type": "textarea",
       "description": "Please write in full details."
-    }
-  ],
-  "starlit.modules.form.models.Form": [
-    {
-      "id": 141,
-      "title": "Contact Us",
-      "slug": "contact-us",
-      "content": "<h1>Contact Us</h1>",
-      "author_id": 2,
-      "status": "published",
-      "publish_date": "2012-01-12 00:00:00",
-      "must_show_in_menu": true,
-      "submit_text": "Send Message",
-      "submit_message": "<h1>Your message has been received. Thanks a bundle!</h1>"
     }
   ]
 }

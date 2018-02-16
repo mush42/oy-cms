@@ -61,4 +61,4 @@ class AdminPlugin(StarlitPlugin):
         return admin
 
     def admin_plugin_static(self, filename):
-        return url_for("{}.static".format(self.name), filename="starlit-admin/{}".format(filename))
+        return url_for("%s.static" %(self.name,), filename="starlit-admin/%s" %(filename,))

@@ -4,29 +4,10 @@
 #wrapper {
   margin: 1rem;
 }
-
-footer {
-  background: rgb(116, 50, 124);
-  padding: 50px 0 65px;
+.footer-tree-link {
+  background-color: transparent !important;
+  padding: .4rem;
 }
-footer .list-inline a {
-  color: #444444;
-}
-footer .list-inline {
-  margin: 0;
-  padding: 0;
-}
-footer .copyright {
-  color: #eee;
-  font-size: 14px;
-  text-align: center;
-  margin-bottom: 0;
-}
-.footer-tree li a {
-	color: rgb(251, 225, 255);
-	font-size: 90%;
-}
-ul ul,
-ul ol {
-	margin-left: 10px;
+.submenu {
+  margin-left: .6rem;
 }

@@ -22,7 +22,7 @@ class Field(db.Model):
     description = db.Column(db.Unicode(255),
         info=dict(label=lazy_gettext('Field Description'), description=lazy_gettext('A summary about the field'))
     )
-    type = db.Column(db.Enum(*FIELD_MAP.keys()), nullable=False,
+    type = db.Column(db.Enum(*FIELD_MAP.keys(), name="field_types"), nullable=False,
         info=dict(choices=[(k, v.name) for k, v in FIELD_MAP.items()], label=lazy_gettext('Field Type'), description=lazy_gettext('HTML Type of the field'))
     )
     choices = db.Column(db.Unicode,
