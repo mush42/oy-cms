@@ -25,7 +25,7 @@
       "title": "Web Design",
       "slug": "design",
       "content": "<h1>Our Design</h1>",
-      "author_id": 2,
+      "author_id": 1,
       "status": "published",
       "must_show_in_menu": true,
       "parent_id": 2,

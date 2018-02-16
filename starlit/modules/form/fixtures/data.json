@@ -5,7 +5,7 @@
       "title": "Contact Us",
       "slug": "contact-us",
       "content": "<h1>Contact Us</h1>",
-      "author_id": 2,
+      "author_id": 1,
       "status": "published",
       "publish_date": "2012-01-12 00:00:00",
       "must_show_in_menu": true,
