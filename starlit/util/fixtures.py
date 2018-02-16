@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 from dateutil.parser import parse
 from werkzeug import import_string
@@ -8,7 +9,10 @@ from starlit.boot.exts.sqla import db
 
 
 class _Fixtured(object):
-    """An object that is able to install fixtures from its module path."""
+    """
+    A Mixin class to enable the installation of fixtures
+    from the path of an instance of `Starlit.wrappers.StarlitModule`.
+    """
     
     def deserialize_instance(self, model, **obj):
         """Given a model and fields as a dict of keyword args
@@ -38,6 +42,10 @@ class _Fixtured(object):
             return
         for model_import_path, objs in self.fixtures.items():
             model = import_string(model_import_path)
+            # Continue gracefully if there is some data in the table
+            if model.query.count():
+                print("Skipping the installation of %s fixtures. Table is not empty." %model_import_path,)
+                continue
             for obj in objs:
                 instance = self.deserialize_instance(model, **obj)
                 db.session.add(instance)
