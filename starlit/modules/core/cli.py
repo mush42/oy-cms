@@ -67,7 +67,7 @@ def createsuperuser(noinput=False):
     else:
         user_name = 'admin'
         email = 'admin@local.host'
-        password = 'adminpassword'
+        password = b'adminpass'
         if user_datastore.find_user(user_name=user_name):
             click.echo("User already exists.")
             return
