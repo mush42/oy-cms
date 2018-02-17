@@ -32,12 +32,13 @@ def create_db():
 
 
 @app.cli.command(name='drop-db', help="Drop database tables")
-def drop_db():
+@click.option('--noinput', '-n', is_flag=True)
+def drop_db(noinput):
     click.echo("!!!!!!!!!")
-    response = click.confirm("""This is a distructive operation. You will loose all  you data.\r\n
-    Do you want to drop all database tables?""")
-    if not response:
-        raise click.Abort()
+    if not noinput:
+        response = click.confirm("""This is a distructive operation. You will loose all  you data.\r\nDo you want to drop all database tables?""")
+        if not response:
+            raise click.Abort()
     with app.app_context():
         db.drop_all()
     click.echo("Database tables dropped")
