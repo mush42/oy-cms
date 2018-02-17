@@ -1,3 +1,16 @@
+# -*- coding: utf-8 -*-
+"""
+    starlit.globals
+    ~~~~~~~~~~
+
+    Starlit context bound objects to be used during request handling.
+    The most important one is the **current_page** which points to
+    the currently requested page if there is one.
+
+    :copyright: (c) 2018 by Musharraf Omer.
+    :license: MIT, see LICENSE for more details.
+"""
+
 import sys
 from werkzeug import import_string
 from werkzeug.local import LocalProxy
@@ -11,9 +24,6 @@ def _get_page_cls():
     return import_string(cls_import_name)
 
 
-parent_page_class = LocalProxy(lambda: _get_page_cls())
-
-
 def _get_page_for_request():
     cls = parent_page_class
     if request is None:
@@ -24,4 +34,6 @@ def _get_page_for_request():
     requested_slug_path = requested_slug_path or current_app.config['HOME_SLUG']
     return cls.query.filter(cls.slug_path==requested_slug_path).one_or_none()
 
+
+parent_page_class = LocalProxy(lambda: _get_page_cls())
 current_page = LocalProxy(lambda: _get_page_for_request())

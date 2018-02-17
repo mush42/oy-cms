@@ -1,11 +1,22 @@
+# -*- coding: utf-8 -*-
+"""	
+    starlit.models.abstract.publishable
+    ~~~~~~~~~~
+
+    Provides a mixin classe for publishing content 
+
+    :copyright: (c) 2018 by Musharraf Omer.
+    :license: MIT, see LICENSE for more details.
+"""
+
 from datetime import datetime
 from sqlalchemy.ext.hybrid import hybrid_property
 from starlit.boot.exts.sqla import db
 from .time_stampped import TimeStampped
 
 
-
 class Publishable(TimeStampped):
+    """Add fields to track the publish status of the content """
     STATUS_CHOICES = [
         ('published', 'Published'),
         ('draft', 'Draft'),

@@ -1,3 +1,14 @@
+# -*- coding: utf-8 -*-
+"""	
+    starlit.models.abstract.slugged
+    ~~~~~~~~~~
+
+    Provide a mixin class for slugged content.
+
+    :copyright: (c) 2018 by Musharraf Omer.
+    :license: MIT, see LICENSE for more details.
+"""
+
 from sqlalchemy import inspect
 from sqlalchemy.orm.exc import NoResultFound
 from flask import current_app
@@ -7,6 +18,7 @@ from ._sqlaevent import SQLAEvent
 
 
 class Titled(SQLAEvent):
+    """Provide a mandatory title field"""
     title = db.Column(
         db.Unicode(255),
         nullable=False,
@@ -18,13 +30,13 @@ class Titled(SQLAEvent):
 
     def __str__(self):
         return self.title
-    __unicode__ = __str__
 
     def __repr__(self):
         return '{0}(title={1})'.format(self.__class__.__name__, self.title)
 
 
 class Slugged(SQLAEvent):
+    """A uniquely slugged mixin class"""
     slug = db.Column(
         db.Unicode(255),
         unique=True,

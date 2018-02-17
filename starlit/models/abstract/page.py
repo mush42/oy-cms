@@ -1,3 +1,14 @@
+# -*- coding: utf-8 -*-
+"""	
+    starlit.models.abstract.page
+    ~~~~~~~~~~
+
+    Provides an abstract sqlalchemy model to be extended
+
+    :copyright: (c) 2018 by Musharraf Omer.
+    :license: MIT, see LICENSE for more details.
+"""
+
 from sqlalchemy import inspect
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -6,11 +17,13 @@ from starlit.boot.exts.sqla import db
 from .displayable import Displayable, DisplayableQuery
 
 class PageQuery(DisplayableQuery):
+    """Add page specific methodds to the query"""
     @property
     def viewable(self):
         return self.published.filter_by(is_live=True)
 
 class AbstractPage(Displayable):
+    """Extends :class:`Displayable` with special fields"""
     __abstract__ = True
     __metadescription_column__ = 'content'
     query_class = PageQuery

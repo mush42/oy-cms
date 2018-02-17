@@ -1,3 +1,14 @@
+# -*- coding: utf-8 -*-
+"""	
+    starlit.models.abstract.polymorphic_prop
+    ~~~~~~~~~~
+
+    Provides helper mixin classes for special sqlalchemy models
+
+    :copyright: (c) 2018 by Musharraf Omer.
+    :license: MIT, see LICENSE for more details.
+"""
+
 import six
 import sqlalchemy.types as types
 from sqlalchemy.orm.interfaces import PropComparator
@@ -14,7 +25,6 @@ class ProxiedDictMixin(object):
     This class basically proxies dictionary access to an attribute
     called ``_proxied``.  The class which inherits this class
     should have an attribute called ``_proxied`` which points to a dictionary.
-
     """
 
     def __len__(self):
@@ -38,8 +48,12 @@ class ProxiedDictMixin(object):
     def __delitem__(self, key):
         del self._proxied[key]
 
-class ReadOnlyProxiedDictMixin(ProxiedDictMixin):
 
+class ReadOnlyProxiedDictMixin(ProxiedDictMixin):
+    """Like :class:`ProxiedDictMixin` but disables the assignment
+    and deletion of items
+    """
+    
     def __setitem__(self, key, value):
         if key not in self._proxied:
             raise AttributeError("Cann't Set Attribute")
@@ -53,7 +67,6 @@ class PolymorphicVerticalProperty(object):
 
     The class which is mapped should indicate typing information
     within the "info" dictionary of mapped Column objects.
-
     """
 
     def __init__(self, key=None, value=None):

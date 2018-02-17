@@ -1,3 +1,14 @@
+# -*- coding: utf-8 -*-
+"""	
+    starlit.models.abstract.metadata
+    ~~~~~~~~~~
+
+    Provides content meta-data mixin classes
+
+    :copyright: (c) 2018 by Musharraf Omer.
+    :license: MIT, see LICENSE for more details.
+"""
+
 from sqlalchemy import inspect
 from starlit.boot.exts.sqla import db
 from starlit.util.helpers import make_summary
@@ -5,6 +16,7 @@ from ._sqlaevent import SQLAEvent
 
 
 class Metadata(SQLAEvent):
+    """Provides fields which could be used with HTML meta tags"""
     meta_title = db.Column(
         db.Unicode(255),
         default=u'',

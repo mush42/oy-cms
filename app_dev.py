@@ -1,11 +1,12 @@
 import os 
-from tempfile import mkdtemp
+import tempfile
+import click
 from starlit import create_app
 from starlit.boot.exts.sqla import db
 from starlit.contrib.admin import AdminPlugin
 
 
-TEMP_DIR = mkdtemp()  
+TEMP_DIR = tempfile.mkdtemp()  
 UPLOADS_PATH = os.path.join(TEMP_DIR, "uploads")
 
 if not os.path.exists(UPLOADS_PATH):
@@ -27,8 +28,16 @@ app.use(AdminPlugin)
 def create_db():
     with app.app_context():
         db.create_all()
+    click.echo("Database tables created.")
+
 
 @app.cli.command(name='drop-db', help="Drop database tables")
 def drop_db():
+    click.echo("!!!!!!!!!")
+    response = click.confirm("""This is a distructive operation. You will loose all  you data.\r\n
+    Do you want to drop all database tables?""")
+    if not response:
+        raise click.Abort()
     with app.app_context():
         db.drop_all()
+    click.echo("Database tables dropped")

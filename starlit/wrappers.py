@@ -1,32 +1,74 @@
+# -*- coding: utf-8 -*-
+"""	
+    starlit.wrappers
+    ~~~~~~~~~~
+
+    Wrapps flask classes to provide the core functionality of
+    the CMS engine
+
+    :copyright: (c) 2018 by Musharraf Omer.
+    :license: MIT, see LICENSE for more details.
+"""
+
 import sys
 import os
-from collections import namedtuple
 from importlib import import_module
 from warnings import warn
+from collections import namedtuple
+
 from werkzeug import import_string
 from werkzeug.utils import cached_property
 from jinja2 import ChoiceLoader, FileSystemLoader
 from flask import Flask, Blueprint
 from flask.config import Config
 from flask.helpers import locked_cached_property, get_root_path
+
 from starlit.util.helpers import find_modules, import_modules
 from starlit.util.fixtures import _Fixtured
 
 
+# contenttype handler functions are stored like this
 handler_opts = namedtuple('PageContentTypeHandler', 'view_func methods module')
 
+
 class StarlitConfig(Config):
+    """Custom config class used by :class:`Starlit`"""
+    
     def from_module_defaults(self, import_name):
+        """Helper method to import the default config module from
+        the given dotted path.
+
+        This method is called by :class:`Starlit` to load registered modules
+        default configurations, which is represented by the presence of
+        a module named **defaults.py** within the same directory of the
+        module.
+    .. Note:: Fall Back Configuration
+
+        The configurations keys registered with this function are fall back
+        values. This means a certain key will not be added if a
+        config with the same name already exists.
+
+        :param import_name: The dotted import name to the module 
+        """
         pymod = sys.modules[import_name]
         if not pymod.__file__.endswith("__init__.py"):
             # A module, try to get the parent package
             import_name = ".".join(import_name.rsplit(".")[:-1])
         defaults_mod = import_string(import_name + ".defaults", silent=True)
-        self.from_object(defaults_mod)
+        for key in dir(defaults_mod):
+            if key not in self and key.isupper():
+                self[key] = getattr(defaults_mod, key)
 
 
 class StarlitModule(Blueprint, _Fixtured):
+    """StarlitModule is a :class:`flask.Blueprint` with some extras
+    
+    This class adds the ability to register custom page handlers and
+    editable settings which can be safely edited by the user on runtime.
 
+    Basically  you can initialize it like other flask blueprints
+    """
+    
     def __init__(self, name, import_name, *args, **kwargs):
         self.name = name
         self.import_name = import_name
@@ -45,11 +87,14 @@ class StarlitModule(Blueprint, _Fixtured):
 
     def register(self, app, *args, **kwargs):
         super(StarlitModule, self).register(app, *args, **kwargs)
+        # Update the app.config with our defaults
         app.config.from_module_defaults(self.import_name)
+        # Add our page contenttype handlers to the app 
         for contenttype, opts in self._content_type_handlers.items():
             app._add_contenttype_handler(contenttype, **opts._asdict())
 
     def contenttype_handler(self, contenttype, methods):
+        """Like :meth:`Starlit.contentype_handler` but for a module. """
         def wrapper(func):
             self._content_type_handlers[contenttype] = handler_opts(
                 func,
@@ -61,17 +106,33 @@ class StarlitModule(Blueprint, _Fixtured):
         return wrapper
 
     def settings_provider(self, func):
+        """Record a function as a setting provider
+
+        Setting provider functions should return a list of options.
+        This could be done easley using :class:`starlit.utils.option.Option`
+        """
         self.settings_providers.append(func)
         def wrapped(*a, **kw):
             return func(*a, **kw)
         return wrapped
 
     def get_provided_settings(self):
+        """Iterate over registered modules and return setting providers"""
         for provider in self.settings_providers:
             yield provider()
 
 
 class Starlit(Flask):
+    """Wrapps the :class:flask.Flask` to provide additional functionality.
+    
+    It add the following features:
+        - Custom module system
+        - Page contenttype handlers
+        - Editable settings which are persisted to the database
+        - Plugin support
+    """
+    
+    # Custom configuration class :class:`StarlitConfig`
     config_class = StarlitConfig
 
     def __init__(self, *args, **kwargs):
@@ -83,7 +144,7 @@ class Starlit(Flask):
 
     @locked_cached_property
     def jinja_loader(self):
-        """Starlit modules should have higher priority"""
+        """Templates provided by starlit modules should have higher priority"""
         mod_templates = [
             FileSystemLoader(self.template_folder),
             super(Starlit, self).jinja_loader,
@@ -102,6 +163,16 @@ class Starlit(Flask):
             )
 
     def contenttype_handler(self, contenttype, methods):
+        """A decorator to add custom contenttype handlers to be
+        registered with the application
+
+        .. Note::
+            Functions decorated with this functions are treated like
+            flask views.
+
+        :param contenttype: a string that identify a certain page class
+        :param methods: a list of HTTP methods that are accepted by this handler
+        """
         def wrapper(func):
             self._add_contenttype_handler(func, contenttype, methods)
             def wrapped(*a, **kw):
@@ -113,10 +184,15 @@ class Starlit(Flask):
         return self._page_contenttype_handlers.get(contenttype)
 
     def register_module(self, module, **options):
+        """Register a starlit module with this application"""
         super(Starlit, self).register_blueprint(blueprint=module, **options)
         self.modules[module.name] = module
 
     def find_starlit_modules(self, pkg):
+        """Find all starlit modules within a given package.
+        
+        :param pkg: the dotted import_name of the package
+        """
         for module in import_modules(pkg):
             modname = module.__name__
             if modname in self.config['EXCLUDED_MODULES']:
@@ -137,14 +213,16 @@ class Starlit(Flask):
 
     @property
     def provided_settings(self):
+        """Iterate over registered modules to collect editable settings"""
         if not self._provided_settings:
             self._collect_provided_settings()
         return self._provided_settings.values()
 
     def use(self, plugin, *args, **kwargs):
+        """Use the given plugin with this application"""
         plugin = plugin()
-        self.plugins[plugin.name] = plugin
         plugin.init_app(self, *args, **kwargs)
         if plugin.needs_module_registration:
             self.register_module(plugin)
+        self.plugins[plugin.name] = plugin
         return plugin

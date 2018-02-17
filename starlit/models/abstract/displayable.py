@@ -1,3 +1,15 @@
+# -*- coding: utf-8 -*-
+"""	
+    starlit.models.abstract.displayable
+    ~~~~~~~~~~
+
+    This module provides the core interface of starlit content.
+    Its core functionality is implemented by other mixin classes
+
+    :copyright: (c) 2018 by Musharraf Omer.
+    :license: MIT, see LICENSE for more details.
+"""
+
 from datetime import datetime
 from sqlalchemy.ext.declarative import declared_attr
 from flask import current_app
@@ -12,6 +24,8 @@ from .user_related import UserRelated
 
 
 class DisplayableQuery(BaseQuery):
+    """A Custom query that provides additional methods"""
+    
     @property
     def published(self):
         pub = self._joinpoint_zero().columns['publish_date']
@@ -22,7 +36,8 @@ class DisplayableQuery(BaseQuery):
         return rv
 
 class Displayable(db.Model, Titled, Slugged, Metadata, Publishable, UserRelated):
-    """Displayable"""
+    """The core of all starlit content models"""
+
     __abstract__ = True
     __slugcolumn__ = 'title'
     __keywordscolumn__ = 'title'

@@ -1,3 +1,14 @@
+# -*- coding: utf-8 -*-
+"""	
+    starlit.models.abstract
+    ~~~~~~~~~~
+
+    Abstract classes to be used with starlit CMS classes.
+
+    :copyright: (c) 2018 by Musharraf Omer.
+    :license: MIT, see LICENSE for more details.
+"""
+
 from .slugged import Slugged, Titled
 from .metadata import Metadata
 from .time_stampped import TimeStampped

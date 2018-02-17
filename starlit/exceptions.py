@@ -1,3 +1,13 @@
+# -*- coding: utf-8 -*-
+"""
+    starlit.exceptions
+    ~~~~~~~~~~
+
+    The core exception classes for starlit
+
+    :copyright: (c) 2018 by Musharraf Omer.
+    :license: MIT, see LICENSE for more details.
+"""
 
 class StarlitException(Exception):
     """The base exception class for Starlit."""    
@@ -6,8 +16,8 @@ class StarlitException(Exception):
 
 
 class StarlitConfigurationError(StarlitException):
-    """Raised when trying to initialize a disabled feature"""
+    """Miss configuration of starlit"""
 
 
 class BadlyFormattedFixture(StarlitException):
-    """Raised when a json.JSONDecodeError exception is raised."""
+    """Raised when a fixture could not be decoded"""
