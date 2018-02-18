@@ -7,7 +7,16 @@ from jinja2.ext import Extension
 from wtforms.widgets.core import html_params
 from markupsafe import escape
 from starlit.babel import gettext
-from starlit.boot.context_processors import should_enable_inline_editing
+from starlit.plugin import StarlitPlugin
+
+
+def should_enable_inline_editing():
+    if not current_app.config.get('ENABLE_INLINE_EDITING'):
+        return False
+    elif not current_user.is_authenticated or not current_user.is_active or not current_user.has_role('admin'):
+        return False
+    return True
+
 
 import random
 import json
@@ -114,3 +123,10 @@ class EditableExtension(Extension):
         name = cls.__name__.lower()
         return url_for('canella-api.%s-resource' %name, pk=pk)
 
+
+class EditablePlugin(StarlitPlugin):
+    """Provide integration with starlit for the EditableExtenssion"""
+    
+    def init_app(self, app):
+        app.jinja_env.extensions['starlit.contrib.jinja.editable.EditableExtension'] = EditableExtension(app.jinja_env)
+        app.jinja_env.globals[should_enable_inline_editing] = should_enable_inline_editing

@@ -10,6 +10,7 @@
     :license: MIT, see LICENSE for more details.
 """
 
+import types
 import sys
 import os
 from importlib import import_module
@@ -34,30 +35,34 @@ handler_opts = namedtuple('PageContentTypeHandler', 'view_func methods module')
 class StarlitConfig(Config):
     """Custom config class used by :class:`Starlit`"""
     
-    def from_module_defaults(self, import_name):
+    def from_module_defaults(self, root_path):
         """Helper method to import the default config module from
-        the given dotted path.
+        the given path.
 
         This method is called by :class:`Starlit` to load registered modules
         default configurations, which is represented by the presence of
         a module named **defaults.py** within the same directory of the
         module.
-    .. Note:: Fall Back Configuration
+
+    .. Note:: Fall Back Configurations
 
         The configurations keys registered with this function are fall back
         values. This means a certain key will not be added if a
-        config with the same name already exists.
+        config key with the same name already exists.
 
-        :param import_name: The dotted import name to the module 
+        :param root_path: The root path of the module
         """
-        pymod = sys.modules[import_name]
-        if not pymod.__file__.endswith("__init__.py"):
-            # A module, try to get the parent package
-            import_name = ".".join(import_name.rsplit(".")[:-1])
-        defaults_mod = import_string(import_name + ".defaults", silent=True)
-        for key in dir(defaults_mod):
+        filename = os.path.join(root_path, 'defaults.py')
+        d = types.ModuleType('default_config')
+        d.__file__ = filename
+        try:
+            with open(filename, mode='rb') as config_file:
+                exec(compile(config_file.read(), filename, 'exec'), d.__dict__)
+        except IOError:
+            return
+        for key in dir(d):
             if key not in self and key.isupper():
-                self[key] = getattr(defaults_mod, key)
+                self[key] = getattr(d, key)
 
 
 class StarlitModule(Blueprint, _Fixtured):
@@ -88,7 +93,7 @@ class StarlitModule(Blueprint, _Fixtured):
     def register(self, app, *args, **kwargs):
         super(StarlitModule, self).register(app, *args, **kwargs)
         # Update the app.config with our defaults
-        app.config.from_module_defaults(self.import_name)
+        app.config.from_module_defaults(self.root_path)
         # Add our page contenttype handlers to the app 
         for contenttype, opts in self._content_type_handlers.items():
             app._add_contenttype_handler(contenttype, **opts._asdict())

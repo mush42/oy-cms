@@ -42,8 +42,13 @@ def add_slug_path(state):
 
 @core.record_once
 def add_cli_command(state):
-    state.app.cli.command(name='install-fixtures')(install_fixtures)
-    state.app.cli.command(name='create-super-user')(createsuperuser)
+    """Add starlit command line interface"""
+    @state.app.cli.group(name='starlit')
+    def starlit_group():
+        """Perform tasks related to Starlit CMS"""
+    
+    starlit_group.command(name='install-fixtures')(install_fixtures)
+    starlit_group.command(name='create-super-user')(createsuperuser)
 
 
 @core.app_context_processor

@@ -1,8 +1,6 @@
+from flask import current_app
 from starlit.util.helpers import prettify_date
-try:
-    from urllib.parse import urlencode
-except ImportError:
-    from urllib import urlencode
+from urllib.parse import urlencode
 
 
 def pretty_date(date):
@@ -11,9 +9,8 @@ def pretty_date(date):
 def args(url, qs):
     return '{}?'.format(url) + urlencode(qs)
 
-def register_template_filters(app):
+def register_template_filters():
     template_filters = (pretty_date, args)
     for template_filter in template_filters:
-        app.add_template_filter(template_filter)
-
+        current_app.add_template_filter(template_filter)
 

@@ -59,7 +59,7 @@ def _prompt_for_user_details(user_name=None, email=None):
     '--noinput', '-n',
     help="Create a new user with a username of 'admin' and a password of 'adminpassword'",
     is_flag=True)
-def createsuperuser(noinput=False):
+def createsuperuser(noinput):
     """Create a new super-user account"""
     from starlit.boot.exts.security import user_datastore
     if not noinput:
@@ -67,7 +67,7 @@ def createsuperuser(noinput=False):
     else:
         user_name = 'admin'
         email = 'admin@local.host'
-        password = b'adminpass'
+        password = 'adminpass'
         if user_datastore.find_user(user_name=user_name):
             click.echo("User already exists.")
             return

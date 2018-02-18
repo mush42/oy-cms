@@ -3,10 +3,10 @@
 {% with page_html_id=page.slug|unique_string %}
 {% if page.children %}
 <li class="nav-item dropdown {{active_class}}">
-<a class="nav-link dropdown-toggle" href="{{page.slug_path}}" id="{{ page_html_id }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{page.title}} <i class="fa fa-caret-down"></i></a>
-<div class="dropdown-menu" aria-labelledby="{{ page_html_id }}">
+<a class="nav-link dropdown-toggle" href="{{page.slug_path}}" id="{{ page_html_id }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{page.title}}</a>
+<div class="dropdown-menu bg-dark" aria-labelledby="{{ page_html_id }}">
 {% for child in page.children %}
-<a class="dropdown-item {{active_class}}" href="{{child.url}}">{{child.title}}</a>
+<a class="dropdown-item bg-dark text-white {{active_class}}" href="{{child.url}}">{{child.title}}</a>
 {% endfor %}
 </div>
 </li>

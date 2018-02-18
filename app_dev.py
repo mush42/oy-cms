@@ -24,16 +24,23 @@ app = create_app('dev', config=config)
 app.use(AdminPlugin)
 
 
-@app.cli.command(name='create-db', help="Create database tables")
+@app.cli.group(name="database")
+def database():
+    """Perform database operations"""
+
+
+@database.command(name='create')
 def create_db():
+    """Create database tables."""
     with app.app_context():
         db.create_all()
     click.echo("Database tables created.")
 
 
-@app.cli.command(name='drop-db', help="Drop database tables")
+@database.command(name='drop')
 @click.option('--noinput', '-n', is_flag=True)
 def drop_db(noinput):
+    """Drop database tables"""
     click.echo("!!!!!!!!!")
     if not noinput:
         response = click.confirm("""This is a distructive operation. You will loose all  you data.\r\nDo you want to drop all database tables?""")
