@@ -88,7 +88,7 @@ def install_fixtures():
     if not User.query.filter(User.active==True).count():
         click.echo(user_not_created_msg)
         if click.prompt("Would you like to create one now? (y/n):", default="y") == 'y':
-            createsuperuser()
+            createsuperuser(noinput=False)
         else:
             raise click.Abort()
     click.echo('Installing fixtures in the database')
