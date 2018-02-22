@@ -6,6 +6,19 @@ from starlit.babel import gettext, ngettext
 
 _unique_string_cache = {}
 
+
+def make_shell_context():
+    """Add starlit-specific variables to the shell context"""
+    from starlit.globals import parent_page_class
+    from starlit.boot.exts.sqla import db
+    from starlit.modules.core.models import User
+    return {
+      'db': db,
+      'User': User,
+      'Page': parent_page_class
+    }
+
+
 def inject_language_info():
     lang = get_locale().language
     rtl = lang in ('ar', 'az', 'fa', 'he', 'ur', )
@@ -31,3 +44,5 @@ def register_context_processors():
     for cp in context_processers:
         current_app.context_processor(cp)
     current_app.template_filter()(unique_string)
+    current_app.shell_context_processor(make_shell_context)
+    

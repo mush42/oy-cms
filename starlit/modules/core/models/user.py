@@ -1,6 +1,8 @@
+from sqlalchemy import inspect
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.ext.associationproxy import association_proxy
 from flask_security import UserMixin, RoleMixin
+from flask_security.utils import hash_password
 from starlit.boot.exts.sqla import db
 from starlit.babel import lazy_gettext
 from starlit.models.abstract import TimeStampped, ProxiedDictMixin, DynamicProp, SQLAEvent
@@ -23,7 +25,7 @@ class Role(db.Model, RoleMixin):
         return self.name
 
 
-class User(db.Model, UserMixin):
+class User(db.Model, UserMixin, SQLAEvent):
     __slugcolumn__ = 'user_name'
     id = db.Column(db.Integer, primary_key=True)
     user_name = db.Column(db.Unicode(128), nullable=False, unique=True, index=True,
@@ -53,3 +55,10 @@ class User(db.Model, UserMixin):
     def __repr__(self):
         return 'User(user_name={})'.format(self.user_name)
 
+    def before_commit(self, session, is_modified):
+        needs_hash = any((
+          not is_modified,
+          is_modified and 'password' not in inspect(self).unmodified
+        ))
+        if needs_hash:
+            self.password = hash_password(self.password)

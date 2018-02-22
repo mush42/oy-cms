@@ -8,6 +8,7 @@ from starlit.boot.exts.security import user_datastore
 @pytest.fixture(scope="module")
 def app():
     app = starlit.create_app(__name__, config=dict(
+        SECRET_KEY='testing-secret-key',
         TESTING=True,
         DEBUG=True,
         SQLALCHEMY_DATABASE_URI='sqlite:///:memory:',

@@ -14,6 +14,8 @@ if not os.path.exists(UPLOADS_PATH):
 
 config = dict(
     DEBUG=True,
+    # Change this before you precede
+    SECRET_KEY='super-secret-key',
     SQLALCHEMY_DATABASE_URI="sqlite:///db.sqlite",
     #EXPLAIN_TEMPLATE_LOADING=True,
     SECURITY_PASSWORD_SALT = '540SDW4426HCAER56546aDrw213d2a6b9a94e15b5d',
