@@ -36,18 +36,21 @@ def create_db():
     """Create database tables."""
     with app.app_context():
         db.create_all()
-    click.echo("Database tables created.")
+    click.secho("Database tables created.", fg='green', bold=True)
 
 
 @database.command(name='drop')
 @click.option('--noinput', '-n', is_flag=True)
 def drop_db(noinput):
     """Drop database tables"""
-    click.echo("!!!!!!!!!")
+    click.secho("!!!!!!!!!", fg='red', blink=True)
     if not noinput:
-        response = click.confirm("""This is a distructive operation. You will loose all  you data.\r\nDo you want to drop all database tables?""")
-        if not response:
+        message = click.style(
+          "This is a distructive operation. You will loose all  your data.\r\n\tDo you want to drop all database tables?",
+          fg='red',
+          blink=True)
+        if not click.confirm(message):
             raise click.Abort()
     with app.app_context():
         db.drop_all()
-    click.echo("Database tables dropped")
+    click.secho("Database tables dropped", fg='green', bold=True)
