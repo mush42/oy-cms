@@ -12,7 +12,7 @@ def app():
         TESTING=True,
         DEBUG=True,
         SQLALCHEMY_DATABASE_URI='sqlite:///:memory:',
-        SECURITY_PASSWORD_SALT = '540SDW4426HCAER56546aDrw213d2a6b9a94e15b5d'
+        SECURITY_PASSWORD_HASH='plaintext',
     ))
     yield app
 
