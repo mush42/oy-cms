@@ -1,15 +1,10 @@
-import re
 import click
 from flask import current_app
 from flask.cli import FlaskGroup
 from starlit.boot.exts.sqla import db
+from starlit.util.helpers import is_valid_email
 from starlit.modules.core.models import User, Role
 
-
-_email_re = re.compile(
-    r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b",
-    flags=re.IGNORECASE
-  )
 
 user_not_created_msg = """
 Super-user required!
@@ -35,7 +30,7 @@ def _prompt_for_user_details(user_name=None, email=None):
         if user_datastore.find_user(email=email):
             click.secho("Error: A user with the same email already address exists.", fg='red')
             return _prompt_for_user_details(user_name=user_name)
-        elif _email_re.match(email) is None:
+        elif not is_valid_email(email):
             click.secho("Invalid email address! Please try again.", fg='red')
             return _prompt_for_user_details(user_name=user_name)
     password = click.prompt(

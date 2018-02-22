@@ -9,10 +9,17 @@
     :license: MIT, see LICENSE for more details.
 """
 
+from werkzeug.exceptions import HTTPException
+
+
 class StarlitException(Exception):
     """The base exception class for Starlit."""    
     def __init__(self, help_message=None):
         self.help_message = help_message
+
+
+class StarlitHTTPException(StarlitException, HTTPException):
+    """An HTTP exception"""
 
 
 class StarlitConfigurationError(StarlitException):

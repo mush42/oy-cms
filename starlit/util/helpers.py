@@ -1,3 +1,4 @@
+import re
 from importlib import import_module
 from pkgutil import iter_modules
 from datetime import datetime
@@ -5,6 +6,15 @@ from dateutil.parser import parse
 from .xlib.dateformat import pretty_date
 from jinja2.utils import Markup
 
+
+_email_re = re.compile(
+    r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b",
+    flags=re.IGNORECASE
+  )
+
+def is_valid_email(email):
+    """Return True if the supplied argument is a valid email"""
+    return _email_re.match(email) is not None
 
 def find_modules(basemodule, package_only=True):
     path = import_module(basemodule).__path__

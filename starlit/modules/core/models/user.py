@@ -1,10 +1,12 @@
 from sqlalchemy import inspect
+from sqlalchemy.orm import validates
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.ext.associationproxy import association_proxy
 from flask_security import UserMixin, RoleMixin
 from flask_security.utils import hash_password
 from starlit.boot.exts.sqla import db
 from starlit.babel import lazy_gettext
+from starlit.util.helpers import is_valid_email
 from starlit.models.abstract import TimeStampped, ProxiedDictMixin, DynamicProp, SQLAEvent
 
 
@@ -46,8 +48,20 @@ class User(db.Model, UserMixin, SQLAEvent):
     roles = db.relationship('Role', secondary=roles_users,
         backref=db.backref('users', lazy='dynamic'),
         info=dict(label=lazy_gettext('Roles'), description=lazy_gettext(''))
-    )    
+    )
+    # TODO: remove this one
     name = property(fget=lambda self: self.profile.name)
+
+    @validates('password')
+    def validate_password(self, key, value):
+        """To be done later"""
+        return value
+
+    @validates('email')
+    def validate_email(self, key, value):
+        if not is_valid_email(value):
+            raise ValueError("Invalid email address for %r" %self)
+        return value
 
     def __str__(self):
         return self.user_name
