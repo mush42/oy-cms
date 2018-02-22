@@ -21,3 +21,9 @@ class StarlitConfigurationError(StarlitException):
 
 class BadlyFormattedFixture(StarlitException):
     """Raised when a fixture could not be decoded"""
+
+
+class PluginRequirementsNotSatisfied(StarlitException):
+    """Raised when a :class:`StarlitPlugin` requires another plugin
+    to be used by the application, but it has not been used yet
+    """

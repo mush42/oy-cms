@@ -16,6 +16,7 @@
 
 from flask_sqlalchemy.model import camel_to_snake_case
 from starlit.wrappers import StarlitModule
+from starlit.exceptions import PluginRequirementsNotSatisfied
 
 
 class StarlitPlugin(StarlitModule):
@@ -37,7 +38,7 @@ class StarlitPlugin(StarlitModule):
     # should be set to this class level variable as a dictionary
     blueprint_opts = None
 
-    def __init__(self):
+    def __init__(self, app=None, *args, **kwargs):
         if self.blueprint_opts is None:
             self.blueprint_opts = {}
         self.blueprint_opts.setdefault('import_name', self.__module__)
@@ -49,6 +50,16 @@ class StarlitPlugin(StarlitModule):
             import_name=self.blueprint_opts.pop('import_name'),
             builtin=False, **self.blueprint_opts
         )
+        if app is not None:
+            self.init_app(app, *args, **kwargs)
+
+    def _check_that_requirements_are_satisfied(self):
+        requirements = getattr(self, 'requires', [])
+        for req in requirements:
+            if req not in self.app.plugins:
+                raise PluginRequirementsNotSatisfied("Plugin %s is required by the plugin %s, but it has not been used by the application.\r\nMake sure that you have used the required plugin before you use this plugin." 
+                  %(req, self.name)
+                )
 
     def init_app(self, app, *args, **kwargs):
         """Implement the plugin logic here
@@ -59,5 +70,5 @@ class StarlitPlugin(StarlitModule):
         Any variables required to configure this plugin are passed as
         positional and keyword arguments to this method.
         """
-        raise NotImplementedError
-
+        self.app = app
+        self._check_that_requirements_are_satisfied()

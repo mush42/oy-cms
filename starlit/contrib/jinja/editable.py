@@ -128,5 +128,6 @@ class EditablePlugin(StarlitPlugin):
     """Provide integration with starlit for the EditableExtenssion"""
     
     def init_app(self, app):
+        super(EditablePlugin, self).init_app(app)
         app.jinja_env.extensions['starlit.contrib.jinja.editable.EditableExtension'] = EditableExtension(app.jinja_env)
         app.jinja_env.globals[should_enable_inline_editing] = should_enable_inline_editing

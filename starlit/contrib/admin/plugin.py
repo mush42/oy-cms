@@ -32,6 +32,7 @@ class AdminPlugin(StarlitPlugin):
     )
 
     def init_app(self, app, *args, **kwargs):
+        super(AdminPlugin, self).init_app(app, *args, **kwargs)
         admin = self.setup_flaskadmin(app)
         app.admin = admin
         app.context_processor(security_ctp_with_aadmin(admin))
