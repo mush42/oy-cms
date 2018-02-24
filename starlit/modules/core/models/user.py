@@ -60,7 +60,7 @@ class User(db.Model, UserMixin, SQLAEvent):
     @validates('email')
     def validate_email(self, key, value):
         if not is_valid_email(value):
-            raise ValueError("Invalid email address for %r" %self)
+            raise ValueError("Invalid email address %s for %r" %(value, self))
         return value
 
     def __str__(self):

@@ -25,7 +25,9 @@ class Settings(object):
         if key in self.source:
             return self.source[key]
         elif key in current_app._provided_settings:
-            self.edit(key, current_app._provided_settings[key].default)
+            val = current_app._provided_settings[key].default
+            self.edit(key, val)
+            return val
         else:
             raise SettingDoesNotExist("Setting %s does not exists" %key)
 
