@@ -6,10 +6,10 @@ from dateutil.parser import parse
 from werkzeug import import_string
 from werkzeug.utils import cached_property
 from starlit.exceptions import BadlyFormattedFixture
-from starlit.boot.exts.sqla import db
+from starlit.boot.sqla import db
 
 
-class _Fixtured(object):
+class Fixtured(object):
     """
     A Mixin class to enable the installation of fixtures
     from the path of an instance of `Starlit.wrappers.StarlitModule`.

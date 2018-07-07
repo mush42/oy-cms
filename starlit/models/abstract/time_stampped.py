@@ -10,7 +10,7 @@
 """
 
 from datetime import datetime
-from starlit.boot.exts.sqla import db
+from starlit.boot.sqla import db
 from ._sqlaevent import SQLAEvent
 
 class TimeStampped(SQLAEvent):

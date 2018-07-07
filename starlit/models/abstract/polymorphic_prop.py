@@ -16,7 +16,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy import event
 from sqlalchemy import literal_column
 from sqlalchemy_utils.types.choice import ChoiceType
-from starlit.boot.exts.sqla import db
+from starlit.boot.sqla import db
 
 
 class ProxiedDictMixin(object):

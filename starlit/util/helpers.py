@@ -3,8 +3,9 @@ from importlib import import_module
 from pkgutil import iter_modules
 from datetime import datetime
 from dateutil.parser import parse
-from .xlib.dateformat import pretty_date
+from flask import request
 from jinja2.utils import Markup
+from .xlib.dateformat import pretty_date
 
 
 _email_re = re.compile(
@@ -56,3 +57,9 @@ def date_stamp(date=None):
     if not date:
         date = datetime.now()
     return date.strftime('%y-%m-%d__%H-%M-%S')
+
+
+def paginate_with_args(query, page_arg='page', perpage_arg='item_count', default_perpage=10):
+    page = int(request.args.get(page_arg, 1))
+    perpage = int(request.args.get(perpage_arg, default_perpage))
+    return query.paginate(page, perpage, False)

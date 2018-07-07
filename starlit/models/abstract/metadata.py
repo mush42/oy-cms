@@ -10,7 +10,7 @@
 """
 
 from sqlalchemy import inspect
-from starlit.boot.exts.sqla import db
+from starlit.boot.sqla import db
 from starlit.util.helpers import make_summary
 from ._sqlaevent import SQLAEvent
 

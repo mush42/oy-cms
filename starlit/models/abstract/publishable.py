@@ -11,7 +11,7 @@
 
 from datetime import datetime
 from sqlalchemy.ext.hybrid import hybrid_property
-from starlit.boot.exts.sqla import db
+from starlit.boot.sqla import db
 from .time_stampped import TimeStampped
 
 

@@ -12,7 +12,7 @@
 from sqlalchemy import inspect
 from sqlalchemy.orm.exc import NoResultFound
 from flask import current_app
-from starlit.boot.exts.sqla import db
+from starlit.boot.sqla import db
 from starlit.util.slugging import slugify
 from ._sqlaevent import SQLAEvent
 

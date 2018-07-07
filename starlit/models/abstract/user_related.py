@@ -13,7 +13,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from flask import current_app
 from flask_security import current_user as security_current_user
 from werkzeug.local import LocalProxy
-from starlit.boot.exts.sqla import db
+from starlit.boot.sqla import db
 from starlit.babel import lazy_gettext
 from ._sqlaevent import SQLAEvent
 

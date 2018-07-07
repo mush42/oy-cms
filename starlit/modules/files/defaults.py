@@ -1,1 +1,0 @@
-FILE_UPLOADS_PATH = ""

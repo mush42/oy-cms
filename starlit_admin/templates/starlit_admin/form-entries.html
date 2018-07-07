@@ -1,0 +1,33 @@
+{% extends 'admin/master.html' %}
+{% import 'starlit_admin/macros.html' as macros with context %}
+
+
+{% block title %}{{form.title}} Form Entries{%endblock%}
+{% block navlinks %}{% endblock %}
+
+{% block brand%}
+<h1>{{form.title}} Entries <span class="muted h3">({{paginator.total}})</span></h1>
+{{macros.render_pagination(paginator)}}
+{%endblock%}
+{% block body %}
+<table class="table table-striped table-bordered table-hover">
+  <tr>
+    <thead>
+      <th class="column-header">Entry ID</th>
+      <th class="column-header">Submit Date</th>
+      {% for field in form.fields %}
+      <th class="column-header">{{field.name}}</th>
+      {% endfor %}
+    </thead>
+  </tr>
+  {% for entry in paginator.items %}
+  <tr>
+    <td>{{entry.id}}</td>
+    <td>{{entry.created.isoformat()}}</td>
+    {% for field in entry.fields %}
+    <td>{{val_proc(field)}}</td>
+    {% endfor %}
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

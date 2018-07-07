@@ -25,11 +25,7 @@ from flask.config import Config
 from flask.helpers import locked_cached_property, get_root_path
 
 from starlit.util.helpers import find_modules, import_modules
-from starlit.util.fixtures import _Fixtured
-
-
-# contenttype handler functions are stored like this
-handler_opts = namedtuple('PageContentTypeHandler', 'view_func methods module')
+from starlit.util.fixtures import Fixtured
 
 
 class StarlitConfig(Config):
@@ -65,11 +61,10 @@ class StarlitConfig(Config):
                 self[key] = getattr(d, key)
 
 
-class StarlitModule(Blueprint, _Fixtured):
+class StarlitModule(Blueprint, Fixtured):
     """StarlitModule is a :class:`flask.Blueprint` with some extras
     
-    This class adds the ability to register custom page handlers and
-    editable settings which can be safely edited by the user on runtime.
+    This class adds the ability to register editable settings which can be safely edited by the user in runtime.
 
     Basically  you can initialize it like other flask blueprints
     """
@@ -77,8 +72,6 @@ class StarlitModule(Blueprint, _Fixtured):
     def __init__(self, name, import_name, *args, **kwargs):
         self.name = name
         self.import_name = import_name
-        if kwargs.pop('builtin', False):
-            self.name = "starlit-{}" .format(self.name)
         # flask wouldn't serve static files if this is not set 
         if not getattr(self, 'static_url_path', None):
             self.static_url_path="/static/" + self.name
@@ -88,27 +81,11 @@ class StarlitModule(Blueprint, _Fixtured):
             static_url_path=self.static_url_path,
             *args, **kwargs)
         self.settings_providers = []
-        self._content_type_handlers = {}
 
     def register(self, app, *args, **kwargs):
         super(StarlitModule, self).register(app, *args, **kwargs)
         # Update the app.config with our defaults
         app.config.from_module_defaults(self.root_path)
-        # Add our page contenttype handlers to the app 
-        for contenttype, opts in self._content_type_handlers.items():
-            app._add_contenttype_handler(contenttype, **opts._asdict())
-
-    def contenttype_handler(self, contenttype, methods):
-        """Like :meth:`Starlit.contentype_handler` but for a module. """
-        def wrapper(func):
-            self._content_type_handlers[contenttype] = handler_opts(
-                func,
-                methods,
-                module=self.name)
-            def wrapped(*a, **kw):
-                return func(*a, **kw)
-            return wrapped
-        return wrapper
 
     def settings_provider(self, func):
         """Record a function as a setting provider
@@ -122,7 +99,7 @@ class StarlitModule(Blueprint, _Fixtured):
         return wrapped
 
     def get_provided_settings(self):
-        """Iterate over registered modules and return setting providers"""
+        """Iterate over registered settings providers and return setting providers"""
         for provider in self.settings_providers:
             yield provider()
 
@@ -132,9 +109,7 @@ class Starlit(Flask):
     
     It add the following features:
         - Custom module system
-        - Page contenttype handlers
         - Editable settings which are persisted to the database
-        - Plugin support
     """
     
     # Custom configuration class :class:`StarlitConfig`
@@ -143,8 +118,6 @@ class Starlit(Flask):
     def __init__(self, *args, **kwargs):
         super(Starlit, self).__init__(*args, **kwargs)
         self.modules = {}
-        self.plugins = {}
-        self._page_contenttype_handlers = {}
         self._provided_settings = {}
 
     @locked_cached_property
@@ -159,34 +132,6 @@ class Starlit(Flask):
                 templates_dir = os.path.join(get_root_path(mod.import_name), mod.template_folder)
                 mod_templates.append(FileSystemLoader(templates_dir))
         return ChoiceLoader(mod_templates)
-
-    def _add_contenttype_handler(self, contenttype, view_func, methods=('GET',), module=None):
-        self._page_contenttype_handlers[contenttype] = handler_opts(
-            view_func,
-            methods,
-            module
-            )
-
-    def contenttype_handler(self, contenttype, methods):
-        """A decorator to add custom contenttype handlers to be
-        registered with the application
-
-        .. Note::
-            Functions decorated with this functions are treated like
-            flask views.
-
-        :param contenttype: a string that identify a certain page class
-        :param methods: a list of HTTP methods that are accepted by this handler
-        """
-        def wrapper(func):
-            self._add_contenttype_handler(func, contenttype, methods)
-            def wrapped(*a, **kw):
-                return func(*a, **kw)
-            return wrapped
-        return wrapper
-
-    def get_handler_for(self, contenttype):
-        return self._page_contenttype_handlers.get(contenttype)
 
     def register_module(self, module, **options):
         """Register a starlit module with this application"""
@@ -223,11 +168,3 @@ class Starlit(Flask):
             self._collect_provided_settings()
         return self._provided_settings.values()
 
-    def use(self, plugin, *args, **kwargs):
-        """Use the given plugin with this application"""
-        plugin = plugin()
-        plugin.init_app(self, *args, **kwargs)
-        if plugin.needs_module_registration:
-            self.register_module(plugin)
-        self.plugins[plugin.name] = plugin
-        return plugin

@@ -3,7 +3,7 @@
     starlit.models.abstract.page
     ~~~~~~~~~~
 
-    Provides an abstract sqlalchemy model to be extended
+    Provides an abstract Page model to be extended
 
     :copyright: (c) 2018 by Musharraf Omer.
     :license: MIT, see LICENSE for more details.
@@ -13,7 +13,7 @@ from sqlalchemy import inspect
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from flask import current_app
-from starlit.boot.exts.sqla import db
+from starlit.boot.sqla import db
 from .displayable import Displayable, DisplayableQuery
 
 class PageQuery(DisplayableQuery):

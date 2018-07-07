@@ -1,1 +1,3 @@
-recursive-include starlit/resources *
+recursive-include starlit/translations *
+recursive-include starlit/modules/ *
+recursive-include starlit_admin/ *

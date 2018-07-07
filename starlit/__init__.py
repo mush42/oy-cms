@@ -11,16 +11,31 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from starlit.exceptions import StarlitException
-from starlit.boot import defaults as boot_config
-from starlit.boot.context_processors import register_context_processors
-from starlit.boot.templating import register_template_filters
-from starlit.boot.exts.extension_registry import initialize_core_exts
-from starlit import models
+from flask import current_app
+from flask_wtf import CSRFProtect
+from starlit.boot.sqla import db, migrate
+from starlit.boot.babel import babel, init_babel
+from starlit.boot.security import initialize_security
 from starlit.wrappers import Starlit
+from starlit.exceptions import StarlitException
+from starlit.core import core
+from starlit.boot.shell import make_shell_context
+from starlit.boot.cli import register_cli_commands
+from starlit.boot import defaults as boot_config
+from starlit.models import *
 
 
-def _prepare_app(name, app_class, *args, **kwargs):
+def initialize_builtin_extensions():
+    """Initialize third-party extensions.""" 
+    app = current_app._get_current_object()
+    CSRFProtect(app)
+    db.init_app(app)
+    migrate.init_app(app, db=db)
+    init_babel(app)
+    initialize_security(app)
+
+
+def _prepare_app(name, app_class, **kwargs):
     """Internal helper used by :func:`create_app` to initialize the application"""
     if not issubclass(app_class, Starlit):
         raise TypeError("""The application class should be a subclass of starlit.wrappers.Starlit.""")
@@ -32,7 +47,7 @@ def _prepare_app(name, app_class, *args, **kwargs):
     return app_class(name, **kwargs)
 
 
-def create_app(name, app_class=Starlit, config=None, *args, **kwargs):
+def create_app(name, config=None, app_class=Starlit, envar='STARLIT_CONFIG', **kwargs):
     """This app factory is the main entry point of Starlit.
 
     Use this function to create a new instance of
@@ -57,7 +72,10 @@ def create_app(name, app_class=Starlit, config=None, *args, **kwargs):
         By default, this function configures the app using:
             - Default configurations of modules registered with the application
             - An environment variable called **STARLIT_CONFIG** if exists
-            - The configuration dictionary passed as **config** argument
+            - The ``config`` parameter:
+                - String: the same as config.from_pyfile
+                - Dict: the same as config.from_mapping
+                - Other: the same as config.from_object
             
         Note that modules registered later using :meth:`starlit.wrappers.Starlit: register_module`
         might override the default configurations set in this function
@@ -65,16 +83,21 @@ def create_app(name, app_class=Starlit, config=None, *args, **kwargs):
 
     :param name: Serves the same purpose as the name argument passed to :class:`flask.Flask`
     :param app_class: The application class to initialize
-    :param config: A dict of configuration values 
+    :param config: Other configuration parameters 
+    :param envar: The environment variable from which to load the configurations
     """
-    app = _prepare_app(name, app_class, *args, **kwargs)
+    app = _prepare_app(name, app_class, **kwargs)
     app.config.from_object(boot_config)
-    app.config.from_envvar('STARLIT_CONFIG', True)
-    app.config.from_mapping(config or dict())
+    app.config.from_envvar(envar, True)
+    if isinstance(config, dict):
+        app.config.from_mapping(config)
+    elif isinstance(config, str):
+        app.config.from_pyfile(config)
+    else:
+        app.config.from_object(config)
     with app.app_context():
-        initialize_core_exts()
-        register_context_processors()
-        register_template_filters()
-    for module in app.find_starlit_modules('starlit.modules'):
-        app.register_module(module)
+        initialize_builtin_extensions()
+        register_cli_commands()
+    app.shell_context_processor(make_shell_context)
+    app.register_module(core)
     return app

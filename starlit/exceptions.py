@@ -30,7 +30,7 @@ class BadlyFormattedFixture(StarlitException):
     """Raised when a fixture could not be decoded"""
 
 
-class PluginRequirementsNotSatisfied(StarlitException):
-    """Raised when a :class:`StarlitPlugin` requires another plugin
-    to be used by the application, but it has not been used yet
+class SettingDoesNotExist(StarlitException):
+    """Raised when accessing a setting that does
+    not exist in the database nor the current_app settings
     """

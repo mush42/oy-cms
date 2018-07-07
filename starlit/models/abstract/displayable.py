@@ -14,7 +14,7 @@ from datetime import datetime
 from sqlalchemy.ext.declarative import declared_attr
 from flask import current_app
 from flask_sqlalchemy import BaseQuery
-from starlit.boot.exts.sqla import db
+from starlit.boot.sqla import db
 from starlit.babel import lazy_gettext
 
 from .slugged import Slugged, Titled
