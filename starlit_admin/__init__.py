@@ -43,7 +43,7 @@ class StarlitAdmin(Admin):
     def _init_extension(self):
         super(StarlitAdmin, self)._init_extension()
         admin_module = StarlitModule(
-            name='admin-templates-module',
+            name='starlit-admin',
             import_name='starlit_admin',
             static_folder='static',
             template_folder='templates'
@@ -56,5 +56,8 @@ class StarlitAdmin(Admin):
             self.app.config['SECURITY_POST_LOGIN_VIEW'] = self.url
 
     def admin_plugin_static(self, filename):
-        return url_for("%s.static" %('admin-templates-module'), filename="starlit-admin/%s" %(filename,))
+        return url_for(
+            "%s.static" %('starlit-admin'),
+            filename="starlit-admin/%s" %(filename,)
+        )
 
