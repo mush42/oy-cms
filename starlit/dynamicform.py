@@ -14,8 +14,8 @@ from wtforms.validators import (
     length, url, 
 ) 
 from flask_admin.contrib.sqla.fields import QuerySelectField
-from starlit.wtf import FileSelectorField, RichTextAreaField
-
+from starlit.util.wtf import FileSelectorField, RichTextAreaField
+from starlit.util.option import Option
 
 info = namedtuple('info', 'name field')
 
@@ -32,16 +32,24 @@ FIELD_MAP = dict(
     url=info(lazy_gettext('URL input'), URLField),
     tel=info(lazy_gettext('Tell input'), TelField),
     file_input=info(lazy_gettext('File input'), FileField)
-    file_selector=info(lazy_gettext('File Selector'), FileSelectorField),
-    wysiwyg=info(lazy_gettext('WYSIWYG Editor'), RichTextAreaField),
-    select2=info(lazy_gettext('Select2 Field'), QuerySelectField),
 )
 
+# Those fields are only available for admin users or staff.
+ADMIN_FIELD_MAP = dict(FIELD_MAP)
+ADMIN_FIELD_MAP.update({
+    'file_selector': info(lazy_gettext('File Selector'), FileSelectorField),
+    'wysiwyg': info(lazy_gettext('WYSIWYG Editor'), RichTextAreaField),
+    'select2': info(lazy_gettext('Select2 Field'), QuerySelectField),
+})
 
 VALIDATORS_MAP = {
     #EmailField: email(),
     #URLField: url(),
 }
+
+
+class FieldBlueprint:
+    """A bluprint to construct a form field."""
 
 
 class DynamicForm(object):
@@ -53,13 +61,23 @@ class DynamicForm(object):
     You can access the scafolded form using the form property
     and the generated unbound fields using the field property
     """
-    def __init__(self, fields, base_form=FlaskForm):
+    def __init__(self, fields, base_form=FlaskForm, with_admin=False):
         class FormWithDynamiclyGeneratedFields(base_form):
             pass
         self.raw_form = FormWithDynamiclyGeneratedFields
+        self.raw_fields = self.normalize(fields)
         self.unbound_fields = list()
-        self.field_map = FIELD_MAP
+        self.field_map = FIELD_MAP if not with_admin else ADMIN_FIELD_MAP
         self._generated = False
+
+    def normalize(self, fields):
+        rv = list()
+        for field in fields:
+            if hasattr(field, 'keys'):
+                rv.append(Option(**field))
+            else:
+                rv.append(field)
+        return rv
 
     @property
     def form(self):
@@ -75,34 +93,34 @@ class DynamicForm(object):
 
     def generate_fields(self, fields_only=False):
         for field in self.raw_fields:
-            field_info = self.field_map.get(field['type'])
+            field_info = self.field_map.get(field.type)
             if field_info is None:
-                raise TypeError('Field type %s is not supported' %field['type'])
+                raise TypeError('Field type %s is not supported' %field.type)
             Field = field_info.field
             kwargs = dict()
-            kwargs['label'] = field['label']
-            kwargs['description'] = field.get('description', '')
-            kwargs['default'] = self.parse_default(field['type'], field.get('default', None))
+            kwargs['label'] = field.label
+            kwargs['description'] = field.description or ''
+            kwargs['default'] = self.parse_default(field.type, field.default)
             kwargs['validators'] = []
             kwargs['render_kw'] = {}
-            if field.get('field_options', None) is not None:
-                kwargs['render_kw'].update(field['field_options'].get('render_kw', {}))
-            if field['type'] == 'select' or field['type']== 'radio':
-                kwargs['choices'] = self.parse_choices(field['choices'])
-            if 'required' in field:
+            if getattr(field, 'field_options', None) is not None:
+                kwargs['render_kw'].update(field.field_options.get('render_kw', {}))
+            if field.type == 'select' or field.type == 'radio':
+                kwargs['choices'] = self.parse_choices(field.choices)
+            if getattr(field, 'required', False):
                 kwargs['validators'].append(data_required())
                 kwargs['render_kw']['required'] = True
             if VALIDATORS_MAP.get(Field):
                 kwargs['validators'].append(VALIDATORS_MAP[Field])
-            if 'length' in field:
-                max_length = field['length'] or -1
+            if hasattr(field, 'length'):
+                max_length = field.length or -1
                 kwargs['validators'].append(length(max=max_length))
                 kwargs['render_kw']['aria-max'] = max_length
-            kwargs.update((field.get('field_options', {})))
+            kwargs.update((getattr(field, 'field_options', None) or {}))
             if fields_only:
-                self.unbound_fields.append((field['name'], Field(**kwargs)))
+                self.unbound_fields.append((field.name, Field(**kwargs)))
             else:
-                setattr(self.raw_form, field['name'], Field(**kwargs))
+                setattr(self.raw_form, field.name, Field(**kwargs))
         self._generated = True
 
     def parse_default(self, field_type, value):
