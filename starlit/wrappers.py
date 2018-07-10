@@ -24,8 +24,8 @@ from flask import Flask, Blueprint
 from flask.config import Config
 from flask.helpers import locked_cached_property, get_root_path
 
-from starlit.util.helpers import find_modules, import_modules
-from starlit.util.fixtures import Fixtured
+from starlit.helpers import find_modules, import_modules
+from starlit.fixtures import Fixtured
 
 
 class StarlitConfig(Config):

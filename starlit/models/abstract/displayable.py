@@ -3,7 +3,7 @@
     starlit.models.abstract.displayable
     ~~~~~~~~~~
 
-    This module provides the core interface of starlit content.
+    This module provides the core content model for starlit.
     Its core functionality is implemented by other mixin classes
 
     :copyright: (c) 2018 by Musharraf Omer.

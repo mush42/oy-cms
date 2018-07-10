@@ -11,8 +11,9 @@
 """
 
 class SQLAEvent(object):
-    """Contains methods to be called during
-        diffrent session lifecycle events
+    """
+    Contains methods to be called during
+    different session lifecycle events
 
     Only models having  this class as
     a base class will be able to react to sqlalchemy events by implementing

@@ -18,7 +18,7 @@ from sqlalchemy import event, inspect
 from sqlalchemy.orm import mapper
 from starlit.boot.sqla import db
 from starlit.models.abstract import SQLAEvent
-from starlit.util.helpers import get_method_in_all_bases
+from starlit.helpers import get_method_in_all_bases
 
 
 get_event_methods = partial(get_method_in_all_bases, exclude=[SQLAEvent])

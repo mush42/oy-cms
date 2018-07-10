@@ -6,7 +6,7 @@ from flask_security import UserMixin, RoleMixin
 from flask_security.utils import hash_password
 from starlit.boot.sqla import db
 from starlit.babel import lazy_gettext
-from starlit.util.helpers import is_valid_email
+from starlit.helpers import is_valid_email
 from starlit.models.abstract import TimeStampped, ProxiedDictMixin, DynamicProp, SQLAEvent
 
 

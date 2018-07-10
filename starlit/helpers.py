@@ -2,10 +2,7 @@ import re
 from importlib import import_module
 from pkgutil import iter_modules
 from datetime import datetime
-from dateutil.parser import parse
 from flask import request
-from jinja2.utils import Markup
-from .xlib.dateformat import pretty_date
 
 
 _email_re = re.compile(
@@ -39,19 +36,6 @@ def get_method_in_all_bases(cls, meth_name, exclude=None):
         if meth is not None:
             yield meth
 
-
-def prettify_date(s):
-    date_time = s
-    if isinstance(date_time, str):
-        date_time = parse(s)
-    return pretty_date(date_time)
-
-
-def date_column_formatter(view, value):
-    return prettify_date(value)
-
-def make_summary(content, p=3):
-    return ' '.join(Markup(content).striptags().split('.')[:p])
 
 def date_stamp(date=None):
     if not date:

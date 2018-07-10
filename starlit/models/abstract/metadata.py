@@ -11,7 +11,6 @@
 
 from sqlalchemy import inspect
 from starlit.boot.sqla import db
-from starlit.util.helpers import make_summary
 from ._sqlaevent import SQLAEvent
 
 
@@ -53,16 +52,13 @@ class Metadata(SQLAEvent):
     def options(self):
         options = (
             ('meta_title', getattr(self, '__metatitle_column__', None), None),
-            ('meta_description', getattr(self, '__metadescription_column__', None), self.gen_description),
+            ('meta_description', getattr(self, '__metadescription_column__', None), None),
             ('keywords', getattr(self, '__keywordscolumn__', None), self.gen_keywords),
         )
         return (opt for opt in options if opt[1])
 
     def gen_keywords(self, value):
         return ' '.join(value.split())
-
-    def gen_description(self, value):
-        return make_summary(value)
 
     def set_value(self, attrname, colname, genfunc):
         if not getattr(self, attrname):

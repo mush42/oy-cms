@@ -1,7 +1,7 @@
 import click
 from flask import current_app
 from starlit.boot.sqla import db
-from starlit.util.helpers import is_valid_email
+from starlit.helpers import is_valid_email
 from starlit.models.user import User
 
 
