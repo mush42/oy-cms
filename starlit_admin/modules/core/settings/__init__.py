@@ -11,8 +11,8 @@ def register_settings_admin(app, admin):
         menu_icon_value='fa-flag'
     ))
     categories = set()
-    for i in app.provided_settings:
-        categories.add(i.category)
+    for opt in app.provided_settings.values():
+        categories.add(opt.get(category, 'general'))
     for category in categories:
         class SettingsAdmin(StarlitBaseView):
             settings_category = category

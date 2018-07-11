@@ -4,9 +4,7 @@ from flask import current_app, request, _request_ctx_stack
 from flask_babelex import get_locale
 from starlit.wrappers import StarlitModule
 from starlit.babel import gettext, ngettext, lazy_gettext
-from starlit.util.slugging import PathToSlugConvertor
-from starlit.util.helpers import prettify_date
-from starlit.util.option import Option
+from starlit.slugging import PathToSlugConvertor
 from .settings import current_settings_profile, current_settings
 
 
@@ -32,17 +30,14 @@ def register_context_processors():
     )
 
 @core.app_template_filter()
-def pretty_date(date):
-    return prettify_date(date)
-
-@core.app_template_filter()
 def qs_args(url, qs):
     return '{}?'.format(url) + urlencode(qs)
 
 @core.settings_provider
-def provide_page_settings():
+def provide_page_settings(module):
     return [
-        Option(u'title',
+        dict(
+            name='title',
             label=lazy_gettext('Site Title'),
             description=u'The site Title',
             category='general',

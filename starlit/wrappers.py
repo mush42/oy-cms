@@ -13,6 +13,7 @@
 import types
 import sys
 import os
+from itertools import chain
 from importlib import import_module
 from warnings import warn
 from collections import namedtuple
@@ -64,12 +65,12 @@ class StarlitConfig(Config):
 class StarlitModule(Blueprint, Fixtured):
     """StarlitModule is a :class:`flask.Blueprint` with some extras
     
-    This class adds the ability to register editable settings which can be safely edited by the user in runtime.
+    This class adds the ability to register editable settings which can be safely edited by the user during runtime.
 
     Basically  you can initialize it like other flask blueprints
     """
     
-    def __init__(self, name, import_name, *args, **kwargs):
+    def __init__(self, name, import_name, **kwargs):
         self.name = name
         self.import_name = import_name
         # flask wouldn't serve static files if this is not set 
@@ -79,7 +80,7 @@ class StarlitModule(Blueprint, Fixtured):
             self.name,
             self.import_name,
             static_url_path=self.static_url_path,
-            *args, **kwargs)
+           **kwargs)
         self.settings_providers = []
 
     def register(self, app, *args, **kwargs):
@@ -90,8 +91,7 @@ class StarlitModule(Blueprint, Fixtured):
     def settings_provider(self, func):
         """Record a function as a setting provider
 
-        Setting provider functions should return a list of options.
-        This could be done easley using :class:`starlit.utils.option.Option`
+        Setting provider functions should return a list of dicts.
         """
         self.settings_providers.append(func)
         def wrapped(*a, **kw):
@@ -99,9 +99,12 @@ class StarlitModule(Blueprint, Fixtured):
         return wrapped
 
     def get_provided_settings(self):
-        """Iterate over registered settings providers and return setting providers"""
+        """
+        Iterate over registered settings providers
+        and return settings.
+        """
         for provider in self.settings_providers:
-            yield provider()
+            yield provider(self)
 
 
 class Starlit(Flask):
@@ -147,24 +150,26 @@ class Starlit(Flask):
             modname = module.__name__
             if modname in self.config['EXCLUDED_MODULES']:
                 continue
-            starlit_modules = (v for v in module.__dict__.values() if isinstance(v, StarlitModule))
+            starlit_modules = (
+              v for v in module.__dict__.values()
+              if isinstance(v, StarlitModule)
+            )
             for mod in set(starlit_modules):
                 yield mod
 
     def _collect_provided_settings(self):
         for mod in self.modules.values():
-            provider = getattr(mod, 'get_provided_settings', None)
-            if provider is None:
-                continue
-            for provided in  provider():
-                for p in provided:
-                    p.module = mod
-                    self._provided_settings[p.name] = p
+            for provided in chain.from_iterable(mod.get_provided_settings()):
+                if 'name' not in provided or 'type' not in provided:
+                    raise ValueError("'name' or 'type' are required in field definition "
+                        "for setting {} in module {}"
+                        .format(provided, mod.import_name)
+                    )
+                self._provided_settings.setdefault(mod.name, []).append(provided)
 
     @property
     def provided_settings(self):
         """Iterate over registered modules to collect editable settings"""
         if not self._provided_settings:
             self._collect_provided_settings()
-        return self._provided_settings.values()
-
+        return self._provided_settings

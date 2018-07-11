@@ -13,9 +13,6 @@ from wtforms.validators import (
     data_required, email,
     length, url, 
 ) 
-from flask_admin.contrib.sqla.fields import QuerySelectField
-from starlit.util.wtf import FileSelectorField, RichTextAreaField
-from starlit.util.option import Option
 
 info = namedtuple('info', 'name field')
 
@@ -32,16 +29,12 @@ FIELD_MAP = dict(
     url=info(lazy_gettext('URL input'), URLField),
     tel=info(lazy_gettext('Tell input'), TelField),
     file_input=info(lazy_gettext('File input'), FileField),
-    file_selector=info(lazy_gettext('File Selector'), FileSelectorField),
-    wysiwyg=info(lazy_gettext('WYSIWYG Editor'), RichTextAreaField),
-    select2=info(lazy_gettext('Select2 Field'), QuerySelectField),
 )
 
 VALIDATORS_MAP = {
     #EmailField: email(),
     #URLField: url(),
 }
-
 
 
 class NotSupportedFieldTypeError(Exception):
@@ -51,23 +44,23 @@ class NotSupportedFieldTypeError(Exception):
 class FieldBlueprint:
     """A bluprint to construct a form field."""
 
-    def __init__(self, name, label, type,
+    def __init__(self, dyform, name, type, label='',
             description=None, required=False,
             choices=None, default=None, **field_options):
         kwargs = locals()
+        try:
+            self.metadata = dyform.field_map[kwargs['type']]
+        except KeyError:
+            raise NotSupportedFieldTypeError(
+                "{} is not a supported field type."
+                .format(self.type)
+                )
         kwargs.pop('self')
         if 'default' in kwargs:
             kwargs['default'] = self.parse_default_value(kwargs.pop('default'))
         if 'choices' in kwargs:
             kwargs['choices'] = self.parse_choices(kwargs.pop('choices'))
         self.__dict__.update(kwargs)
-        try:
-            self.metadata = FIELD_MAP[self.type]
-        except KeyError:
-            raise NotSupportedFieldTypeError(
-                "{} is not a supported field type."
-                .format(self.type)
-                )
 
     def make_concrete(self):
         ConcreteField = self.metadata.field
@@ -84,8 +77,8 @@ class FieldBlueprint:
         if getattr(self, 'required', False):
             kwargs['validators'].append(data_required())
             kwargs['render_kw']['required'] = True
-        if ConcreteField in VALIDATORS_MAP:
-            kwargs['validators'].append(VALIDATORS_MAP[Field])
+        if ConcreteField in self.dyform.validattor_map:
+            kwargs['validators'].append(self.dyform.validattor_map[ConcreteField])
         if hasattr(self, 'length'):
             max_length = field.length or -1
             kwargs['validators'].append(length(max=max_length))
@@ -121,12 +114,17 @@ class DynamicForm(object):
     Just pass an iterable of dicts containing some
     metadataabout the fields you want to create.
     
-    Metadata should contain at least label, type,
-    description and several other optional attributes.
+    Metadata should contain at least name and type and
+    optionally description and several other attributes.
     
     You can access the scaffolded form using the form property
     and the generated unbound fields using the field property
     """
+    # A list of field info from which to start
+    field_map = FIELD_MAP
+    # A list of validattors
+    validattor_map = VALIDATORS_MAP
+
     def __init__(self, fields, base_form=FlaskForm):
         class FormWithDynamiclyGeneratedFields(base_form):
             pass
@@ -137,7 +135,7 @@ class DynamicForm(object):
 
     def normalize(self, fields):
         for field in fields:
-            yield FieldBlueprint(**field) if hasattr(field, 'keys') else field
+            yield FieldBlueprint(self, **field) if hasattr(field, 'keys') else field
 
     @property
     def form(self):

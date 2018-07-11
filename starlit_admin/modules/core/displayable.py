@@ -13,8 +13,8 @@ from datetime import date
 from starlit.boot.sqla import db
 from starlit.models.abstract import Displayable
 from starlit.babel import gettext, lazy_gettext
-from starlit.util.helpers import date_column_formatter
 from starlit_admin.core import StarlitModelView
+
 
 
 def status_formatter(view, context, model, name):
@@ -22,9 +22,7 @@ def status_formatter(view, context, model, name):
     return dict(Displayable.STATUS_CHOICES).get(status)
 
 DEFAULT_FORMATTERS = dict(typefmt.BASE_FORMATTERS)
-DEFAULT_FORMATTERS.update({
-    date: date_column_formatter,
-})
+DEFAULT_FORMATTERS.update({})
 
 DISPLAYABEL_DEFAULTS = dict(
     can_view_details = False,

@@ -1,3 +1,10 @@
+from flask_admin.contrib.sqla.fields import QuerySelectField
+from starlit.wtf_utils import FileSelectorField, RichTextAreaField
+    file_selector=info(lazy_gettext('File Selector'), FileSelectorField),
+    wysiwyg=info(lazy_gettext('WYSIWYG Editor'), RichTextAreaField),
+    select2=info(lazy_gettext('Select2 Field'), QuerySelectField),
+
+
 from flask import render_template
 from wtforms import StringField, TextAreaField
 from wtforms.widgets import TextArea, TextInput

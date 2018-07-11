@@ -1,3 +1,4 @@
+from itertools import chain
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -69,10 +70,12 @@ class Settings(ProxiedDictMixin, db.Model, SQLAEvent):
         ctx = _app_ctx_stack.top
         if not getattr(ctx, 'app_categories', None):
             ctx.app_categories = {}
-            for opt in current_app.provided_settings:
-                ctx.app_categories[opt.category] = SettingCategory(name=opt.category)
-        for option in current_app.provided_settings:
-            setting = Setting(key=option.name)
-            setting.value = option.default
-            setting.category = ctx.app_categories[option.category]
-            self.options[option.name] = setting
+        for opt in chain.from_iterable(current_app.provided_settings.values()):
+            opt_category = opt.get('category', 'general')
+            if opt_category not in ctx.app_categories:
+                category_obj = SettingCategory(name=opt_category)
+                ctx.app_categories[opt_category] = category_obj
+            setting = Setting(key=opt['name'])
+            setting.value = opt.get('default', None)
+            setting.category = ctx.app_categories[opt_category]
+            self.options[opt['name']] = setting

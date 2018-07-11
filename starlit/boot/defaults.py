@@ -27,5 +27,3 @@ SUPPORTED_LOCALES = OrderedDict((
 DEFAULT_LOCALE = 'en'
 
 # Starlit specific configurations
-UPLOADS_PATH = ""
-FILES_URL_PREFIX = ""

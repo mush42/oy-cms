@@ -4,7 +4,7 @@ from flask_admin import expose
 from flask_wtf import Form
 
 from starlit.boot.sqla import db
-from starlit.util.dynamicform import DynamicForm
+from starlit.dynamicform import DynamicForm
 from starlit.babel import gettext, lazy_gettext
 from starlit.core.settings import current_settings
 from starlit_admin.core import AuthenticationViewMixin, StarlitBaseView
@@ -12,12 +12,13 @@ from starlit_admin.core import AuthenticationViewMixin, StarlitBaseView
 
 def make_settings_form_for_category(category):
     fields = []
-    for option in current_app.provided_settings:
-        if option.category != category:
-            continue
-        option.default = getattr(current_settings, option.name)
+    options = filter(
+        lambda opt: opt.get('category', 'genral') == category,
+        current_app.provided_settings)
+    for option in options:
+        option['default'] = getattr(current_settings, option.name)
         fields.append(option)
-    return DynamicForm(fields, with_admin=True).form
+    return DynamicForm(fields).form
 
 
 def update_settings_from_form(data):
