@@ -13,6 +13,8 @@ from wtforms.validators import (
     data_required, email,
     length, url, 
 ) 
+from starlit.wrappers import AbstractField
+
 
 info = namedtuple('info', 'name field')
 
@@ -44,67 +46,44 @@ class NotSupportedFieldTypeError(Exception):
 class FieldBlueprint:
     """A bluprint to construct a form field."""
 
-    def __init__(self, dyform, name, type, label='',
-            description=None, required=False,
-            choices=None, default=None, **field_options):
-        kwargs = locals()
+    # A list of field info from which to start
+    field_map = FIELD_MAP
+    # A list of validattors
+    validattor_map = VALIDATORS_MAP
+
+    def __init__(self, abstract_field):
         try:
-            self.metadata = dyform.field_map[kwargs['type']]
+            self.metadata = self.field_map[self.abstract_field.type]
         except KeyError:
             raise NotSupportedFieldTypeError(
                 "{} is not a supported field type."
                 .format(self.type)
                 )
-        kwargs.pop('self')
-        if 'default' in kwargs:
-            kwargs['default'] = self.parse_default_value(kwargs.pop('default'))
-        if 'choices' in kwargs:
-            kwargs['choices'] = self.parse_choices(kwargs.pop('choices'))
-        self.__dict__.update(kwargs)
 
     def make_concrete(self):
+        field = self.abstract_field
         ConcreteField = self.metadata.field
         kwargs = dict()
-        kwargs['label'] = self.label
-        kwargs['description'] = self.description or ''
-        kwargs['default'] = self.default
+        kwargs['label'] = field.label
+        kwargs['description'] = field.description or ''
+        kwargs['default'] = field.default
         kwargs['validators'] = []
         kwargs['render_kw'] = {}
-        if self.field_options and 'render_kw' in self.field_options:
+        if self.field_options and ('render_kw' in self.field_options):
             kwargs['render_kw'].update(self.field_options.pop('render_kw', {}))
         if self.type in ('select', 'radio'):
             kwargs['choices'] = self.choices
         if getattr(self, 'required', False):
             kwargs['validators'].append(data_required())
             kwargs['render_kw']['required'] = True
-        if ConcreteField in self.dyform.validattor_map:
-            kwargs['validators'].append(self.dyform.validattor_map[ConcreteField])
+        if ConcreteField in self.validattor_map:
+            kwargs['validators'].append(self.validattor_map[ConcreteField])
         if hasattr(self, 'length'):
             max_length = field.length or -1
             kwargs['validators'].append(length(max=max_length))
             kwargs['render_kw']['aria-max'] = max_length
         kwargs.update(self.field_options)
         return ConcreteField, kwargs
-
-    def parse_default_value(self, value):
-        if value is None:
-            return
-        elif callable(value):
-             value = value(self)
-        if self.type == 'checkbox' and type(value) is not bool:
-            raise TypeError("Invalid default value for checkbox")
-        return value
-
-
-    def parse_choices(self, choices):
-        if callable(choices):
-            choices = choices(self)
-        if hasattr(choices, 'keys'):
-            return choices.items()
-        elif type(choices) is not str:
-            raise TypeError("{} Invalid value for field choices.". format(choices))
-        for choice in choices.split(';'):
-            yield choice.split(':')
 
 
 class DynamicForm(object):
@@ -120,10 +99,6 @@ class DynamicForm(object):
     You can access the scaffolded form using the form property
     and the generated unbound fields using the field property
     """
-    # A list of field info from which to start
-    field_map = FIELD_MAP
-    # A list of validattors
-    validattor_map = VALIDATORS_MAP
 
     def __init__(self, fields, base_form=FlaskForm):
         class FormWithDynamiclyGeneratedFields(base_form):
@@ -135,7 +110,7 @@ class DynamicForm(object):
 
     def normalize(self, fields):
         for field in fields:
-            yield FieldBlueprint(self, **field) if hasattr(field, 'keys') else field
+            yield FieldBlueprint(field) if hasattr(field, 'keys') else field
 
     @property
     def form(self):

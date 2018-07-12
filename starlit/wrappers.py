@@ -29,6 +29,54 @@ from starlit.helpers import find_modules, import_modules
 from starlit.fixtures import Fixtured
 
 
+class AbstractField(object):
+    """The field interface"""
+
+    def __init__(self, name, type, label='',
+            description=None, required=False,
+            choices=None, default=None, **field_options):
+        kwargs = locals()
+        kwargs.pop('self')
+        self.__dict__.update(kwargs)
+        if self.default is not None:
+            self.default = self.parse_default_value(kwargs['default'])
+        if self.choices is not None:
+            self.choices = self.parse_choices(kwargs['choices'])
+
+    def parse_default_value(self, value):
+        if value is None:
+            return
+        elif callable(value):
+             value = value(self)
+        if self.type == 'checkbox' and type(value) is not bool:
+            raise TypeError("Invalid default value for checkbox")
+        return value
+
+    def parse_choices(self, choices):
+        if callable(choices):
+            choices = choices(self)
+        if hasattr(choices, 'keys'):
+            return choices.items()
+        elif type(choices) is not str:
+            raise TypeError("{} Invalid value for field choices.". format(choices))
+        for choice in choices.split(';'):
+            yield choice.split(':')
+
+
+class SingleSettingContainer(AbstractField):
+    """A setting container that sets necessary defaults."""
+    def __init__(self, raw_field):
+        super().__init__(**raw_field)
+        self.raw_field = raw_field
+        if 'name' not in raw_field or 'type' not in raw_field:
+            raise ValueError("'name' or 'type' are required in field definition "
+                "for setting {} in module {}"
+                .format(provided, mod.import_name)
+            )
+        if 'category' not in raw_field or not getattr(self, 'category', ''):
+            self.category = 'general'
+
+
 class StarlitConfig(Config):
     """Custom config class used by :class:`Starlit`"""
     
@@ -121,7 +169,7 @@ class Starlit(Flask):
     def __init__(self, *args, **kwargs):
         super(Starlit, self).__init__(*args, **kwargs)
         self.modules = {}
-        self._provided_settings = {}
+        self._provided_settings = None
 
     @locked_cached_property
     def jinja_loader(self):
@@ -160,16 +208,15 @@ class Starlit(Flask):
     def _collect_provided_settings(self):
         for mod in self.modules.values():
             for provided in chain.from_iterable(mod.get_provided_settings()):
-                if 'name' not in provided or 'type' not in provided:
-                    raise ValueError("'name' or 'type' are required in field definition "
-                        "for setting {} in module {}"
-                        .format(provided, mod.import_name)
-                    )
-                self._provided_settings.setdefault(mod.name, []).append(provided)
+                self._provided_settings.setdefault(
+                  mod.name, []).append(
+                  SingleSettingContainer(provided)
+                )
 
     @property
     def provided_settings(self):
         """Iterate over registered modules to collect editable settings"""
-        if not self._provided_settings:
+        if self._provided_settings is None:
+            self._provided_settings = {}
             self._collect_provided_settings()
-        return self._provided_settings
+        yield from self._provided_settings.items()
