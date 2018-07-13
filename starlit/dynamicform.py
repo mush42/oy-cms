@@ -19,7 +19,7 @@ from starlit.wrappers import AbstractField
 info = namedtuple('info', 'name field')
 
 FIELD_MAP = dict(
-    text=info(lazy_gettext('Single line text input'), StringField),
+    string=info(lazy_gettext('Single line text input'), StringField),
     number=info(lazy_gettext('Number input'), IntegerField),
     select=info(lazy_gettext('Select Box'), SelectField),
     checkbox=info(lazy_gettext('Check Box'), BooleanField),
@@ -30,7 +30,7 @@ FIELD_MAP = dict(
     datetime=info(lazy_gettext('Date & Time input'), DateTimeField),
     url=info(lazy_gettext('URL input'), URLField),
     tel=info(lazy_gettext('Tell input'), TelField),
-    file_input=info(lazy_gettext('File input'), FileField),
+    file=info(lazy_gettext('File input'), FileField),
 )
 
 VALIDATORS_MAP = {
@@ -69,8 +69,8 @@ class FieldBlueprint:
         kwargs['default'] = field.default
         kwargs['validators'] = []
         kwargs['render_kw'] = {}
-        if self.field_options and ('render_kw' in self.field_options):
-            kwargs['render_kw'].update(self.field_options.pop('render_kw', {}))
+        if field.field_options and ('render_kw' in field.field_options):
+            kwargs['render_kw'].update(field.field_options.pop('render_kw', {}))
         if self.type in ('select', 'radio'):
             kwargs['choices'] = self.choices
         if getattr(self, 'required', False):
@@ -82,7 +82,7 @@ class FieldBlueprint:
             max_length = field.length or -1
             kwargs['validators'].append(length(max=max_length))
             kwargs['render_kw']['aria-max'] = max_length
-        kwargs.update(self.field_options)
+        kwargs.update(field.field_options)
         return ConcreteField, kwargs
 
 
@@ -110,7 +110,7 @@ class DynamicForm(object):
 
     def normalize(self, fields):
         for field in fields:
-            yield FieldBlueprint(field) if hasattr(field, 'keys') else field
+            yield FieldBlueprint(field) if type(field) is dict else field
 
     @property
     def form(self):
