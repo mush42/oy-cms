@@ -11,10 +11,7 @@ def register_settings_admin(app, admin):
         menu_icon_value='fa-flag'
     ))
     categories = set()
-    for moname, opts in app.provided_settings:
-        for opt in opts:
-            categories.add(opt.category)
-    for category in categories:
+    for category, settings in app.provided_settings:
         class SettingsAdmin(StarlitBaseView):
             settings_category = category
             @expose('/', methods=['Get', 'POST'])
@@ -25,11 +22,10 @@ def register_settings_admin(app, admin):
                     flash("Settings were successfully saved")
                     return redirect(request.url)
                 return self.render('starlit_admin/settings.html', form=form)
-        category_details = app.config["DEFAULT_SETTINGS_CATEGORIES"][category]
         admin.add_view(SettingsAdmin(
-            name=category_details["label"],
+            name=category.title(),
             menu_icon_type='fa',
-            menu_icon_value=category_details["icon"],
+            menu_icon_value='fa-gear',
             category=gettext("Settings"),
             endpoint="admin-settings-{}".format(category),
             url="settings/{}".format(category)

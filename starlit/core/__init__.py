@@ -33,7 +33,7 @@ def register_context_processors():
 def qs_args(url, qs):
     return '{}?'.format(url) + urlencode(qs)
 
-@core.settings_provider
+@core.settings_provider()
 def provide_page_settings(module):
     return [
         dict(

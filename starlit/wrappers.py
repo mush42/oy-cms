@@ -63,19 +63,6 @@ class AbstractField(object):
             yield choice.split(':')
 
 
-class SingleSettingContainer(AbstractField):
-    """A setting container that sets necessary defaults."""
-    def __init__(self, raw_field):
-        super().__init__(**raw_field)
-        self.raw_field = raw_field
-        if 'name' not in raw_field or 'type' not in raw_field:
-            raise ValueError("'name' or 'type' are required in field definition "
-                "for setting {} in module {}"
-                .format(provided, mod.import_name)
-            )
-        if 'category' not in raw_field or not getattr(self, 'category', ''):
-            self.category = 'general'
-
 
 class StarlitConfig(Config):
     """Custom config class used by :class:`Starlit`"""
@@ -124,35 +111,28 @@ class StarlitModule(Blueprint, Fixtured):
         # flask wouldn't serve static files if this is not set 
         if not getattr(self, 'static_url_path', None):
             self.static_url_path="/static/" + self.name
+        self.provided_settings = {}
         super(StarlitModule, self).__init__(
             self.name,
             self.import_name,
             static_url_path=self.static_url_path,
            **kwargs)
-        self.settings_providers = []
 
     def register(self, app, *args, **kwargs):
         super(StarlitModule, self).register(app, *args, **kwargs)
         # Update the app.config with our defaults
         app.config.from_module_defaults(self.root_path)
 
-    def settings_provider(self, func):
+    def settings_provider(self, category=None):
         """Record a function as a setting provider
 
         Setting provider functions should return a list of dicts.
         """
-        self.settings_providers.append(func)
-        def wrapped(*a, **kw):
-            return func(*a, **kw)
-        return wrapped
-
-    def get_provided_settings(self):
-        """
-        Iterate over registered settings providers
-        and return settings.
-        """
-        for provider in self.settings_providers:
-            yield provider(self)
+        def decorator(func):
+            ret = func(self)
+            self.provided_settings.setdefault(category or self.name, []).append(ret)
+            return ret
+        return decorator
 
 
 class Starlit(Flask):
@@ -168,8 +148,8 @@ class Starlit(Flask):
 
     def __init__(self, *args, **kwargs):
         super(Starlit, self).__init__(*args, **kwargs)
+        self.provided_settings_dict = None
         self.modules = {}
-        self._provided_settings = None
 
     @locked_cached_property
     def jinja_loader(self):
@@ -207,16 +187,14 @@ class Starlit(Flask):
 
     def _collect_provided_settings(self):
         for mod in self.modules.values():
-            for provided in chain.from_iterable(mod.get_provided_settings()):
-                self._provided_settings.setdefault(
-                  mod.name, []).append(
-                  SingleSettingContainer(provided)
-                )
+            for category, settings in mod.provided_settings.items():
+                for setting in chain.from_iterable(settings):
+                    self.provided_settings_dict.setdefault(category, []).append(AbstractField(**setting))
 
     @property
     def provided_settings(self):
         """Iterate over registered modules to collect editable settings"""
-        if self._provided_settings is None:
-            self._provided_settings = {}
+        if self.provided_settings_dict is None:
+            self.provided_settings_dict = {}
             self._collect_provided_settings()
-        yield from self._provided_settings.items()
+        yield from self.provided_settings_dict.items()

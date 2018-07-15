@@ -13,11 +13,9 @@ from starlit_admin.core import AuthenticationViewMixin, StarlitBaseView
 
 def make_settings_form_for_category(category):
     fields = []
-    opts = chain.from_iterable((opts for modname, opts in current_app.provided_settings))
-    options = filter(lambda opt: opt.category == category, opts)
-    for option in options:
-        option['default'] = getattr(current_settings, option.name)
-        fields.append(option)
+    for setting in app.provided_settings_dict['category']:
+        setting.default = getattr(current_settings, setting.name)
+        fields.append(setting)
     return DynamicForm(fields).form
 
 
