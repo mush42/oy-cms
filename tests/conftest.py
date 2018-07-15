@@ -1,8 +1,8 @@
 import pytest
 import starlit
 from webtest import TestApp
-from starlit.boot.exts.sqla import db as sqla_db
-from starlit.boot.exts.security import user_datastore
+from starlit.boot.sqla import db as sqla_db
+from starlit.boot.security import user_datastore
 
 
 @pytest.fixture(scope="module")

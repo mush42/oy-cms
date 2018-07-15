@@ -1,5 +1,5 @@
 import pytest
-from starlit.modules.editable_settings.models import SettingsProfile
+from starlit.models.settings import SettingsProfile
 
 
 def test_settings(db):

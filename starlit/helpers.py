@@ -1,3 +1,4 @@
+import types
 import re
 from importlib import import_module
 from pkgutil import iter_modules
@@ -47,3 +48,14 @@ def paginate_with_args(query, page_arg='page', perpage_arg='item_count', default
     page = int(request.args.get(page_arg, 1))
     perpage = int(request.args.get(perpage_arg, default_perpage))
     return query.paginate(page, perpage, False)
+
+
+def exec_module(filename, mod_name):
+    d = types.ModuleType(mod_name)
+    d.__file__ = filename
+    try:
+        with open(filename, mode='rb') as module:
+            exec(compile(module.read(), filename, 'exec'), d.__dict__)
+        return d
+    except IOError:
+        raise FileNotFoundError(f"{filename} does not exist")

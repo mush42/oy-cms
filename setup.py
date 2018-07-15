@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='Starlit',
-    version='0.1dev',
+    version='0.1.dev',
     description='A lightweight, modular, and extensible content management system.',
     license='MIT',
     author='Musharraf Omer',
@@ -12,6 +12,11 @@ setup(
     platforms='any',
     include_package_data=True,
     zip_safe=False,
+    entry_points={
+        'flask.commands': [
+            'starlit-project=starlit.main:create_project'
+        ],
+    },
     install_requires=[
       'Flask',
       'Flask-Admin',

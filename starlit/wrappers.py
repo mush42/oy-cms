@@ -10,7 +10,6 @@
     :license: MIT, see LICENSE for more details.
 """
 
-import types
 import sys
 import os
 from itertools import chain
@@ -25,7 +24,7 @@ from flask import Flask, Blueprint
 from flask.config import Config
 from flask.helpers import locked_cached_property, get_root_path
 
-from starlit.helpers import find_modules, import_modules
+from starlit.helpers import exec_module, find_modules, import_modules
 from starlit.fixtures import Fixtured
 
 
@@ -85,13 +84,7 @@ class StarlitConfig(Config):
         :param root_path: The root path of the module
         """
         filename = os.path.join(root_path, 'defaults.py')
-        d = types.ModuleType('default_config')
-        d.__file__ = filename
-        try:
-            with open(filename, mode='rb') as config_file:
-                exec(compile(config_file.read(), filename, 'exec'), d.__dict__)
-        except IOError:
-            return
+        d = exec_module(filename, 'default_module_config')
         for key in dir(d):
             if key not in self and key.isupper():
                 self[key] = getattr(d, key)
