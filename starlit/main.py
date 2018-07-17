@@ -11,7 +11,10 @@
 """
 import os
 import click
-import jinja2
+from jinja2 import (
+    Environment, PackageLoader,
+    FileSystemLoader, select_autoescape
+  )
 
 
 def prepare_directory(directory):
@@ -27,16 +30,16 @@ def prepare_directory(directory):
 
 @click.command()
 @click.argument('project_name', help="The name of the project  to create")
-def create_project(project_name):
+@click.option('templatedir', help="The path to the template to be used")
+def create_project(project_name, templatedir=None):
     """Create a new starlit project"""
-    directory = prepare_directory(project_name)
+    if templatedir and not os.path.isdir(templatedir):
+        raise FileNotFoundError(f"Template directory {templatedir} does not exist.")
+    targetdir = prepare_directory(project_name)
+    jinja_loader = PackageLoader('starlit', package_path='project_template')
+    if templatedir:
+        jinja_loader = FileSystemLoader(templatedir)
+    jinja_env = Environment(loader=jinja_loader)
+    for dirpath, dirnames, filenames in os.walk():
 
-#--------------------
-from jinja2 import Environment, PackageLoader, select_autoescape
 
-starlit_pkg_loader = PackageLoader(
-    'starlit',
-    package_path='project_template'
-)
-
-env = Environment(loader=starlit_pkg_loader)
