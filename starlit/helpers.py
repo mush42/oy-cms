@@ -50,10 +50,12 @@ def paginate_with_args(query, page_arg='page', perpage_arg='item_count', default
     return query.paginate(page, perpage, False)
 
 
-def exec_module(filename, mod_name):
+def exec_module(filename, mod_name, globals=None):
     d = types.ModuleType(mod_name)
     d.__file__ = filename
     try:
+        if globals is not None:
+            d.__dict__.update(globals)
         with open(filename, mode='rb') as module:
             exec(compile(module.read(), filename, 'exec'), d.__dict__)
         return d

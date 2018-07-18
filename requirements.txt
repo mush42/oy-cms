@@ -17,7 +17,8 @@ inflect==0.2.5
 marshmallow==2.15.0
 marshmallow-sqlalchemy==0.13.2
 passlib==1.7.1
-Pillow==4.3.0
+Pillow
+python-dotenv
 speaklater==1.3
 SQLAlchemy==1.1.15
 SQLAlchemy-Continuum==1.3.3
