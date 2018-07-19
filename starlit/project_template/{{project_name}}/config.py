@@ -18,11 +18,8 @@ def getenvar(name, default=None):
     return val
 
 
-def get_db_uri():
-    return os.path.join(os.getcwd(), 'db.sqlite')
-
 
 DEBUG = getenvar('{{ PROJECT_NAME }}_DEBUG', False)
 SECRET_KEY = getenvar('{{ PROJECT_NAME }}_SECRET_KEY')
-SQLALCHEMY_DATABASE_URI = getenvar('{{ PROJECT_NAME }}_DB_URI', get_db_uri())
+SQLALCHEMY_DATABASE_URI = getenvar('{{ PROJECT_NAME }}_DB_URI', 'sqlite:///:memory:')
 SECURITY_PASSWORD_SALT = getenvar('{{ PROJECT_NAME }}_PASSWORD_SALT')

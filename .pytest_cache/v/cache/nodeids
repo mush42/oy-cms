@@ -1,0 +1,8 @@
+[
+  "tests/base/test_starlit_module.py::test_load_config_from_package_defaults",
+  "tests/models/test_abstract.py::test_slugging",
+  "tests/models/test_abstract.py::test_timestammped",
+  "tests/models/test_abstract.py::test_metadata",
+  "tests/models/test_settings.py::test_settings",
+  "tests/models/test_user_model.py::test_add_user"
+]
