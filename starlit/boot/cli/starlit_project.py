@@ -28,19 +28,22 @@ class ProjectTemplateCopier:
         _build_ctx_mod_path = os.path.join(self.templatedir, 'build_context.py')
         if ctx_build_vars is None:
             ctx_build_vars = dict()
-        ctx_build_vars.setdefault('appname', self.project_name)
+        ctx_build_vars.setdefault('project_name', self.project_name)
         mod = exec_module(_build_ctx_mod_path, 'ctxb', ctx_build_vars)
-        self.render_ctx = {}
+        self.render_ctx = {'project_name': self.project_name}
         for attr in mod.__all__:
             self.render_ctx[attr] = getattr(mod, attr)
 
-    def copy_rendered(self, t_file, o_file):
+    def copy_rendered(self, src, dst, *, follow_symlinks=False):
         """Render the given template to the output file"""
-        click.echo(f"Copying {t_file} to {o_file}")
-        relative_template = os.path.relpath(t_file, self.templatedir)
-        template = self.jinja_env.get_template(relative_template)
-        with open(o_file, 'w', encoding='utf8') as output:
-            output.write(template.render(**self.render_ctx))
+        click.echo(f"Copying {src} to {dst}")
+        t_file = os.path.relpath(src, self.templatedir)
+        t_file = '/'.join(os.path.split(t_file))
+        template = self.jinja_env.get_template(t_file)
+        with open(dst, 'w', encoding='utf8') as o_file:
+            rendered = template.render(**self.render_ctx)
+            o_file.write(rendered)
+        return dst
 
     def copy_all(self):
         shutil.copytree(

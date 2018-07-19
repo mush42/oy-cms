@@ -1,12 +1,10 @@
 #-*-coding: utf-8-*-
 """
 
-    {{ appname }}.models
+    {{ project_name }}.models
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     This file contains your models
-
-    :copyright: your name 
 """
 from starlit.models import db
 

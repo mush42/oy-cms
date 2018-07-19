@@ -14,7 +14,7 @@ setup(
     zip_safe=False,
     entry_points={
         'flask.commands': [
-            'starlit-project=starlit.__main__:create_project'
+            'starlit-project=starlit.boot.cli.starlit_project:create_project'
         ],
     },
     install_requires=[
