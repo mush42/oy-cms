@@ -9,12 +9,18 @@
     :copyright: (c) 2018 by Musharraf Omer.
     :license: MIT, see LICENSE for more details.
 """
+import itertools
+import keyword
 import os
+import re
 import shutil
 import click
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Template, Environment, FileSystemLoader
 from flask.helpers import get_root_path
 from starlit.helpers import exec_module
+
+
+identifier = re.compile(r"^[^\d\W]\w*\Z", re.UNICODE)
 
 
 class ProjectTemplateCopier:
@@ -36,7 +42,6 @@ class ProjectTemplateCopier:
 
     def copy_rendered(self, src, dst, *, follow_symlinks=False):
         """Render the given template to the output file"""
-        click.echo(f"Copying {src} to {dst}")
         t_file = os.path.relpath(src, self.templatedir)
         t_file = '/'.join(os.path.split(t_file))
         template = self.jinja_env.get_template(t_file)
@@ -50,13 +55,33 @@ class ProjectTemplateCopier:
           self.templatedir,
           self.distdir,
           copy_function=self.copy_rendered
-      )
+        )
+        self.post_copy()
+        click.echo(f"\r\n.........................\r\n")
+        click.echo(f"New project created at {self.distdir}")
+
+    def post_copy(self):
+        for root, dirnames, files in os.walk(self.distdir):
+            for f in itertools.chain(dirnames, files):
+                if self.jinja_env.variable_start_string in f:
+                    newname = Template(f).render(**self.render_ctx)
+                    pjoin = lambda p: os.path.join(root, p)
+                    os.rename(pjoin(f), pjoin(newname))
+        os.unlink(os.path.join(self.distdir, 'build_context.py'))
+
+
+def is_valid_identifier(project_name):
+    """Check that the project name is a valid python identifier"""
+    if keyword.iskeyword(project_name):
+        return False
+    return identifier.match(project_name) is not None
 
 
 def prepare_directory(directory):
     directory = os.path.join(os.getcwd(), directory)
     if os.path.isdir(directory) and os.listdir(directory):
         click.echo(f"Error: The folder {directory} already exists and is not empty.")
+        raise click.Abort()
     return directory
 
 
@@ -65,10 +90,29 @@ def prepare_directory(directory):
 @click.option('--templatedir', help="The template to be used", default=None)
 def create_project(project_name, templatedir=None):
     """Create a new starlit project"""
+    if not is_valid_identifier(project_name):
+        click.echo(f"{project_name} is not valid as a project name")
+        raise click.Abort()
     if templatedir and not os.path.isdir(templatedir):
         click.echo(f"Error: Template directory {templatedir} does not exist.")
+        raise click.Abort()
     if templatedir is None:
         templatedir = os.path.join(get_root_path('starlit'), 'project_template')
+    templates = []
+    for f in os.listdir(templatedir):
+        if os.path.isdir(os.path.join(templatedir, f)):
+            if os.path.isfile(os.path.join(templatedir, f, 'build_context.py')):
+                templates.append(f)
+    if templates and len(templates) > 1:
+        rv = ''
+        while rv not in templates:
+            click.echo("Which template you would like to use?\r\n")
+            for i in templates:
+                click.echo(f"  * {i}")
+            rv = click.prompt("\r\nChoose one of the above: ", default='default')
+        templatedir = os.path.join(templatedir, rv)
+    else:
+        templatedir = os.path.join(templatedir, templates[0])
     click.echo(f"Creating project {project_name}...")
     click.echo(f"Using project template: {templatedir}...")
     copier = ProjectTemplateCopier(
