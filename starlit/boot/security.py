@@ -4,8 +4,8 @@ from flask_security import Security, SQLAlchemyUserDatastore
 from starlit.boot.sqla import db
 from starlit.models.user import User, Role
 from starlit.babel import gettext, lazy_gettext
-from .forms.login import StarlitLoginForm
-from .forms.recover import StarlitRecoverPasswordForm
+from .security_forms.login import StarlitLoginForm
+from .security_forms.recover import StarlitRecoverPasswordForm
 
 
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)

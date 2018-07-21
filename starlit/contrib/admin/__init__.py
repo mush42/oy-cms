@@ -1,9 +1,9 @@
 from flask import request, url_for
 from flask_admin import Admin, helpers as admin_helpers
-from starlit.wrappers import StarlitModule
 from starlit.babel import lazy_gettext, gettext, ngettext
-from .core import StarlitIndexView
-from .modules.core import register_settings_admin
+from .wrappers import StarlitIndexView
+from .core import register_settings_admin
+from .resource_module import admin_resource_module
 
 
 def security_ctp_with_admin(admin):
@@ -29,6 +29,7 @@ class StarlitAdmin(Admin):
             menu_icon_type='fa', menu_icon_value='fa-home',
             template='starlit_admin/index.html')
         )
+        self.resource_module = kwargs.pop('resource_module', admin_resource_module)
         defaults = {
             'name': lazy_gettext('Dashboard'),
             'template_mode': 'bootstrap3',
@@ -42,13 +43,7 @@ class StarlitAdmin(Admin):
 
     def _init_extension(self):
         super(StarlitAdmin, self)._init_extension()
-        admin_module = StarlitModule(
-            name='starlit-admin',
-            import_name='starlit_admin',
-            static_folder='static',
-            template_folder='templates'
-        )
-        self.app.register_module(admin_module)
+        self.app.register_module(self.resource_module)
         register_settings_admin(self.app, self)
         self.app.context_processor(security_ctp_with_admin(self))
         self.app.context_processor(lambda: {"admin_plugin_static": self.admin_plugin_static})

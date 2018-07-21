@@ -18,6 +18,7 @@ import click
 from jinja2 import Template, Environment, FileSystemLoader
 from flask.helpers import get_root_path
 from starlit.helpers import exec_module
+from ._vcs import get_vcs_from_url, clone
 
 
 identifier = re.compile(r"^[^\d\W]\w*\Z", re.UNICODE)
@@ -93,11 +94,16 @@ def create_project(project_name, templatedir=None):
     if not is_valid_identifier(project_name):
         click.echo(f"{project_name} is not valid as a project name")
         raise click.Abort()
-    if templatedir and not os.path.isdir(templatedir):
-        click.echo(f"Error: Template directory {templatedir} does not exist.")
-        raise click.Abort()
     if templatedir is None:
         templatedir = os.path.join(get_root_path('starlit'), 'project_template')
+    else:
+        rv = get_vcs_from_url(templatedir)
+        if rv is not None:
+            click.echo(f"Cloning template from {rv.url}...")
+            templatedir = clone(rv.url)
+    if not os.path.isdir(templatedir):
+        click.echo(f"Error: Template directory {templatedir} does not exist.")
+        raise click.Abort()
     templates = []
     for f in os.listdir(templatedir):
         if os.path.isdir(os.path.join(templatedir, f)):
@@ -105,11 +111,11 @@ def create_project(project_name, templatedir=None):
                 templates.append(f)
     if templates and len(templates) > 1:
         rv = ''
+        click.echo("Which template you would like to use?\r\n")
+        for i in templates:
+            click.echo(f"  * {i}")
         while rv not in templates:
-            click.echo("Which template you would like to use?\r\n")
-            for i in templates:
-                click.echo(f"  * {i}")
-            rv = click.prompt("\r\nChoose one of the above: ", default='default')
+            rv = click.prompt("\r\nPlease choose one of the above: ", default='default')
         templatedir = os.path.join(templatedir, rv)
     else:
         templatedir = os.path.join(templatedir, templates[0])

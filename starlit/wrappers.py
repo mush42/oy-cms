@@ -15,7 +15,7 @@ import os
 from itertools import chain
 from importlib import import_module
 from warnings import warn
-from collections import namedtuple
+from collections import OrderedDict, namedtuple
 
 from werkzeug import import_string
 from werkzeug.utils import cached_property
@@ -84,6 +84,8 @@ class StarlitConfig(Config):
         :param root_path: The root path of the module
         """
         filename = os.path.join(root_path, 'defaults.py')
+        if not os.path.isfile(filename):
+            return
         d = exec_module(filename, 'default_module_config')
         for key in dir(d):
             if key not in self and key.isupper():
@@ -142,20 +144,18 @@ class Starlit(Flask):
     def __init__(self, *args, **kwargs):
         super(Starlit, self).__init__(*args, **kwargs)
         self.provided_settings_dict = None
-        self.modules = {}
+        self.modules = OrderedDict()
 
     @locked_cached_property
     def jinja_loader(self):
         """Templates provided by starlit modules should have higher priority"""
-        mod_templates = [
-            FileSystemLoader(self.template_folder),
-            super(Starlit, self).jinja_loader,
-        ]
+        mod_templates = []
         for mod in self.modules.values():
             if mod.template_folder:
                 templates_dir = os.path.join(get_root_path(mod.import_name), mod.template_folder)
                 mod_templates.append(FileSystemLoader(templates_dir))
-        return ChoiceLoader(mod_templates)
+        mod_templates.append(super(Starlit, self).jinja_loader)
+        return ChoiceLoader(tuple(mod_templates))
 
     def register_module(self, module, **options):
         """Register a starlit module with this application"""

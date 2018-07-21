@@ -8,7 +8,10 @@ from starlit.slugging import PathToSlugConvertor
 from .settings import current_settings_profile, current_settings
 
 
-core = StarlitModule('starlit.core', __name__)
+core = StarlitModule('starlit.core',
+    __name__,
+    template_folder='templates'
+  )
 
 
 @core.record_once

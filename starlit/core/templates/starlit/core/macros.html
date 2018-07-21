@@ -1,0 +1,108 @@
+
+
+{% macro render_errors_and_description(field) %}
+<div id="{{field.id ~ '-desc' }}">
+<small class="form-text text-muted">{{field.description}}</small>
+{% for error in field.errors %}
+<div class="invalid-feedback">
+  {{error}}
+</div>
+{% endfor %}
+</div>
+{% endmacro %}
+
+{% macro render_field(field) %}
+  <div class="form-group">
+  <label for="{{field.id}}">{{field.label.text}}</label>
+    {{field(**{"class":"form-control", "aria-describedby": field.id ~ '-desc'}) }}
+    {{render_errors_and_description(field) }}
+</div>
+{% endmacro %}
+
+{% macro render_checkbox(checkbox) %}
+<div class="form-group">
+  <div class="custom-control custom-checkbox">
+    {% with check_html_id=checkbox.id %}
+    <input type="checkbox" class="custom-control-input" name={{checkbox.name}} id="{{ check_html_id }}">
+    <label class="custom-control-label" for="{{ check_html_id }}">{{checkbox.label.text}}</label>
+    {{render_errors_and_description(checkbox)}}
+    {% endwith %}
+  </div>
+</div>
+{% endmacro %}
+
+{% macro render_radio(radio) %}
+<fieldset>
+<legend>{{radio.label}}</legend>
+<div class="form-group">
+{% for input in radio %}
+{% with input_html_id=input.id %}
+  <div class="custom-control custom-radio">
+  <input class="custom-control-input" type="radio" name="{{ input.name }}" id="{{input_html_id}}" value="{{ input.value}}">
+  <label class="custom-control-label" for="{{input_html_id}}">{{ input.label }}</label>
+</div>
+{% endwith %}
+{% endfor %}
+</div>
+</fieldset>
+{% endmacro %}
+
+{% macro render_select(select) %}
+{% with select_id=select.id %}
+<div class="form-group">
+  <label for="{{select_id}}">{{select.label}}</label>
+  <select class="custom-select" id="{{select_id}}" name="{{ select.name }}">
+  {% for val, label, selected in select.iter_choices() %}
+    <option value="{{ val }}">{{label}}</option>
+  {% endfor %}
+  </select>
+</div>
+{% endwith %}
+{% endmacro %}
+
+
+{% macro render_form(form, action=None, title='', submit_text=_trans('Submit'), id='') %}
+<form role="form" id="{{ id }}" action="{{action or request.url}}" method="post" enctype="multipart/form-data" aria-label="{{ current_page.title}}">
+    {% for field in form %}
+      {% if field.widget.input_type == 'hidden' %}
+        {{field}}
+      {% else %}
+      {% if field.type=='BooleanField' %}
+        {{render_checkbox(field) }}
+      {% elif field.type == 'RadioField' %}
+        {{render_radio(field) }}
+      {% elif field.type == 'SelectField' %}
+        {{render_select(field) }}
+      {% else %}
+      {{ render_field(field) }}
+    {% endif %}
+    {% endif %}
+    {% endfor %}
+    <div class="form-row py-3">
+      <div class="form-group">
+        <input type="submit" class="btn btn-info" value="{{submit_text}}" />
+      </div>
+    </div>
+</form>
+{% endmacro %}
+
+{% macro messages() %}
+  {% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+      {% for category, m in messages %}
+        {% if category %}
+        {% set mapping={'message': 'info', 'error': 'danger', 'success':'success'} %}
+          {% set raw_cat=mapping.get(category, category) %}
+          {% if '.' in raw_cat %}
+            {% set cat = raw_cat.split('.')[0] %}
+          {% else %}
+            {% set cat = raw_cat %}
+          {% endif %}
+          <div class="alert alert-{{ cat }} alert-dismissible fade show" role="alert">
+          {{ m|safe if 'markup' in raw_cat else m }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+{% endmacro %}
