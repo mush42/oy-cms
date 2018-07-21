@@ -22,7 +22,6 @@ from starlit.boot.shell import make_shell_context
 from starlit.boot.cli import register_cli_commands
 from starlit.boot import defaults as boot_config
 from starlit.core import core
-from starlit.core.security_resource_module import security_resource_module
 from starlit.models import *
 
 
@@ -101,6 +100,4 @@ def create_app(name, config=None, app_class=Starlit, envar='STARLIT_CONFIG', **k
         register_cli_commands()
     app.shell_context_processor(make_shell_context)
     app.register_module(core)
-    if app.config.get('STARLIT_OVERRIDE_SECURITY_FORMS', True):
-        app.register_module(security_resource_module)
     return app

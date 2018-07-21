@@ -1,0 +1,13 @@
+{% extends 'starlit/contrib/bs4/base.html' %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('starlit.contrib.security_template_module.static', filename='starlit/contrib/security_template_module/css/security-styles.css') }}">
+{% endblock %}
+
+{% block page_body %}
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+{% endblock %}
+
+{% block bs4_js %}{% endblock %}

@@ -1,8 +1,8 @@
 {% extends 'security/base.html' %}
-{% import 'starlit/core/macros.html' as macros with context %}
+{% import 'starlit/contrib/bs4/macros.html' as macros with context %}
 
 
-{% block title %}Login {% endblock %}
+{% block sub_title %}Login{% endblock %}
 
 {% block content %}
 {{ macros.messages() }}

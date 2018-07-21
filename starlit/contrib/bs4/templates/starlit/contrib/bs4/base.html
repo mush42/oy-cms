@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="{% block html_lang %}en{% endblock %}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>{%block title %}{{ settings.title }} &mdash; {% block sub_title %}{% endblock %}{%endblock %}</title>
+  {% block bs4_css %}
+  <link rel="stylesheet" type="text/css" href="{{ url_for('starlit.contrib.bs4.static', filename='starlit/contrib/bs4/css/bootstrap.min.css') }}">
+  {% endblock %}
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="{% block body_class %}bs4{% endblock %}">
+
+  {% block page_body %}{% endblock %}
+
+  {% block bs4_js %}
+  <script 	src="{{ url_for('starlit.contrib.bs4.static', filename='starlit/contrib/bs4/js/jquery.min.js') }}"></script>
+  <script src="{{ url_for('starlit.contrib.bs4.static', filename='starlit/contrib/bs4/js/bootstrap.min.js') }}"></script>
+  {% endblock %}
+  {% block extra_js %}{% endblock %}
+</body>
+</html>
