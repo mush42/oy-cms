@@ -23,7 +23,7 @@ class StarlitLoginForm(EmailFormMixin, PasswordFormMixin, LoginForm):
         super(StarlitLoginForm, self).__init__(*a, **kw)
         self.lang.choices = current_app.config['SUPPORTED_LOCALES'].items()
     lang = SelectField(
-        label=lazy_gettext('Dashboard Language'),
+        label=lazy_gettext('Prefered language'),
         validators=[data_required()],
         render_kw=dict(required=True)
     )

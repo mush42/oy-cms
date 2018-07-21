@@ -7,6 +7,7 @@
     you should use this module
 """
 from starlit.wrappers import StarlitModule
+from starlit.contrib.bs4 import bs4
 
 
 security_template_module = StarlitModule(
@@ -16,3 +17,8 @@ security_template_module = StarlitModule(
     template_folder='templates'
   )
 
+
+@security_template_module.record_once
+def setup_security_tpl(state):
+    if 'starlit.contrib.bs4' not in state.app.modules:
+        state.app.register_module(bs4)

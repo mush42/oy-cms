@@ -61,8 +61,10 @@
 {% endmacro %}
 
 
-{% macro render_form(form, action=None, title='', submit_text=_trans('Submit'), id='') %}
-<form role="form" id="{{ id }}" action="{{action or request.url}}" method="post" enctype="multipart/form-data" aria-label="{{ current_page.title}}">
+{% macro render_form(form, action=None, legend='', submit_text=_trans('Submit'), id='', multipart=False) %}
+<form role="form" id="{{ id }}" action="{{action or request.url}}" method="post" {% if multipart %}enctype="multipart/form-data"{% endif %}>
+  <fieldset>
+  <legend>{{ title }}</legend>
     {% for field in form %}
       {% if field.widget.input_type == 'hidden' %}
         {{field}}

@@ -39,9 +39,9 @@ class SettingsProfileAdmin(StarlitModelView):
     column_editable_list = ["name"]
 
 
-def make_settings_form_for_category(category):
+def make_settings_form_for_category(app, category):
     fields = []
-    for setting in app.provided_settings_dict['category']:
+    for setting in app.provided_settings_dict[category]:
         setting.default = getattr(current_settings, setting.name)
         fields.append(setting)
     return DynamicForm(fields).form
@@ -69,7 +69,7 @@ def register_settings_admin(app, admin):
             settings_category = category
             @expose('/', methods=['Get', 'POST'])
             def index(self):
-                form = make_settings_form_for_category(category=self.settings_category)
+                form = make_settings_form_for_category(app, category=self.settings_category)
                 if form.validate_on_submit():
                     update_settings_from_form(form.data)
                     flash("Settings were successfully saved")

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    starlit.contrib.security_template_module
+    starlit.contrib.bs4
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     Provides the minified css and js files of

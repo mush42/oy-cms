@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% import 'starlit/contrib/bs4/macros.html' as macros with context %}
 <html lang="{% block html_lang %}en{% endblock %}">
 <head>
   <meta charset="utf-8">
@@ -12,6 +13,12 @@
 </head>
 <body class="{% block body_class %}bs4{% endblock %}">
 
+  {% block messages %}
+    <div class="container">
+      {{ macros.messages() }}
+    </div>
+  {% endblock %}
+  
   {% block page_body %}{% endblock %}
 
   {% block bs4_js %}

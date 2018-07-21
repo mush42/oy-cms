@@ -62,7 +62,6 @@ class AbstractField(object):
             yield choice.split(':')
 
 
-
 class StarlitConfig(Config):
     """Custom config class used by :class:`Starlit`"""
     

@@ -100,17 +100,17 @@ class DynamicForm(object):
     and the generated unbound fields using the field property
     """
 
-    def __init__(self, fields, base_form=FlaskForm):
+    def __init__(self, fieldset, base_form=FlaskForm):
         class FormWithDynamiclyGeneratedFields(base_form):
             pass
         self.raw_form = FormWithDynamiclyGeneratedFields
-        self.fields = self.normalize(fields)
+        self.fieldset = self.normalize(fieldset)
         self.unbound_fields = list()
         self._generated = False
 
     def normalize(self, fields):
         for field in fields:
-            yield FieldBlueprint(field) if type(field) is dict else field
+            yield FieldBlueprint(field)
 
     @property
     def form(self):
@@ -125,7 +125,7 @@ class DynamicForm(object):
         return self.unbound_fields
 
     def generate_fields(self, fields_only=False):
-        for field in self.fields:
+        for field in self.fieldset:
             concrete_field, kwargs = field.make_concrete()
             if fields_only:
                 self.unbound_fields.append((field.name, concrete_field(**kwargs)))
