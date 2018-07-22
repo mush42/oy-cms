@@ -1,3 +1,4 @@
+from functools import partial
 from flask import request, url_for
 from flask_admin import Admin, helpers as admin_helpers
 from starlit.babel import lazy_gettext, gettext, ngettext
@@ -44,7 +45,8 @@ class StarlitAdmin(Admin):
     def _init_extension(self):
         super(StarlitAdmin, self)._init_extension()
         self.app.register_module(self.resource_module)
-        register_settings_admin(self.app, self)
+        regsettings = partial(register_settings_admin, self.app, self)
+        self.app.before_first_request(regsettings)
         self.app.context_processor(security_ctp_with_admin(self))
         self.app.context_processor(lambda: {"admin_plugin_static": self.admin_plugin_static})
         if 'SECURITY_POST_LOGIN_VIEW' not in self.app.config:

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# TODO: Load editable settings from .json files
 """
     starlit
     ~~~~~~~~~~~

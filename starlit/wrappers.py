@@ -15,7 +15,7 @@ import os
 from itertools import chain
 from importlib import import_module
 from warnings import warn
-from collections import OrderedDict, namedtuple
+from collections import UserString, OrderedDict, namedtuple
 
 from werkzeug import import_string
 from werkzeug.utils import cached_property
@@ -28,12 +28,22 @@ from starlit.helpers import exec_module, find_modules, import_modules
 from starlit.fixtures import Fixtured
 
 
+class DualValueString(UserString):
+    """A string that has two values:
+          - a primary value: str
+          - a dictionary containing extra values
+    """
+    def __init__(self, seq, **extra):
+        super(DualValueString, self).__init__(seq)
+        self.args = extra
+
+
 class AbstractField(object):
     """The field interface"""
 
     def __init__(self, name, type, label='',
             description=None, required=False,
-            choices=None, default=None, **field_options):
+            choices=None, default=None,  field_options=None):
         kwargs = locals()
         kwargs.pop('self')
         self.__dict__.update(kwargs)
@@ -99,18 +109,17 @@ class StarlitModule(Blueprint, Fixtured):
     Basically  you can initialize it like other flask blueprints
     """
     
-    def __init__(self, name, import_name, **kwargs):
-        self.name = name
-        self.import_name = import_name
-        # flask wouldn't serve static files if this is not set 
-        if not getattr(self, 'static_url_path', None):
-            self.static_url_path="/static/" + self.name
-        self.provided_settings = {}
+    def __init__(self, name, import_name, viewable_name=None, **kwargs):
+        # flask wouldn't serve static files if static_url_path is not set 
+        auto_static_url_path = kwargs.get('static_url_path', None) or '/static/' + name
+        self.viewable_name =  viewable_name
+        self.provided_settings =OrderedDict()
         super(StarlitModule, self).__init__(
-            self.name,
-            self.import_name,
-            static_url_path=self.static_url_path,
-           **kwargs)
+            name,
+            import_name,
+            static_url_path=auto_static_url_path,
+            **kwargs
+        )
 
     def register(self, app, *args, **kwargs):
         super(StarlitModule, self).register(app, *args, **kwargs)
@@ -123,9 +132,8 @@ class StarlitModule(Blueprint, Fixtured):
         Setting provider functions should return a list of dicts.
         """
         def decorator(func):
-            ret = func(self)
-            self.provided_settings.setdefault(category or self.name, []).append(ret)
-            return ret
+            self.provided_settings.setdefault(category or self.name, []).append(func)
+            return func
         return decorator
 
 
@@ -139,6 +147,8 @@ class Starlit(Flask):
     
     # Custom configuration class :class:`StarlitConfig`
     config_class = StarlitConfig
+    # Holds category information
+    catinfo = namedtuple('catinfo', 'name display_name')
 
     def __init__(self, *args, **kwargs):
         super(Starlit, self).__init__(*args, **kwargs)
@@ -151,8 +161,7 @@ class Starlit(Flask):
         mod_templates = []
         for mod in self.modules.values():
             if mod.template_folder:
-                templates_dir = os.path.join(get_root_path(mod.import_name), mod.template_folder)
-                mod_templates.append(FileSystemLoader(templates_dir))
+                mod_templates.append(mod.jinja_loader)
         mod_templates.append(super(Starlit, self).jinja_loader)
         return ChoiceLoader(tuple(mod_templates))
 
@@ -160,6 +169,8 @@ class Starlit(Flask):
         """Register a starlit module with this application"""
         super(Starlit, self).register_blueprint(blueprint=module, **options)
         self.modules[module.name] = module
+        # Force-refresh provided settings
+        self.provided_settings_dict = None
 
     def find_starlit_modules(self, pkg):
         """Find all starlit modules within a given package.
@@ -179,8 +190,14 @@ class Starlit(Flask):
 
     def _collect_provided_settings(self):
         for mod in self.modules.values():
-            for category, settings in mod.provided_settings.items():
-                for setting in chain.from_iterable(settings):
+            for cat, setting_funcs in mod.provided_settings.items():
+                if cat not in self.modules:
+                    raise LookupError(f"'{cat}' is being used as a setting category\
+                        but it is not a registered module.")
+                settings = chain.from_iterable([func(self, mod) for func in setting_funcs])
+                for setting in settings:
+                    viewable_name = self.modules[cat].viewable_name
+                    category = DualValueString(cat, viewable_name=viewable_name)
                     self.provided_settings_dict.setdefault(category, []).append(AbstractField(**setting))
 
     @property

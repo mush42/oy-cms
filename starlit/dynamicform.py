@@ -19,7 +19,7 @@ from starlit.wrappers import AbstractField
 info = namedtuple('info', 'name field')
 
 FIELD_MAP = dict(
-    string=info(lazy_gettext('Single line text input'), StringField),
+    text=info(lazy_gettext('Single line text input'), StringField),
     number=info(lazy_gettext('Number input'), IntegerField),
     select=info(lazy_gettext('Select Box'), SelectField),
     checkbox=info(lazy_gettext('Check Box'), BooleanField),
@@ -43,55 +43,46 @@ class NotSupportedFieldTypeError(Exception):
     """Raised during the construction of the field"""
 
 
-class FieldBlueprint:
-    """A bluprint to construct a form field."""
-
-    # A list of field info from which to start
-    field_map = FIELD_MAP
-    # A list of validattors
-    validattor_map = VALIDATORS_MAP
-
-    def __init__(self, abstract_field):
-        try:
-            self.metadata = self.field_map[self.abstract_field.type]
-        except KeyError:
-            raise NotSupportedFieldTypeError(
-                "{} is not a supported field type."
-                .format(self.type)
-                )
-
-    def make_concrete(self):
-        field = self.abstract_field
-        ConcreteField = self.metadata.field
-        kwargs = dict()
-        kwargs['label'] = field.label
-        kwargs['description'] = field.description or ''
-        kwargs['default'] = field.default
-        kwargs['validators'] = []
-        kwargs['render_kw'] = {}
-        if field.field_options and ('render_kw' in field.field_options):
-            kwargs['render_kw'].update(field.field_options.pop('render_kw', {}))
-        if self.type in ('select', 'radio'):
-            kwargs['choices'] = self.choices
-        if getattr(self, 'required', False):
-            kwargs['validators'].append(data_required())
-            kwargs['render_kw']['required'] = True
-        if ConcreteField in self.validattor_map:
-            kwargs['validators'].append(self.validattor_map[ConcreteField])
-        if hasattr(self, 'length'):
-            max_length = field.length or -1
-            kwargs['validators'].append(length(max=max_length))
-            kwargs['render_kw']['aria-max'] = max_length
+def make_concrete_field(field,
+      field_map= FIELD_MAP,
+      validators= VALIDATORS_MAP):
+    metadata = field_map.get(field.type, None)
+    if metadata is None:
+        raise NotSupportedFieldTypeError(
+            "{} is not a supported field type."
+            .format(field.type)
+        )
+    ConcreteField = metadata.field
+    kwargs = dict()
+    kwargs['label'] = field.label
+    kwargs['description'] = field.description or ''
+    kwargs['default'] = field.default
+    kwargs['validators'] = []
+    kwargs['render_kw'] = {}
+    if field.type in ('select', 'radio'):
+        kwargs['choices'] = field.choices
+    if getattr(field, 'required', False):
+        kwargs['validators'].append(data_required())
+        kwargs['render_kw']['required'] = True
+    if ConcreteField in validators:
+        kwargs['validators'].extend(validators[ConcreteField])
+    if hasattr(field, 'length'):
+        max_length = field.length or -1
+        kwargs['validators'].append(length(max=max_length))
+        kwargs['render_kw']['aria-max'] = max_length
+    if (field.field_options is not None) and ('render_kw' in field.field_options):
+        kwargs['render_kw'].update(field.field_options.pop('render_kw', {}))
         kwargs.update(field.field_options)
-        return ConcreteField, kwargs
+    return field.name, ConcreteField, kwargs
 
 
 class DynamicForm(object):
     """
     A Dynamic form generator:
 
-    Just pass an iterable of dicts containing some
-    metadataabout the fields you want to create.
+    The simplest use is to pass an iterable of dicts
+    containing some metadata about the fields you want
+    to create.
     
     Metadata should contain at least name and type and
     optionally description and several other attributes.
@@ -110,7 +101,9 @@ class DynamicForm(object):
 
     def normalize(self, fields):
         for field in fields:
-            yield FieldBlueprint(field)
+            if type(field) is dict:
+                yield AbstractField(**field)
+            yield field
 
     @property
     def form(self):
@@ -126,10 +119,10 @@ class DynamicForm(object):
 
     def generate_fields(self, fields_only=False):
         for field in self.fieldset:
-            concrete_field, kwargs = field.make_concrete()
+            fieldname, concrete_field, kwargs = make_concrete_field(field)
             if fields_only:
-                self.unbound_fields.append((field.name, concrete_field(**kwargs)))
+                self.unbound_fields.append((fieldname, concrete_field(**kwargs)))
             else:
-                setattr(self.raw_form, field.name, concrete_field(**kwargs))
+                setattr(self.raw_form, fieldname, concrete_field(**kwargs))
         self._generated = True
 

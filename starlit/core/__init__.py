@@ -10,7 +10,7 @@ from .settings import current_settings_profile, current_settings
 
 core = StarlitModule('starlit.core',
     __name__,
-    template_folder='templates'
+    viewable_name=lazy_gettext("General")
   )
 
 
@@ -37,13 +37,12 @@ def qs_args(url, qs):
     return '{}?'.format(url) + urlencode(qs)
 
 @core.settings_provider()
-def provide_page_settings(module):
+def provide_page_settings(app, module):
     return [
         dict(
             name='title',
             label=lazy_gettext('Site Title'),
             description=u'The site Title',
-            category='general',
             type='text',
             default=u'Starlit CMS'
         ),

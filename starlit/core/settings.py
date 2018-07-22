@@ -9,21 +9,24 @@ from starlit.models.settings import SettingsProfile
 
 
 class Settings(object):
-    def __init__(self, source):
-        self.source = source
+    def __init__(self, storage):
+        self.storage = storage
 
     def __getattr__(self, key):
-        if key in self.source:
-            return self.source[key]
-        elif key in current_app._provided_settings:
-            self.edit(key, current_app._provided_settings[key].default)
-        else:
-            raise SettingDoesNotExist("Setting %s does not exists" %key)
+        if key in self.storage:
+            return self.storage[key]
+        app_settings = chain.from_iterable(current_app.provided_settings_dict.values())
+        for setting in app_settings:
+            if setting.name == key:
+                self.edit(key, setting.default)
+                return setting.default
+        raise SettingDoesNotExist("Setting %s does not exists" %key)
+
+    def __setattribute__(self, key, value):
+        raise AttributeError("Can't set attribute")
 
     def edit(self, key, value):
-        if key not in chain(self.source, current_app._provided_settings):
-            raise SettingDoesNotExist("Setting %s does not exists" %key)
-        self.source[key] = value
+        self.storage[key] = value
         db.session.commit()
 
 

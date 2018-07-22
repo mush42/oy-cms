@@ -76,7 +76,7 @@ def register_settings_admin(app, admin):
                     return redirect(request.url)
                 return self.render('starlit_admin/settings.html', form=form)
         admin.add_view(SettingsAdmin(
-            name=category.title(),
+            name=category.args['viewable_name'],
             menu_icon_type='fa',
             menu_icon_value='fa-gear',
             category=gettext("Settings"),
