@@ -1,4 +1,5 @@
 import click
+from itertools import chain
 from flask import current_app
 from starlit.boot.sqla import db
 from starlit.models.settings import SettingsProfile
@@ -34,7 +35,7 @@ def drop_db(noinput):
 
 def clean_settings():
     click.secho("~~~~~~~~~~~~~~~~~~~~~~", fg='red')
-    click.echo("Cleanning database tables..")
+    click.echo("Cleaning database tables..")
     # sqlalchemy raises exceptions if the tables have not been created
     # so we degrade gracefully
     try:
@@ -44,10 +45,11 @@ def clean_settings():
         click.secho("No active settings profile. Exiting....", fg='red', bold=True)
         return
     active_settings = profile.settings
-    to_remove = []
-    for setting in active_settings:
-        if setting not in current_app.provided_settings:
-            to_remove.append(setting)
+    current_app.provided_settings_dict = {}
+    current_app._collect_provided_settings()
+    app_settings = chain.from_iterable(current_app.provided_settings_dict.values())
+    valid_settings = {s.name for s in app_settings}
+    to_remove = set(active_settings) - valid_settings
     for k in to_remove:
         click.secho("\tRemoving setting::: %s" %k, fg='red')
         del active_settings[k]

@@ -1,0 +1,18 @@
+[
+  {"starlit.core": [
+    {
+      "name": "egg_1",
+    "type": "text",
+    "label": "Egg (1)",
+    "default": "This is an egg."
+  }
+  ]},
+  {
+    "starlit.contrib.bs4": [
+      {
+      "name": "spam_1",
+      "type": "text",
+      "label": "Span(1)"
+    }
+  ]}
+]

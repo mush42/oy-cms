@@ -27,3 +27,4 @@ SUPPORTED_LOCALES = OrderedDict((
 DEFAULT_LOCALE = 'en'
 
 # Starlit specific configurations
+STARLIT_LOAD_SETTINGS_JSON = False
