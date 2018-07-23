@@ -5,6 +5,12 @@
     "type": "text",
     "label": "Egg (1)",
     "default": "This is an egg."
+  },
+  {
+    "name": "software_opt",
+    "type": "Checkbox",
+    "label": "Write changes to disc?",
+    "default": true
   }
   ]},
   {
