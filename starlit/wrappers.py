@@ -127,14 +127,6 @@ class StarlitModule(Blueprint, Fixtured):
         # Update the app.config with our defaults
         app.config.from_module_defaults(self.root_path)
 
-    def load_settings_from_json(self):
-        settings_json = os.path.join(self.root_path, 'settings.json')
-        if os.path.isfile(settings_json):
-            fp = open(settings_json, 'r', encoding='utf8')
-            for d in json.load(fp):
-                for category, settings in d.items():
-                    self.provided_settings.setdefault(category, []).append(lambda a, m: settings)
-
     def settings_provider(self, category=None):
         """Record a function as a setting provider
 
@@ -199,13 +191,12 @@ class Starlit(Flask):
 
     def _collect_provided_settings(self):
         for mod in self.modules.values():
-            if self.config.get('STARLIT_LOAD_SETTINGS_JSON', False):
-                mod.load_settings_from_json()
             for cat, setting_funcs in mod.provided_settings.items():
-                if cat not in self.modules:
+                cat_mod = self.modules.get(cat, None)
+                if cat_mod is None:
                     raise LookupError(f"'{cat}' is being used as a setting category\
                         but it is not a registered module.")
-                settings = chain.from_iterable([func(self, mod) for func in setting_funcs])
+                settings = chain.from_iterable([func(self, cat_mod) for func in setting_funcs])
                 for setting in settings:
                     viewable_name = self.modules[cat].viewable_name
                     category = DualValueString(cat, viewable_name=viewable_name)
