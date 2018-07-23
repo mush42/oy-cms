@@ -133,7 +133,7 @@ class StarlitModule(Blueprint, Fixtured):
             fp = open(settings_json, 'r', encoding='utf8')
             for d in json.load(fp):
                 for category, settings in d.items():
-                    self.provided_settings.setdefault(category or self.name, []).append(lambda a, m: settings)
+                    self.provided_settings.setdefault(category, []).append(lambda a, m: settings)
 
     def settings_provider(self, category=None):
         """Record a function as a setting provider

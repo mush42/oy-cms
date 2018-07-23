@@ -20,7 +20,7 @@ from starlit.wrappers import Starlit
 from starlit.exceptions import StarlitException
 from starlit.boot.shell import make_shell_context
 from starlit.boot.cli import register_cli_commands
-from starlit.boot import defaults as boot_config
+from starlit.boot import boot_config
 from starlit.core import core
 from starlit.models import *
 

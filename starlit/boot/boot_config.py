@@ -22,9 +22,7 @@ ALLWAYS_UPDATE_SLUGS = False
 DEFAULT_LOCALE = 'en'
 SUPPORTED_LOCALES = OrderedDict((
     ('en', 'English'),
-    ('ar', 'Arabic')
 ))
-DEFAULT_LOCALE = 'en'
 
 # Starlit specific configurations
 STARLIT_LOAD_SETTINGS_JSON = False
