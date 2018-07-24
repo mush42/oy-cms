@@ -1,5 +1,4 @@
 
-
 {% macro render_errors_and_description(field) %}
 <div id="{{field.id ~ '-desc' }}">
 <small class="form-text text-muted">{{field.description}}</small>
@@ -20,30 +19,26 @@
 {% endmacro %}
 
 {% macro render_checkbox(checkbox) %}
-<div class="form-group">
-  <div class="custom-control custom-checkbox">
+<div class="form-group form-check">
     {% with check_html_id=checkbox.id %}
-    <input type="checkbox" class="custom-control-input" name={{checkbox.name}} id="{{ check_html_id }}">
-    <label class="custom-control-label" for="{{ check_html_id }}">{{checkbox.label.text}}</label>
+    <input type="checkbox" class="form-check-input" name={{checkbox.name}} id="{{ check_html_id }}">
+    <label class="form-check-label" for="{{ check_html_id }}">{{checkbox.label.text}}</label>
     {{render_errors_and_description(checkbox)}}
     {% endwith %}
-  </div>
 </div>
 {% endmacro %}
 
 {% macro render_radio(radio) %}
 <fieldset>
 <legend>{{radio.label}}</legend>
-<div class="form-group">
 {% for input in radio %}
 {% with input_html_id=input.id %}
-  <div class="custom-control custom-radio">
-  <input class="custom-control-input" type="radio" name="{{ input.name }}" id="{{input_html_id}}" value="{{ input.value}}">
-  <label class="custom-control-label" for="{{input_html_id}}">{{ input.label }}</label>
+<div class="form-check">
+  <input class="form-check-input" type="radio" name="{{ input.name }}" id="{{input_html_id}}" value="{{ input.value}}">
+  <label class="form-check-label" for="{{input_html_id}}">{{ input.label }}</label>
 </div>
 {% endwith %}
 {% endfor %}
-</div>
 </fieldset>
 {% endmacro %}
 
@@ -80,31 +75,27 @@
     {% endif %}
     {% endif %}
     {% endfor %}
-    <div class="form-row py-3">
-      <div class="form-group">
-        <input type="submit" class="btn btn-info" value="{{submit_text}}" />
-      </div>
+    <div class="form-group">
+      <button type="submit" class="btn btn-info">{{submit_text}}</button>
     </div>
 </form>
 {% endmacro %}
 
 {% macro messages() %}
-  {% with messages = get_flashed_messages(with_categories=True) %}
+  {% with messages = get_flashed_messages(with_categories=True) -%}
     {% if messages %}
       {% for category, m in messages %}
         {% if category %}
         {% set mapping={'message': 'info', 'error': 'danger', 'success':'success'} %}
-          {% set raw_cat=mapping.get(category, category) %}
-          {% if '.' in raw_cat %}
-            {% set cat = raw_cat.split('.')[0] %}
-          {% else %}
-            {% set cat = raw_cat %}
-          {% endif %}
-          <div class="alert alert-{{ cat }} alert-dismissible fade show" role="alert">
-          {{ m|safe if 'markup' in raw_cat else m }}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        {% set cat=mapping.get(category, category) %}
         {% endif %}
+        <div class="alert alert-{{ cat }} alert-dismissible fade show" role="alert">
+          {{ m|safe if 'markup' in raw_cat else m }}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
       {% endfor %}
     {% endif %}
-  {% endwith %}
+  {%- endwith %}
 {% endmacro %}

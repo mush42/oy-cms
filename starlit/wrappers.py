@@ -114,7 +114,8 @@ class StarlitModule(Blueprint, Fixtured):
         # flask wouldn't serve static files if static_url_path is not set 
         auto_static_url_path = kwargs.get('static_url_path', None) or '/static/' + name
         self.viewable_name =  viewable_name
-        self.provided_settings =OrderedDict()
+        # A list of dicts or functions that return a list of dicts
+        self.settings = []
         super(StarlitModule, self).__init__(
             name,
             import_name,
@@ -133,7 +134,8 @@ class StarlitModule(Blueprint, Fixtured):
         Setting provider functions should return a list of dicts.
         """
         def decorator(func):
-            self.provided_settings.setdefault(category or self.name, []).append(func)
+            func.category = category or self.name
+            self.settings.append(func)
             return func
         return decorator
 
@@ -190,14 +192,16 @@ class Starlit(Flask):
                 yield mod
 
     def _collect_provided_settings(self):
+        self.provided_settings_dict = {}
         for mod in self.modules.values():
-            for cat, setting_funcs in mod.provided_settings.items():
-                cat_mod = self.modules.get(cat, None)
-                if cat_mod is None:
+            for setting_func in mod.settings:
+                cat = setting_func.category
+                if cat not in self.modules:
                     raise LookupError(f"'{cat}' is being used as a setting category\
+                        in module {mod.name}, function {setting_func.__name__}\
                         but it is not a registered module.")
-                settings = chain.from_iterable([func(self, cat_mod) for func in setting_funcs])
-                for setting in settings:
+                provided = setting_func(self)
+                for setting in provided:
                     viewable_name = self.modules[cat].viewable_name
                     category = DualValueString(cat, viewable_name=viewable_name)
                     self.provided_settings_dict.setdefault(category, []).append(AbstractField(**setting))
@@ -206,6 +210,5 @@ class Starlit(Flask):
     def provided_settings(self):
         """Iterate over registered modules to collect editable settings"""
         if self.provided_settings_dict is None:
-            self.provided_settings_dict = {}
             self._collect_provided_settings()
         yield from self.provided_settings_dict.items()

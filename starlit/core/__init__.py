@@ -37,7 +37,7 @@ def qs_args(url, qs):
     return '{}?'.format(url) + urlencode(qs)
 
 @core.settings_provider()
-def provide_page_settings(app, module):
+def provide_page_settings(app):
     return [
         dict(
             name='title',
