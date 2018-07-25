@@ -35,23 +35,26 @@ def drop_db(noinput):
 
 def clean_settings():
     click.secho("~~~~~~~~~~~~~~~~~~~~~~", fg='red')
-    click.echo("Cleaning database tables..")
+    click.echo("Removing settings that are no longer being used.")
     # sqlalchemy raises exceptions if the tables have not been created
     # so we degrade gracefully
     try:
         profile = SettingsProfile.query.filter_by(is_active=True).one()
-        click.echo('The active settings profile is: %s' %profile.name)
+        click.echo('> The active settings profile is: %s' %profile.name)
     except SQLAlchemyError:
         click.secho("No active settings profile. Exiting....", fg='red', bold=True)
-        return
+        raise click.Abort()
     active_settings = profile.settings
     current_app.provided_settings_dict = {}
     current_app._collect_provided_settings()
     app_settings = chain.from_iterable(current_app.provided_settings_dict.values())
     valid_settings = {s.name for s in app_settings}
     to_remove = set(active_settings) - valid_settings
+    if not to_remove:
+        click.secho("------- Great: No unused settings ----------", fg='green')
+        return
     for k in to_remove:
-        click.secho("\tRemoving setting::: %s" %k, fg='red')
+        click.secho("\t> Removing unused setting::: %s" %k, fg='red')
         del active_settings[k]
     db.session.commit()
     click.secho("Database cleaned.", fg='green', bold=True)
@@ -60,4 +63,5 @@ def clean_settings():
 
 def clean_db():
     """Clean the database tables."""
+    click.echo("Cleaning database tables..")
     clean_settings()

@@ -34,7 +34,7 @@ class ProjectTemplateCopier:
         self.jinja_env = Environment(loader=FileSystemLoader(self.templatedir))
         _build_ctx_mod_path = os.path.join(self.templatedir, 'build_context.py')
         if ctx_build_vars is None:
-            ctx_build_vars = dict()
+            ctx_build_vars = {}
         ctx_build_vars.setdefault('project_name', self.project_name)
         mod = exec_module(_build_ctx_mod_path, 'ctxb', ctx_build_vars)
         self.render_ctx = {'project_name': self.project_name}
@@ -44,6 +44,7 @@ class ProjectTemplateCopier:
     def copy_rendered(self, src, dst, *, follow_symlinks=False):
         """Render the given template to the output file"""
         t_file = os.path.relpath(src, self.templatedir)
+        # TODO: Find a better way to handle back-slashes
         t_file = '/'.join(os.path.split(t_file))
         template = self.jinja_env.get_template(t_file)
         with open(dst, 'w', encoding='utf8') as o_file:
@@ -58,8 +59,6 @@ class ProjectTemplateCopier:
           copy_function=self.copy_rendered
         )
         self.post_copy()
-        click.echo(f"\r\n.........................\r\n")
-        click.echo(f"New project created at {self.distdir}")
 
     def post_copy(self):
         for root, dirnames, files in os.walk(self.distdir):
@@ -92,7 +91,9 @@ def prepare_directory(directory):
 def create_project(project_name, templatedir=None):
     """Create a new starlit project"""
     if not is_valid_identifier(project_name):
-        click.echo(f"{project_name} is not valid as a project name")
+        click.echo(f"{project_name} is not valid as a project name. \r\n\
+            Please use a valid python identifier, consisting only of \
+            numbers, letters, and underscores.")
         raise click.Abort()
     if templatedir is None:
         templatedir = os.path.join(get_root_path('starlit'), 'project_template')
@@ -126,3 +127,5 @@ def create_project(project_name, templatedir=None):
         prepare_directory(project_name),
         project_name
       ).copy_all()
+    click.echo(f"\r\n.........................\r\n")
+    click.echo(f"New project created at {self.distdir}")
