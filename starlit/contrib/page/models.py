@@ -1,4 +1,4 @@
-from starlit.boot.exts.sqla import db
+from starlit.boot.sqla import db
 from starlit.models.abstract import AbstractPage
 
 

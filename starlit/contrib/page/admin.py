@@ -1,9 +1,9 @@
 from flask import url_for
 from starlit.boot.sqla import db
 from starlit.babel import gettext, lazy_gettext
-from starlit.util.wtf import RichTextAreaField
-from starlit_modules.page.models import Page
-from starlit_admin.modules.core import DisplayableAdmin
+from starlit.contrib.admin.core import DisplayableAdmin
+from starlit.contrib.admin.wtf import TinymceTextAreaField
+from .models import Page
 
 
 class PageAdmin(DisplayableAdmin):
@@ -11,7 +11,7 @@ class PageAdmin(DisplayableAdmin):
     form_excluded_columns = ["children", "contenttype", "slug_path"]
     column_list = [(1, "parent")]
     form_overrides = {
-        'content': RichTextAreaField
+        'content': TinymceTextAreaField
     }
 
     def edit_form(self, obj):

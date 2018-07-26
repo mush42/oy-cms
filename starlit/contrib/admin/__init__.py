@@ -27,12 +27,14 @@ def security_ctp_with_admin(admin):
 class StarlitAdmin(Admin):
     """Provides integration with Flask-Admin"""
 
+    # Resource module that provides templates and static files
+    resource_module = admin_resource_module
+
     def __init__(self, app=None, auto_register_modules=False, **kwargs):
         index_view = kwargs.pop('index_view', StarlitIndexView(
             menu_icon_type='fa', menu_icon_value='fa-home',
             template='starlit_admin/index.html')
         )
-        self.resource_module = kwargs.pop('resource_module', admin_resource_module)
         self.auto_register_modules = auto_register_modules
         defaults = {
             'name': lazy_gettext('Dashboard'),

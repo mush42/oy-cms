@@ -1,5 +1,5 @@
 from flask import request, render_template, _request_ctx_stack
-from starlit.globals import current_page
+from .globals import current_page
 
 
 def templates_for_page(page):

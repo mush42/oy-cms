@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    starlit_modules.page.globals
+    starlit.contrib.page.globals
     ~~~~~~~~~~
 
     Starlit context bound objects to be used during request handling.
@@ -33,8 +33,6 @@ def _get_page_for_request():
     if blueprint is not None:
         requested_slug_path = requested_slug_path.lstrip(current_app.blueprints[blueprint].url_prefix or '')
     requested_slug_path = requested_slug_path.strip('/')
-    if requested_slug_path is None:
-        return
     requested_slug_path = requested_slug_path or current_app.config['HOME_SLUG']
     return cls.query.filter(cls.slug_path==requested_slug_path).one_or_none()
 
