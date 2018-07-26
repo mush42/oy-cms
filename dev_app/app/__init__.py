@@ -6,7 +6,7 @@ from .module import module
 
 
 app = create_app(__name__, 'config.py', template_folder='templates')
-admin = StarlitAdmin(app)
+admin = StarlitAdmin(app, auto_register_modules=True)
 app.register_module(security_template_module)
 app.register_module(module)
 

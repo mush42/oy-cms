@@ -21,7 +21,7 @@ JQUERY_CDN_URL = "https://code.jquery.com/jquery-2.2.4.min.js"
 
 
 # Holds info about possible urls
-bs4url = namedtuple('bs4_url', 'remote local')
+bs4url = namedtuple('bs4_url', 'setting_key local_path')
 
 
 bs4 = StarlitModule(
@@ -36,9 +36,9 @@ bs4 = StarlitModule(
 # maps resource types to url_info
 _prefix = bs4.name.replace('.', '/')
 resource_url = dict(
-    jquery=bs4url(lambda: current_settings.jquerycdn, _prefix + '/js/jquery.min.js'),
-    bs4css=bs4url(lambda: current_settings.bs4cdn_css, _prefix + '/css/bootstrap.min.css'),
-    bs4js=bs4url(lambda: current_settings.bs4cdn_js, _prefix + '/js/bootstrap.min.js')
+    jquery=bs4url('jquerycdn', _prefix + '/js/jquery.min.js'),
+    bs4css=bs4url('bs4cdn_css', _prefix + '/css/bootstrap.min.css'),
+    bs4js=bs4url('bs4cdn_js', _prefix + '/js/bootstrap.min.js')
 )
 del _prefix
 
@@ -50,8 +50,8 @@ def bs4_url_for(restype):
     """
     url_info = resource_url[restype]
     if current_settings.bs4_use_cdn:
-        return url_info.remote()
-    return url_for(bs4.name + '.static', filename=url_info.local)
+        return getattr(current_settings, url_info.setting_key)
+    return url_for(bs4.name + '.static', filename=url_info.local_path)
 
 @bs4.app_context_processor
 def add_bs4_ctxp():

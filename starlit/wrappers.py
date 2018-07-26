@@ -27,6 +27,7 @@ from flask.helpers import locked_cached_property, get_root_path
 
 from starlit.helpers import exec_module, find_modules, import_modules
 from starlit.fixtures import Fixtured
+from starlit.signals import starlit_module_registered
 
 
 class DualValueString(UserString):
@@ -116,6 +117,7 @@ class StarlitModule(Blueprint, Fixtured):
         self.viewable_name =  viewable_name
         # A list of dicts or functions that return a list of dicts
         self.settings = []
+        self.__module__ = import_name
         super(StarlitModule, self).__init__(
             name,
             import_name,
@@ -127,6 +129,7 @@ class StarlitModule(Blueprint, Fixtured):
         super(StarlitModule, self).register(app, *args, **kwargs)
         # Update the app.config with our defaults
         app.config.from_module_defaults(self.root_path)
+        starlit_module_registered.send(app, module=self)
 
     def settings_provider(self, category=None):
         """Record a function as a setting provider
