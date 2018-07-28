@@ -1,10 +1,10 @@
 {
-  "starlit.modules.page.models.Page": [
+  "starlit.contrib.page.models.Page": [
     {
       "id": 1,
       "title": "Home",
       "slug": "index",
-      "content": "_file:home.html",
+      "content": "Wellcome to Home",
       "author_id": 1,
       "status": "published",
       "must_show_in_menu": true,

@@ -3,7 +3,7 @@ from starlit.boot.sqla import db
 from starlit.babel import gettext, lazy_gettext
 from starlit.contrib.admin.core import DisplayableAdmin
 from starlit.contrib.admin.wtf import TinymceTextAreaField
-from .models import Page
+from ..models import Page
 
 
 class PageAdmin(DisplayableAdmin):
@@ -24,3 +24,12 @@ class PageAdmin(DisplayableAdmin):
     def get_preview_url(instance):
         return instance.slug_path
 
+
+def register_admin(app, admin):
+    admin.add_view(PageAdmin(
+        Page,
+        db.session,
+        name=lazy_gettext('Pages'),
+        menu_icon_type='fa',
+        menu_icon_value='fa-book'
+    ))

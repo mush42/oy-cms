@@ -10,32 +10,32 @@
     :license: MIT, see LICENSE for more details.
 """
 from collections import namedtuple
+from werkzeug.exceptions import NotFound
 from flask import current_app, request, _request_ctx_stack
-from starlit.contrib.page.globals import current_page, parent_page_class
 from starlit.babel import lazy_gettext
-from .resource_module import page_resource_module
 from .models import Page
+from .globals import current_page, parent_page_class
+from .page_module import page_module
 from .templating import render_page_template
-
-
-# Holds info about a page handler
-handler_opts = namedtuple('PageContentTypeHandler', 'view_func methods module')
 
 
 class Page(object):
     """Flask extension for starlit pages."""
 
-    # Resource module that provides templates and static files
-    resource_module = page_resource_module
+    # The module that provides templates and static files and other extras
+    module = page_module
+
+    # Holds info about a page handler
+    handler_opts = namedtuple('PageContentTypeHandler', 'view_func methods module')
 
     def __init__(self, app=None):
         self.contenttype_handlers = {}
         if app:
-            self.app = app
             self.init_app(app)
 
     def init_app(self, app):
         app.before_request_funcs.setdefault(None, []).append(self.set_page_and_response_if_appropriate)
+        app.register_module(self.module)
 
     def page_view(self):
         handler = self.get_handler_for(current_page.contenttype)
@@ -54,7 +54,7 @@ class Page(object):
             return self.page_view()
 
     def _add_contenttype_handler(self, contenttype, view_func, methods=('GET',), module=None):
-        self.contenttype_handlers[contenttype] = handler_opts(
+        self.contenttype_handlers[contenttype] = self.handler_opts(
             view_func,
             methods,
             module

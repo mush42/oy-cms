@@ -12,7 +12,7 @@ def templates_for_page(page):
     rv = []
     if getattr(_request_ctx_stack.top, 'module', None):
         rv.extend(built_tpl_path(_request_ctx_stack.top.module + '/'))
-    return rv + built_tpl_path('site/page/')
+    return rv + built_tpl_path('pages/')
     
 
 def render_page_template(page=None, context=None, template=None):
