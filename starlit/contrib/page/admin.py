@@ -3,7 +3,7 @@ from starlit.boot.sqla import db
 from starlit.babel import gettext, lazy_gettext
 from starlit.contrib.admin.core import DisplayableAdmin
 from starlit.contrib.admin.wtf import TinymceTextAreaField
-from ..models import Page
+from .models import Page
 
 
 class PageAdmin(DisplayableAdmin):

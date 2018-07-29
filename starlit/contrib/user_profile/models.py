@@ -4,11 +4,11 @@ from sqlalchemy.orm import backref
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.ext.associationproxy import association_proxy
 from flask_security import UserMixin, RoleMixin
-from starlit.boot.exts.sqla import db
+from starlit.boot.sqla import db
 from starlit.babel import lazy_gettext
 from starlit.models.abstract import TimeStampped, ProxiedDictMixin, DynamicProp, SQLAEvent
-from starlit.modules.core.models import User
-from . import user_profile
+from starlit.models import User
+
 
 class Profile(ProxiedDictMixin, db.Model, TimeStampped):
     id = db.Column(db.Integer, primary_key=True)
@@ -30,16 +30,8 @@ class Profile(ProxiedDictMixin, db.Model, TimeStampped):
         info=dict(label=lazy_gettext('Biography'), description=lazy_gettext(''))
     )
 
-    @property
-    def name(self):
-        return ' '.join([self.first_name, self.last_name])
-
-    @name.setter
-    def name(self, value):
-        self.first_name, self.last_name = value
-
     def __str__(self):
-        return "{}'s Profile".format(self.name)
+        return f"<UserProfile: firstname={self.first_name}, last_name={self.last_name}"
 
 
 class ProfileExtras(DynamicProp, db.Model):
@@ -48,12 +40,10 @@ class ProfileExtras(DynamicProp, db.Model):
 
 
 
-
 def add_user_profile(target, *args, **kwargs):
     if isinstance(target, User) and not getattr(target, "profile", None):
         target.profile = Profile()
 
 
-@user_profile.record_once
-def register_user_profiles_event_listener(state):
+def register_user_profiles_event_listener():
     event.listen(mapper, 'init', add_user_profile)

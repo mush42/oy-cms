@@ -12,30 +12,50 @@
 from collections import namedtuple
 from werkzeug.exceptions import NotFound
 from flask import current_app, request, _request_ctx_stack
+from starlit.wrappers import StarlitModule
 from starlit.babel import lazy_gettext
 from .models import Page
 from .globals import current_page, parent_page_class
-from .page_module import page_module
 from .templating import render_page_template
+from .admin import register_admin
 
 
-class Page(object):
-    """Flask extension for starlit pages."""
-
-    # The module that provides templates and static files and other extras
-    module = page_module
-
+class Page(StarlitModule):
+    """A starlit module that provide the extenssion
+        point to the page functionality
+    """
+    
     # Holds info about a page handler
     handler_opts = namedtuple('PageContentTypeHandler', 'view_func methods module')
 
-    def __init__(self, app=None):
+    def __init__(self, app,
+          name='starlit.contrib.page',
+          import_name='starlit.contrib.page',
+          **kwargs):
+        super().__init__(name,
+            import_name=import_name,
+            template_folder="templates",
+            viewable_name=lazy_gettext("Page"),
+            **kwargs)
         self.contenttype_handlers = {}
         if app:
             self.init_app(app)
 
     def init_app(self, app):
-        app.before_request_funcs.setdefault(None, []).append(self.set_page_and_response_if_appropriate)
-        app.register_module(self.module)
+        self.before_app_request(self.set_page_and_response_if_appropriate)
+        self.app_context_processor(self.enject_pages)
+        app.register_module(self)
+
+    def enject_pages(self):
+        pages = parent_page_class.query.viewable.filter(
+            parent_page_class.is_primary==True).filter(
+            parent_page_class.slug_path!=current_app.config.get('HOME_SLUG')
+        ).all()
+        return dict(
+            pages=pages,
+            current_page=current_page,
+            page=current_page
+        )
 
     def page_view(self):
         handler = self.get_handler_for(current_page.contenttype)
