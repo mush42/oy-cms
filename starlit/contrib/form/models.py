@@ -2,13 +2,11 @@ from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.ext.hybrid import hybrid_property
 from flask import current_app
-from starlit.boot.exts.sqla import db
+from starlit.models import db
 from starlit.models.abstract import ProxiedDictMixin, DynamicProp
 from starlit.babel import lazy_gettext
 from starlit.models.abstract import TimeStampped
-from starlit.modules.page.models import Page
-from starlit.util.dynamicform import DynamicForm, FIELD_MAP
-
+from starlit.contrib.page.models import Page
 
 
 class Field(db.Model):

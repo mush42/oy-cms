@@ -42,8 +42,11 @@ class Page(StarlitModule):
             self.init_app(app)
 
     def init_app(self, app):
+        if hasattr(app, '_page_ext'):
+            raise RuntimeError("Only one Page extension could be registred with the application")
         self.before_app_request(self.set_page_and_response_if_appropriate)
         self.app_context_processor(self.enject_pages)
+        app._page_ext = self
         app.register_module(self)
 
     def enject_pages(self):
