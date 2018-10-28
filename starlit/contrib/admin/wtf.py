@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    starlit.contrib.page.wtf
+    starlit.contrib.admin.wtf
     ~~~~~~~~~~
 
     Provide WTForms custom fields.
