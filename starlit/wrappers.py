@@ -35,6 +35,7 @@ class DualValueString(UserString):
           - a primary value: str
           - a dictionary containing extra values
     """
+
     def __init__(self, seq, **extra):
         super(DualValueString, self).__init__(seq)
         self.args = extra
@@ -43,40 +44,48 @@ class DualValueString(UserString):
 class AbstractField(object):
     """The field interface"""
 
-    def __init__(self, name, type, label='',
-            description=None, required=False,
-            choices=None, default=None,  field_options=None):
+    def __init__(
+        self,
+        name,
+        type,
+        label="",
+        description=None,
+        required=False,
+        choices=None,
+        default=None,
+        field_options=None,
+    ):
         kwargs = locals()
-        kwargs.pop('self')
+        kwargs.pop("self")
         self.__dict__.update(kwargs)
         if self.default is not None:
-            self.default = self.parse_default_value(kwargs['default'])
+            self.default = self.parse_default_value(kwargs["default"])
         if self.choices is not None:
-            self.choices = self.parse_choices(kwargs['choices'])
+            self.choices = self.parse_choices(kwargs["choices"])
 
     def parse_default_value(self, value):
         if value is None:
             return
         elif callable(value):
-             value = value(self)
-        if self.type == 'checkbox' and type(value) is not bool:
+            value = value(self)
+        if self.type == "checkbox" and type(value) is not bool:
             raise TypeError("Invalid default value for checkbox")
         return value
 
     def parse_choices(self, choices):
         if callable(choices):
             choices = choices(self)
-        if hasattr(choices, 'keys'):
+        if hasattr(choices, "keys"):
             return choices.items()
         elif type(choices) is not str:
-            raise TypeError("{} Invalid value for field choices.". format(choices))
-        for choice in choices.split(';'):
-            yield choice.split(':')
+            raise TypeError("{} Invalid value for field choices.".format(choices))
+        for choice in choices.split(";"):
+            yield choice.split(":")
 
 
 class StarlitConfig(Config):
     """Custom config class used by :class:`Starlit`"""
-    
+
     def from_module_defaults(self, root_path):
         """Helper method to import the default config module from
         the given path.
@@ -94,10 +103,10 @@ class StarlitConfig(Config):
 
         :param root_path: The root path of the module
         """
-        filename = os.path.join(root_path, 'defaults.py')
+        filename = os.path.join(root_path, "defaults.py")
         if not os.path.isfile(filename):
             return
-        d = exec_module(filename, 'default_module_config')
+        d = exec_module(filename, "default_module_config")
         for key in dir(d):
             if key not in self and key.isupper():
                 self[key] = getattr(d, key)
@@ -110,19 +119,16 @@ class StarlitModule(Blueprint, Fixtured):
 
     Basically  you can initialize it like other flask blueprints
     """
-    
+
     def __init__(self, name, import_name, viewable_name=None, **kwargs):
-        # flask wouldn't serve static files if static_url_path is not set 
-        auto_static_url_path = kwargs.get('static_url_path', None) or '/static/' + name
-        self.viewable_name =  viewable_name
+        # flask wouldn't serve static files if static_url_path is not set
+        auto_static_url_path = kwargs.get("static_url_path", None) or "/static/" + name
+        self.viewable_name = viewable_name
         # A list of dicts or functions that return a list of dicts
         self.settings = []
         self.__module__ = import_name
         super(StarlitModule, self).__init__(
-            name,
-            import_name,
-            static_url_path=auto_static_url_path,
-            **kwargs
+            name, import_name, static_url_path=auto_static_url_path, **kwargs
         )
 
     def register(self, app, *args, **kwargs):
@@ -136,10 +142,12 @@ class StarlitModule(Blueprint, Fixtured):
 
         Setting provider functions should return a list of dicts.
         """
+
         def decorator(func):
             func.category = category or self.name
             self.settings.append(func)
             return func
+
         return decorator
 
 
@@ -150,11 +158,11 @@ class Starlit(Flask):
         - Custom module system
         - Editable settings which are persisted to the database
     """
-    
+
     # Custom configuration class :class:`StarlitConfig`
     config_class = StarlitConfig
     # Holds category information
-    catinfo = namedtuple('catinfo', 'name display_name')
+    catinfo = namedtuple("catinfo", "name display_name")
 
     def __init__(self, *args, **kwargs):
         super(Starlit, self).__init__(*args, **kwargs)
@@ -185,11 +193,10 @@ class Starlit(Flask):
         """
         for module in import_modules(pkg):
             modname = module.__name__
-            if modname in self.config['EXCLUDED_MODULES']:
+            if modname in self.config["EXCLUDED_MODULES"]:
                 continue
             starlit_modules = (
-              v for v in module.__dict__.values()
-              if isinstance(v, StarlitModule)
+                v for v in module.__dict__.values() if isinstance(v, StarlitModule)
             )
             for mod in set(starlit_modules):
                 yield mod
@@ -200,14 +207,18 @@ class Starlit(Flask):
             for setting_func in mod.settings:
                 cat = setting_func.category
                 if cat not in self.modules:
-                    raise LookupError(f"'{cat}' is being used as a setting category\
+                    raise LookupError(
+                        f"'{cat}' is being used as a setting category\
                         in module {mod.name}, function {setting_func.__name__}\
-                        but it is not a registered module.")
+                        but it is not a registered module."
+                    )
                 provided = setting_func(self)
                 for setting in provided:
                     viewable_name = self.modules[cat].viewable_name
                     category = DualValueString(cat, viewable_name=viewable_name)
-                    self.provided_settings_dict.setdefault(category, []).append(AbstractField(**setting))
+                    self.provided_settings_dict.setdefault(category, []).append(
+                        AbstractField(**setting)
+                    )
 
     @property
     def provided_settings(self):

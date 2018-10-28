@@ -18,7 +18,7 @@ from flask import current_app, request
 
 
 def _get_page_cls():
-    cls_import_name = current_app.config['PARENT_PAGE_CLASS']
+    cls_import_name = current_app.config["PARENT_PAGE_CLASS"]
     if cls_import_name in sys.modules:
         return sys.modules[cls_import_name]
     return import_string(cls_import_name)
@@ -31,10 +31,12 @@ def _get_page_for_request():
     requested_slug_path = request.path
     blueprint = request.blueprint
     if blueprint is not None:
-        requested_slug_path = requested_slug_path.lstrip(current_app.blueprints[blueprint].url_prefix or '')
-    requested_slug_path = requested_slug_path.strip('/')
-    requested_slug_path = requested_slug_path or current_app.config['HOME_SLUG']
-    return cls.query.filter(cls.slug_path==requested_slug_path).one_or_none()
+        requested_slug_path = requested_slug_path.lstrip(
+            current_app.blueprints[blueprint].url_prefix or ""
+        )
+    requested_slug_path = requested_slug_path.strip("/")
+    requested_slug_path = requested_slug_path or current_app.config["HOME_SLUG"]
+    return cls.query.filter(cls.slug_path == requested_slug_path).one_or_none()
 
 
 parent_page_class = LocalProxy(lambda: _get_page_cls())

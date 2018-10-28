@@ -10,6 +10,7 @@
     :license: MIT, see LICENSE for more details.
 """
 
+
 class SQLAEvent(object):
     """
     Contains methods to be called during

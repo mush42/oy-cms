@@ -13,7 +13,8 @@ from werkzeug.exceptions import HTTPException
 
 
 class StarlitException(Exception):
-    """The base exception class for Starlit."""    
+    """The base exception class for Starlit."""
+
     def __init__(self, help_message=None):
         self.help_message = help_message
 

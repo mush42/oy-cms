@@ -13,21 +13,19 @@ from datetime import datetime
 from starlit.boot.sqla import db
 from ._sqlaevent import SQLAEvent
 
+
 class TimeStampped(SQLAEvent):
     """Add created and updated fields"""
+
     created = db.Column(
         db.DateTime,
         default=datetime.utcnow,
         nullable=False,
-        info=dict(
-            label='Creation Date'
-        )
+        info=dict(label="Creation Date"),
     )
     updated = db.Column(
         db.DateTime,
         onupdate=datetime.utcnow,
         nullable=True,
-        info=dict(
-            label='Last Updated'
-        )
+        info=dict(label="Last Updated"),
     )

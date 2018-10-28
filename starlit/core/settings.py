@@ -20,7 +20,7 @@ class Settings(object):
             if setting.name == key:
                 self.edit(key, setting.default)
                 return setting.default
-        raise SettingDoesNotExist("Setting %s does not exists" %key)
+        raise SettingDoesNotExist("Setting %s does not exists" % key)
 
     def __setattribute__(self, key, value):
         raise AttributeError("Can't set attribute")
@@ -31,8 +31,11 @@ class Settings(object):
 
 
 def get_active_settings_profile():
-    active_settings_profile = SettingsProfile.query.filter(SettingsProfile.is_active==True).one()
+    active_settings_profile = SettingsProfile.query.filter(
+        SettingsProfile.is_active == True
+    ).one()
     return active_settings_profile
 
-current_settings_profile= LocalProxy(lambda: get_active_settings_profile())
+
+current_settings_profile = LocalProxy(lambda: get_active_settings_profile())
 current_settings = LocalProxy(lambda: Settings(get_active_settings_profile().settings))

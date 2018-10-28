@@ -17,4 +17,3 @@ from .displayable import Displayable, DisplayableQuery
 from .page import AbstractPage
 from .polymorphic_prop import ProxiedDictMixin, DynamicProp
 from ._sqlaevent import SQLAEvent
-

@@ -19,25 +19,25 @@ from .models import Profile
 
 class BaseUserAdmin(StarlitModelView):
     def is_accessible(self):
-        return current_user.has_role('admin')
+        return current_user.has_role("admin")
 
 
 class ProfileAdmin(BaseUserAdmin):
     can_create = False
     can_delete = False
-    column_exclude_list = ['user', 'created', 'extras']
-    column_list = ['first_name', 'last_name', 'updated']
-    form_excluded_columns = ['user', 'extras', 'updated', 'created']
+    column_exclude_list = ["user", "created", "extras"]
+    column_list = ["first_name", "last_name", "updated"]
+    form_excluded_columns = ["user", "extras", "updated", "created"]
 
     def on_form_prefill(self, form, id):
         model = self.get_one(id)
         for field in form:
-            if field.name.startswith('profile_extra__'):
+            if field.name.startswith("profile_extra__"):
                 field.data = model.get(field.name[15:])
 
     def after_model_change(self, form, model, is_created):
         for field in form:
-            if field.name.startswith('profile_extra__'):
+            if field.name.startswith("profile_extra__"):
                 model[field.name[15:]] = field.data
         db.session.commit()
 
@@ -45,29 +45,33 @@ class ProfileAdmin(BaseUserAdmin):
     def form_extra_fields(self):
         """Contribute the fields of profile extras"""
         rv = {}
-        extra_fields = list(current_app.config.get('PROFILE_EXTRA_FIELDS', []))
+        extra_fields = list(current_app.config.get("PROFILE_EXTRA_FIELDS", []))
         for field in DynamicForm(extra_fields).fields:
-            rv.setdefault('profile_extra__%s' %field[0], field[1])
+            rv.setdefault("profile_extra__%s" % field[0], field[1])
         return rv
 
-class RoleAdmin(BaseUserAdmin):
-    column_exclude_list = ['user']
 
+class RoleAdmin(BaseUserAdmin):
+    column_exclude_list = ["user"]
 
 
 def register_admin(app, admin):
     with app.app_context():
-        admin.add_view(RoleAdmin(
-            Role,
-            db.session,
-            name=lazy_gettext('Roles'),
-            menu_icon_type='fa',
-            menu_icon_value='fa-clock'
-        ))
-        admin.add_view(ProfileAdmin(
-            Profile,
-            db.session,
-            name=lazy_gettext('Profiles'),
-            menu_icon_type='fa',
-            menu_icon_value='fa-user'
-        ))
+        admin.add_view(
+            RoleAdmin(
+                Role,
+                db.session,
+                name=lazy_gettext("Roles"),
+                menu_icon_type="fa",
+                menu_icon_value="fa-clock",
+            )
+        )
+        admin.add_view(
+            ProfileAdmin(
+                Profile,
+                db.session,
+                name=lazy_gettext("Profiles"),
+                menu_icon_type="fa",
+                menu_icon_value="fa-user",
+            )
+        )

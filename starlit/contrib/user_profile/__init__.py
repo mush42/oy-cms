@@ -8,7 +8,7 @@ class UserProfile(StarlitModule):
     """Extenssion point to the user profile feature"""
 
     def __init__(self, app=None):
-        super().__init__('starlit.contrib.user_profile', __name__)
+        super().__init__("starlit.contrib.user_profile", __name__)
         if app:
             self.init_app(app)
 

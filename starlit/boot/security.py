@@ -13,14 +13,14 @@ security = Security()
 
 
 def security_processer():
-    if request.blueprint != 'security':
+    if request.blueprint != "security":
         return
-    if request.endpoint == 'security.login':
+    if request.endpoint == "security.login":
         form = StarlitLoginForm()
         if form.validate_on_submit():
-            session['lang'] = form.lang.data
-    elif request.endpoint == 'security.logout' and 'lang' in session:
-        session.pop('lang')
+            session["lang"] = form.lang.data
+    elif request.endpoint == "security.logout" and "lang" in session:
+        session.pop("lang")
 
 
 def initialize_security(app):
@@ -28,5 +28,6 @@ def initialize_security(app):
         app,
         login_form=StarlitLoginForm,
         forgot_password_form=StarlitRecoverPasswordForm,
-        datastore=user_datastore)
+        datastore=user_datastore,
+    )
     app.before_request(security_processer)

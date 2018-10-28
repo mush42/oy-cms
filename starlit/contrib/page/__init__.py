@@ -24,41 +24,47 @@ class Page(StarlitModule):
     """A starlit module that provide the extenssion
         point to the page functionality
     """
-    
-    # Holds info about a page handler
-    handler_opts = namedtuple('PageContentTypeHandler', 'view_func methods module')
 
-    def __init__(self, app,
-          name='starlit.contrib.page',
-          import_name='starlit.contrib.page',
-          **kwargs):
-        super().__init__(name,
+    # Holds info about a page handler
+    handler_opts = namedtuple("PageContentTypeHandler", "view_func methods module")
+
+    def __init__(
+        self,
+        app,
+        name="starlit.contrib.page",
+        import_name="starlit.contrib.page",
+        **kwargs
+    ):
+        super().__init__(
+            name,
             import_name=import_name,
             template_folder="templates",
             viewable_name=lazy_gettext("Page"),
-            **kwargs)
+            **kwargs
+        )
         self.contenttype_handlers = {}
         if app:
             self.init_app(app)
 
     def init_app(self, app):
-        if hasattr(app, '_page_ext'):
-            raise RuntimeError("Only one Page extension could be registred with the application")
+        if hasattr(app, "_page_ext"):
+            raise RuntimeError(
+                "Only one Page extension could be registred with the application"
+            )
         self.before_app_request(self.set_page_and_response_if_appropriate)
         self.app_context_processor(self.enject_pages)
         app._page_ext = self
         app.register_module(self)
 
     def enject_pages(self):
-        pages = parent_page_class.query.viewable.filter(
-            parent_page_class.is_primary==True).filter(
-            parent_page_class.slug_path!=current_app.config.get('HOME_SLUG')
-        ).all()
-        return dict(
-            pages=pages,
-            current_page=current_page,
-            page=current_page
+        pages = (
+            parent_page_class.query.viewable.filter(
+                parent_page_class.is_primary == True
+            )
+            .filter(parent_page_class.slug_path != current_app.config.get("HOME_SLUG"))
+            .all()
         )
+        return dict(pages=pages, current_page=current_page, page=current_page)
 
     def page_view(self):
         handler = self.get_handler_for(current_page.contenttype)
@@ -76,12 +82,12 @@ class Page(StarlitModule):
         if isinstance(request.routing_exception, NotFound) and current_page:
             return self.page_view()
 
-    def _add_contenttype_handler(self, contenttype, view_func, methods=('GET',), module=None):
+    def _add_contenttype_handler(
+        self, contenttype, view_func, methods=("GET",), module=None
+    ):
         self.contenttype_handlers[contenttype] = self.handler_opts(
-            view_func,
-            methods,
-            module
-            )
+            view_func, methods, module
+        )
 
     def contenttype_handler(self, contenttype, methods):
         """A decorator to add custom contenttype handlers to be
@@ -94,11 +100,12 @@ class Page(StarlitModule):
         :param contenttype: a string that identify a certain page class
         :param methods: a list of HTTP methods that are accepted by this handler
         """
+
         def wrapper(func):
             self._add_contenttype_handler(func, contenttype, methods)
             return func
+
         return wrapper
 
     def get_handler_for(self, contenttype):
         return self.contenttype_handlers.get(contenttype)
-

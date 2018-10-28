@@ -53,14 +53,15 @@ class ReadOnlyProxiedDictMixin(ProxiedDictMixin):
     """Like :class:`ProxiedDictMixin` but disables the assignment
     and deletion of items
     """
-    
+
     def __setitem__(self, key, value):
         if key not in self._proxied:
             raise AttributeError("Cann't Set Attribute")
         self._proxied[key] = value
 
     def __delitem__(self, key):
-        raise AttributeError('Deleting is not allowed')
+        raise AttributeError("Deleting is not allowed")
+
 
 class PolymorphicVerticalProperty(object):
     """A key/value pair with polymorphic value storage.
@@ -99,6 +100,7 @@ class PolymorphicVerticalProperty(object):
         """A comparator for .value, builds a polymorphic comparison via CASE.
 
         """
+
         def __init__(self, cls):
             self.cls = cls
 
@@ -107,37 +109,42 @@ class PolymorphicVerticalProperty(object):
             whens = [
                 (
                     literal_column("'%s'" % discriminator),
-                    cast(getattr(self.cls, attribute), String)
-                ) for attribute, discriminator in pairs
+                    cast(getattr(self.cls, attribute), String),
+                )
+                for attribute, discriminator in pairs
                 if attribute is not None
             ]
             return case(whens, self.cls.type, null())
+
         def __eq__(self, other):
             return self._case() == cast(other, String)
+
         def __ne__(self, other):
             return self._case() != cast(other, String)
 
     def __repr__(self):
-        return '<%s %r>' % (self.__class__.__name__, self.value)
+        return "<%s %r>" % (self.__class__.__name__, self.value)
+
 
 @event.listens_for(PolymorphicVerticalProperty, "mapper_configured", propagate=True)
 def on_new_class(mapper, cls_):
     """Look for Column objects with type info in them, and work up
     a lookup table."""
     info_dict = {}
-    info_dict[type(None)] = (None, 'none')
-    info_dict['none'] = (None, 'none')
+    info_dict[type(None)] = (None, "none")
+    info_dict["none"] = (None, "none")
     for k in mapper.c.keys():
         col = mapper.c[k]
-        if 'type' in col.info:
-            python_type, discriminator = col.info['type']
+        if "type" in col.info:
+            python_type, discriminator = col.info["type"]
             info_dict[python_type] = (k, discriminator)
             info_dict[discriminator] = (k, discriminator)
     cls_.type_map = info_dict
 
+
 class DynamicProp(PolymorphicVerticalProperty):
     key = db.Column(db.String(128))
     type = db.Column(db.String(64))
-    int_value = db.Column(db.Integer, info={'type': (int, 'integer')})
-    str_value = db.Column(db.Unicode(255), info={'type': (six.text_type, 'string')})
-    bool_value = db.Column(db.Boolean, info={'type': (bool, 'boolean')})
+    int_value = db.Column(db.Integer, info={"type": (int, "integer")})
+    str_value = db.Column(db.Unicode(255), info={"type": (six.text_type, "string")})
+    bool_value = db.Column(db.Boolean, info={"type": (bool, "boolean")})

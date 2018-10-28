@@ -7,13 +7,16 @@ from starlit.boot.security import user_datastore
 
 @pytest.fixture(scope="module")
 def app():
-    app = starlit.create_app(__name__, config=dict(
-        SECRET_KEY='testing-secret-key',
-        TESTING=True,
-        DEBUG=True,
-        SQLALCHEMY_DATABASE_URI='sqlite:///:memory:',
-        SECURITY_PASSWORD_HASH='plaintext',
-    ))
+    app = starlit.create_app(
+        __name__,
+        config=dict(
+            SECRET_KEY="testing-secret-key",
+            TESTING=True,
+            DEBUG=True,
+            SQLALCHEMY_DATABASE_URI="sqlite:///:memory:",
+            SECURITY_PASSWORD_HASH="plaintext",
+        ),
+    )
     yield app
 
 
@@ -21,13 +24,14 @@ def app():
 def client(app):
     yield TestApp(app)
 
+
 def create_user():
-    admin_role = user_datastore.find_or_create_role('admin')
+    admin_role = user_datastore.find_or_create_role("admin")
     return user_datastore.create_user(
-        user_name='admin',
-        email='admin@localhost.com',
-        password='mmmaaa',
-        roles=[admin_role]
+        user_name="admin",
+        email="admin@localhost.com",
+        password="mmmaaa",
+        roles=[admin_role],
     )
 
 
@@ -38,9 +42,8 @@ def db(request, app):
         user = create_user()
         sqla_db.session.commit()
         app.test_user = user
-        if getattr(request.module, '__install_fixtures__', True):
+        if getattr(request.module, "__install_fixtures__", True):
             for mod in app.modules.values():
                 mod.install_fixtures()
         yield sqla_db
         sqla_db.drop_all()
-

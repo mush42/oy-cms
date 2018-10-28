@@ -14,16 +14,18 @@ class Fixtured(object):
     A Mixin class to enable the installation of fixtures
     from the path of an instance of `Starlit.wrappers.StarlitModule`.
     """
-    
+
     def deserialize_instance(self, model, **obj):
         """Given a model and fields as a dict of keyword args
         this will return an instance of model with the fields
         """
         for k, v in obj.items():
-            if hasattr(v, 'strip') and v.startswith('_file'):
-                to_read = os.path.join(self.root_path, 'fixtures', '_files', v.lstrip('_file:'))
-                obj[k] = open(to_read, 'r').read()
-            elif 'date' in k:
+            if hasattr(v, "strip") and v.startswith("_file"):
+                to_read = os.path.join(
+                    self.root_path, "fixtures", "_files", v.lstrip("_file:")
+                )
+                obj[k] = open(to_read, "r").read()
+            elif "date" in k:
                 obj[k] = parse(v)
         return model(**obj)
 
@@ -31,12 +33,14 @@ class Fixtured(object):
     def fixtures(self):
         """Returns the json decoded fixture or None"""
         try:
-            with self.open_resource('fixtures/data.json') as datafile:
+            with self.open_resource("fixtures/data.json") as datafile:
                 return json.load(datafile)
         except IOError:
             return
         except json.JSONDecodeError:
-            raise BadlyFormattedFixture("Error deserializing fixtures for: " + self.module)
+            raise BadlyFormattedFixture(
+                "Error deserializing fixtures for: " + self.module
+            )
 
     def install_fixtures(self):
         if not self.fixtures:

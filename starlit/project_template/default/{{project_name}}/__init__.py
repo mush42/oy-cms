@@ -1,4 +1,4 @@
-#-*-coding: utf-8-*-
+# -*-coding: utf-8-*-
 """
     {{ project_name }}
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -9,6 +9,5 @@ from starlit import create_app
 from starlit.contrib.admin import StarlitAdmin
 
 
-app = create_app('{{project_name}}', 'config.py')
+app = create_app("{{project_name}}", "config.py")
 admin = StarlitAdmin(app)
- 

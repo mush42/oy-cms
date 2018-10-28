@@ -32,12 +32,12 @@ class ProjectTemplateCopier:
         self.distdir = distdir
         self.project_name = project_name
         self.jinja_env = Environment(loader=FileSystemLoader(self.templatedir))
-        _build_ctx_mod_path = os.path.join(self.templatedir, 'build_context.py')
+        _build_ctx_mod_path = os.path.join(self.templatedir, "build_context.py")
         if ctx_build_vars is None:
             ctx_build_vars = {}
-        ctx_build_vars.setdefault('project_name', self.project_name)
-        mod = exec_module(_build_ctx_mod_path, 'ctxb', ctx_build_vars)
-        self.render_ctx = {'project_name': self.project_name}
+        ctx_build_vars.setdefault("project_name", self.project_name)
+        mod = exec_module(_build_ctx_mod_path, "ctxb", ctx_build_vars)
+        self.render_ctx = {"project_name": self.project_name}
         for attr in mod.__all__:
             self.render_ctx[attr] = getattr(mod, attr)
 
@@ -45,18 +45,16 @@ class ProjectTemplateCopier:
         """Render the given template to the output file"""
         t_file = os.path.relpath(src, self.templatedir)
         # TODO: Find a better way to handle back-slashes
-        t_file = '/'.join(os.path.split(t_file))
+        t_file = "/".join(os.path.split(t_file))
         template = self.jinja_env.get_template(t_file)
-        with open(dst, 'w', encoding='utf8') as o_file:
+        with open(dst, "w", encoding="utf8") as o_file:
             rendered = template.render(**self.render_ctx)
             o_file.write(rendered)
         return dst
 
     def copy_all(self):
         shutil.copytree(
-          self.templatedir,
-          self.distdir,
-          copy_function=self.copy_rendered
+            self.templatedir, self.distdir, copy_function=self.copy_rendered
         )
         self.post_copy()
 
@@ -67,7 +65,7 @@ class ProjectTemplateCopier:
                     newname = Template(f).render(**self.render_ctx)
                     pjoin = lambda p: os.path.join(root, p)
                     os.rename(pjoin(f), pjoin(newname))
-        os.unlink(os.path.join(self.distdir, 'build_context.py'))
+        os.unlink(os.path.join(self.distdir, "build_context.py"))
 
 
 def is_valid_identifier(project_name):
@@ -86,17 +84,19 @@ def prepare_directory(directory):
 
 
 @click.command()
-@click.argument('project_name')
-@click.option('--templatedir', help="The template to be used", default=None)
+@click.argument("project_name")
+@click.option("--templatedir", help="The template to be used", default=None)
 def create_project(project_name, templatedir=None):
     """Create a new starlit project"""
     if not is_valid_identifier(project_name):
-        click.echo(f"{project_name} is not valid as a project name. \r\n\
+        click.echo(
+            f"{project_name} is not valid as a project name. \r\n\
             Please use a valid python identifier, consisting only of \
-            numbers, letters, and underscores.")
+            numbers, letters, and underscores."
+        )
         raise click.Abort()
     if templatedir is None:
-        templatedir = os.path.join(get_root_path('starlit'), 'project_template')
+        templatedir = os.path.join(get_root_path("starlit"), "project_template")
     else:
         rv = get_vcs_from_url(templatedir)
         if rv is not None:
@@ -108,24 +108,22 @@ def create_project(project_name, templatedir=None):
     templates = []
     for f in os.listdir(templatedir):
         if os.path.isdir(os.path.join(templatedir, f)):
-            if os.path.isfile(os.path.join(templatedir, f, 'build_context.py')):
+            if os.path.isfile(os.path.join(templatedir, f, "build_context.py")):
                 templates.append(f)
     if templates and len(templates) > 1:
-        rv = ''
+        rv = ""
         click.echo("Which template you would like to use?\r\n")
         for i in templates:
             click.echo(f"  * {i}")
         while rv not in templates:
-            rv = click.prompt("\r\nPlease choose one of the above: ", default='default')
+            rv = click.prompt("\r\nPlease choose one of the above: ", default="default")
         templatedir = os.path.join(templatedir, rv)
     else:
         templatedir = os.path.join(templatedir, templates[0])
     click.echo(f"Creating project {project_name}...")
     click.echo(f"Using project template: {templatedir}...")
     copier = ProjectTemplateCopier(
-        templatedir,
-        prepare_directory(project_name),
-        project_name
-      ).copy_all()
+        templatedir, prepare_directory(project_name), project_name
+    ).copy_all()
     click.echo(f"\r\n.........................\r\n")
     click.echo(f"New project created at {self.distdir}")

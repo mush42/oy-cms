@@ -10,12 +10,13 @@ class PathToSlugConvertor(PathConverter):
         return self.clean_slashes(value)
 
     def to_url(self, value):
-        return '/{}/'.format(value)
+        return "/{}/".format(value)
+
 
 def split_slug(slug):
-    slugs = slug.split('/')
+    slugs = slug.split("/")
     root = slugs[0]
-    path = ''
-    if len(slugs) >0:
-        path = '/'.join(slugs[1:])
+    path = ""
+    if len(slugs) > 0:
+        path = "/".join(slugs[1:])
     return (root, path)

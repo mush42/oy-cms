@@ -12,9 +12,9 @@ import subprocess
 import tempfile
 
 
-RX_VCS = re.compile(r'^(git|hg)(@|\+[a-z]+://|://)', re.IGNORECASE)
+RX_VCS = re.compile(r"^(git|hg)(@|\+[a-z]+://|://)", re.IGNORECASE)
 
-VCS = namedtuple('VCS', 'type url')
+VCS = namedtuple("VCS", "type url")
 
 
 def get_vcs_from_url(url):
@@ -25,8 +25,8 @@ def get_vcs_from_url(url):
     if match:
         vcs_type = match.group(1)
         vcs_url = normalize_url(url)
-    elif url.endswith('.git'):
-        vcs_type = 'git'
+    elif url.endswith(".git"):
+        vcs_type = "git"
         vcs_url = url
     else:
         return
@@ -35,7 +35,7 @@ def get_vcs_from_url(url):
 
 def normalize_url(url):
     """Ensure the url doesn't start with either git or hg."""
-    if not url.startswith(('git+', 'hg+')):
+    if not url.startswith(("git+", "hg+")):
         return url
     return url[4:]
 
@@ -55,7 +55,7 @@ def _clone_to_temp(vcs):
     location = tempfile.mkdtemp()
     shutil.rmtree(location)  # Path must not exists
     try:
-        subprocess.check_call([vcs.type, 'clone', vcs.url, location])
+        subprocess.check_call([vcs.type, "clone", vcs.url, location])
     except Exception as e:
         print(e)
         return None
@@ -65,6 +65,6 @@ def _clone_to_temp(vcs):
 def _clone_to(vcs, location):
     """Clone a repo inside the `location` folder."""
     try:
-        subprocess.Popen([vcs.type, 'clone', vcs.url], cwd=location)
+        subprocess.Popen([vcs.type, "clone", vcs.url], cwd=location)
     except:
         return location

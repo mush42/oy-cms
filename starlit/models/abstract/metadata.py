@@ -16,49 +16,51 @@ from ._sqlaevent import SQLAEvent
 
 class Metadata(SQLAEvent):
     """Provides fields which could be used with HTML meta tags"""
+
     meta_title = db.Column(
         db.Unicode(255),
-        default=u'',
-        info=dict(
-            label='Meta Title',
-            description='The title used by search engines'
-        )
+        default=u"",
+        info=dict(label="Meta Title", description="The title used by search engines"),
     )
     meta_description = db.Column(
         db.UnicodeText,
-        default=u'',
+        default=u"",
         info=dict(
-            label='Meta Description',
-            description='The description used by search engines'
-        )
+            label="Meta Description",
+            description="The description used by search engines",
+        ),
     )
     should_auto_generate = db.Column(
         db.Boolean,
         info=dict(
-            label='Auto generate the metadata',
-            description='If enabled the metadata will be generated automaticly'
-        )
+            label="Auto generate the metadata",
+            description="If enabled the metadata will be generated automaticly",
+        ),
     )
     keywords = db.Column(
-        db.Text, 
-        default=u'',
+        db.Text,
+        default=u"",
         info=dict(
-            label='Keywords',
-            description='The keywords for this content (Used by search engines)'
-        )
+            label="Keywords",
+            description="The keywords for this content (Used by search engines)",
+        ),
     )
 
     @property
     def options(self):
         options = (
-            ('meta_title', getattr(self, '__metatitle_column__', None), None),
-            ('meta_description', getattr(self, '__metadescription_column__', None), None),
-            ('keywords', getattr(self, '__keywordscolumn__', None), self.gen_keywords),
+            ("meta_title", getattr(self, "__metatitle_column__", None), None),
+            (
+                "meta_description",
+                getattr(self, "__metadescription_column__", None),
+                None,
+            ),
+            ("keywords", getattr(self, "__keywordscolumn__", None), self.gen_keywords),
         )
         return (opt for opt in options if opt[1])
 
     def gen_keywords(self, value):
-        return ' '.join(value.split())
+        return " ".join(value.split())
 
     def set_value(self, attrname, colname, genfunc):
         if not getattr(self, attrname):

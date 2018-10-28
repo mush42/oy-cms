@@ -9,8 +9,8 @@
 from starlit.wrappers import StarlitModule
 
 admin_resource_module = StarlitModule(
-    name='starlit-admin',
-    import_name='starlit.contrib.admin.resource_module',
-    static_folder='static',
-    template_folder='templates'
+    name="starlit-admin",
+    import_name="starlit.contrib.admin.resource_module",
+    static_folder="static",
+    template_folder="templates",
 )

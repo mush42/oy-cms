@@ -8,42 +8,42 @@ from starlit.slugging import PathToSlugConvertor
 from .settings import current_settings_profile, current_settings
 
 
-core = StarlitModule('starlit.core',
-    __name__,
-    viewable_name=lazy_gettext("General")
-  )
+core = StarlitModule("starlit.core", __name__, viewable_name=lazy_gettext("General"))
 
 
 @core.record_once
 def configure_app(state):
     """Configure the app after blueprint registration."""
-    state.app.url_map.converters['slug'] = PathToSlugConvertor
+    state.app.url_map.converters["slug"] = PathToSlugConvertor
+
 
 @core.app_context_processor
 def register_context_processors():
     lang = get_locale().language
-    rtl = lang in ('ar', 'az', 'fa', 'he', 'ur', )
+    rtl = lang in ("ar", "az", "fa", "he", "ur")
     return dict(
         lang=lang,
         rtl=rtl,
         _trans=gettext,
         _ntrans=ngettext,
         settings_profile=current_settings_profile,
-        settings=current_settings
+        settings=current_settings,
     )
+
 
 @core.app_template_filter()
 def qs_args(url, qs):
-    return '{}?'.format(url) + urlencode(qs)
+    return "{}?".format(url) + urlencode(qs)
+
 
 @core.settings_provider()
 def provide_page_settings(app):
     return [
         dict(
-            name='title',
-            label=lazy_gettext('Site Title'),
-            description=u'The site Title',
-            type='text',
-            default=u'Starlit CMS'
-        ),
+            name="title",
+            label=lazy_gettext("Site Title"),
+            description=u"The site Title",
+            type="text",
+            default=u"Starlit CMS",
+        )
     ]

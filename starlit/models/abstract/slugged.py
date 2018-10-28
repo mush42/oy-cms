@@ -19,45 +19,46 @@ from ._sqlaevent import SQLAEvent
 
 class Titled(SQLAEvent):
     """Provide a mandatory title field"""
+
     title = db.Column(
         db.Unicode(255),
         nullable=False,
         info=dict(
-            label='Title',
-            description='The title to display in the browser title bar.'
-        )
+            label="Title", description="The title to display in the browser title bar."
+        ),
     )
 
     def __str__(self):
         return self.title
 
     def __repr__(self):
-        return '{0}(title={1})'.format(self.__class__.__name__, self.title)
+        return "{0}(title={1})".format(self.__class__.__name__, self.title)
 
 
 class Slugged(SQLAEvent):
     """A uniquely slugged mixin class"""
+
     slug = db.Column(
         db.Unicode(255),
         unique=True,
         index=True,
         info=dict(
-            label='Slug',
-            description='A Slug is that portion of the URL used to identify this content.'
-        )
+            label="Slug",
+            description="A Slug is that portion of the URL used to identify this content.",
+        ),
     )
 
     def before_flush(self, session, is_modified):
         if not self.slug or self._slug_exists(session, self.slug):
             self._update_slug(session)
-        if is_modified and current_app.config['ALLWAYS_UPDATE_SLUGS']:
+        if is_modified and current_app.config["ALLWAYS_UPDATE_SLUGS"]:
             state = inspect(self)
             if self.__slugcolumn__ not in state.unmodified:
                 self.slug = None
                 self.before_flush(session, is_modified=False)
 
     def _update_slug(self, session):
-        populates_from = getattr(self, '__slugcolumn__', None)
+        populates_from = getattr(self, "__slugcolumn__", None)
         if populates_from is None:
             raise AssertionError(
                 "You must specify the column the slug is populated from."
@@ -81,7 +82,4 @@ class Slugged(SQLAEvent):
             if not self._slug_exists(session, slug):
                 return slug
             index += 1
-            slug = u'%(slug)s-%(index)s' % {
-                'slug': original_slug,
-                'index': index
-            }
+            slug = u"%(slug)s-%(index)s" % {"slug": original_slug, "index": index}

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
     starlit
-    ~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~
 
     Starlit is a Micro Content Management System (CMS) for the modern web.
     It is based on Flask, and provides a full-fledged and flexible CMS
@@ -26,7 +26,7 @@ from starlit.models import *
 
 
 def initialize_builtin_extensions():
-    """Initialize third-party extensions.""" 
+    """Initialize third-party extensions."""
     app = current_app._get_current_object()
     CSRFProtect(app)
     db.init_app(app)
@@ -38,16 +38,15 @@ def initialize_builtin_extensions():
 def _prepare_app(name, app_class, **kwargs):
     """Internal helper used by :func:`create_app` to initialize the application"""
     if not issubclass(app_class, Starlit):
-        raise TypeError("""The application class should be a subclass of starlit.wrappers.Starlit.""")
-    default_kwargs = dict(
-        template_folder='templates',
-        static_folder='static'
-    )
-    [kwargs.setdefault(k, v) for k,v in default_kwargs.items()]
+        raise TypeError(
+            """The application class should be a subclass of starlit.wrappers.Starlit."""
+        )
+    default_kwargs = dict(template_folder="templates", static_folder="static")
+    [kwargs.setdefault(k, v) for k, v in default_kwargs.items()]
     return app_class(name, **kwargs)
 
 
-def create_app(name, config=None, app_class=Starlit, envar='STARLIT_CONFIG', **kwargs):
+def create_app(name, config=None, app_class=Starlit, envar="STARLIT_CONFIG", **kwargs):
     """This app factory is the main entry point of Starlit.
 
     Use this function to create a new instance of

@@ -7,4 +7,3 @@ from sqlalchemy_continuum import make_versioned
 db = SQLAlchemy()
 migrate = Migrate()
 make_versioned(plugins=[FlaskPlugin()])
-

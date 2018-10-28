@@ -17,13 +17,16 @@ from starlit.boot.sqla import db
 from starlit.babel import lazy_gettext
 from ._sqlaevent import SQLAEvent
 
+
 def _test_aware_current_user():
     # TODO: a very ugly approach. Remove it ASAP
-    if current_app.config['DEBUG'] and current_app.testing:
+    if current_app.config["DEBUG"] and current_app.testing:
         return current_app.test_user
     return security_current_user
 
+
 current_user = LocalProxy(lambda: _test_aware_current_user())
+
 
 class UserRelated(SQLAEvent):
     """A Mixin class that provide the User Related fields"""
@@ -32,35 +35,34 @@ class UserRelated(SQLAEvent):
     def author_id(cls):
         return db.Column(
             db.Integer,
-            db.ForeignKey('user.id'),
+            db.ForeignKey("user.id"),
             default=lambda: current_user.id,
             nullable=False,
-            info=dict(label=lazy_gettext('Author'))
-            )
+            info=dict(label=lazy_gettext("Author")),
+        )
 
     @declared_attr
     def author(cls):
         return db.relationship(
-            'User',
+            "User",
             foreign_keys=[cls.author_id],
-            info=dict(label=lazy_gettext('Author'), description=lazy_gettext(''))
-            )
+            info=dict(label=lazy_gettext("Author"), description=lazy_gettext("")),
+        )
 
     @declared_attr
     def editor_id(cls):
         return db.Column(
             db.Integer,
-            db.ForeignKey('user.id'),
+            db.ForeignKey("user.id"),
             nullable=True,
-            #onupdate=lambda: current_user.id,
-            info=dict(label=lazy_gettext('Author'))
-            )
+            # onupdate=lambda: current_user.id,
+            info=dict(label=lazy_gettext("Author")),
+        )
 
     @declared_attr
     def last_edited_by(cls):
         return db.relationship(
-            'User',
+            "User",
             foreign_keys=[cls.editor_id],
-            info=dict(label=lazy_gettext('Author'), description=lazy_gettext(''))
-            )
-
+            info=dict(label=lazy_gettext("Author"), description=lazy_gettext("")),
+        )

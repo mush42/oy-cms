@@ -11,26 +11,29 @@ from inflect import engine
 from starlit.boot.exts.sqla import db
 
 
-api = Api(prefix='/api')
+api = Api(prefix="/api")
 ma = Marshmallow()
-cors = CORS(resources='/api/*')
+cors = CORS(resources="/api/*")
+
 
 class StarlitResourceType(MethodViewType):
     """Provides automatic endpoint registration for  collection and resource views."""
-    
+
     @staticmethod
     def gen_default_api_endpoints(cls):
         e = engine()
         model_name = cls.schema.Meta.model.__name__.lower()
         identifier = e.plural(model_name)
         rv = {
-            '/%s/' %identifier: {
-                'endpoint': '%s-collection' %model_name,
-                'methods': ['GET', 'POST']
+            "/%s/"
+            % identifier: {
+                "endpoint": "%s-collection" % model_name,
+                "methods": ["GET", "POST"],
             },
-            '/%s/<int:pk>/' %identifier: {
-                'endpoint': '%s-resource' %model_name,
-                'methods': ['GET', 'PUT', 'DELETE']
+            "/%s/<int:pk>/"
+            % identifier: {
+                "endpoint": "%s-resource" % model_name,
+                "methods": ["GET", "PUT", "DELETE"],
             },
         }
         return rv
@@ -40,19 +43,22 @@ class StarlitResourceType(MethodViewType):
         if not rv.schema:
             return rv
         default_endpoints = cls.gen_default_api_endpoints(rv)
-        if hasattr(rv, 'url_map'):
+        if hasattr(rv, "url_map"):
             default_endpoints.update(rv.url_map)
         for url, options in default_endpoints.items():
             api.add_resource(
                 rv,
                 url,
-                methods=options.get('methods', ['POST', 'PUT', 'DELETE', 'GET']),
-                endpoint=options.get('endpoint')
+                methods=options.get("methods", ["POST", "PUT", "DELETE", "GET"]),
+                endpoint=options.get("endpoint"),
             )
-        site_endpoint = getattr(rv.schema, 'site_endpoint', [])
+        site_endpoint = getattr(rv.schema, "site_endpoint", [])
         if site_endpoint:
-            rv.schema._declared_fields['site_url'] = URLFor(site_endpoint[0], **site_endpoint[1])
+            rv.schema._declared_fields["site_url"] = URLFor(
+                site_endpoint[0], **site_endpoint[1]
+            )
         return rv
+
 
 class StarlitResource(with_metaclass(StarlitResourceType, Resource)):
     """
@@ -60,11 +66,12 @@ class StarlitResource(with_metaclass(StarlitResourceType, Resource)):
     It also register all subclasses with the api.
     To use it provide a sqlalchemy-marshmallow schema.
     """
+
     schema = None
 
     def schema_dump(self, obj, schema_kwargs=None, **kwargs):
-        options = getattr(self.schema, 'dump_options', {})
-        kw = options.get('one' if not kwargs.get('many') else 'many', {})
+        options = getattr(self.schema, "dump_options", {})
+        kw = options.get("one" if not kwargs.get("many") else "many", {})
         kw.update(schema_kwargs or {})
         mod_schema = self.schema(**kw)
         return mod_schema.dump(obj, **kwargs)
@@ -90,11 +97,15 @@ class StarlitResource(with_metaclass(StarlitResourceType, Resource)):
             obj = self.query_one(pk)
             self.abort(obj)
             return self.schema_dump(obj).data
-        page = int(request.args.get('page', 1))
-        item_count = int(request.args.get('item_count', 10))
+        page = int(request.args.get("page", 1))
+        item_count = int(request.args.get("item_count", 10))
         paginator = self.query_all().paginate(page, item_count, False)
-        return self.schema_dump(paginator.items, many=True), 200, {'X-Total-Count': self.query.count}
-        
+        return (
+            self.schema_dump(paginator.items, many=True),
+            200,
+            {"X-Total-Count": self.query.count},
+        )
+
     def post(self):
         obj, errors = self.schema().load(self.get_post_data())
         if errors:
@@ -106,7 +117,9 @@ class StarlitResource(with_metaclass(StarlitResourceType, Resource)):
     def put(self, pk):
         obj = self.query_one(pk)
         self.abort(obj)
-        data, errors = self.schema().load(data=self.get_post_data(), instance=obj, partial=True)
+        data, errors = self.schema().load(
+            data=self.get_post_data(), instance=obj, partial=True
+        )
         if errors:
             return errors, 400
         db.session.add(data)
@@ -118,7 +131,7 @@ class StarlitResource(with_metaclass(StarlitResourceType, Resource)):
         self.abort(obj)
         db.session.delete(obj)
         db.session.commit()
-        return {'message': 'Resource was deleted successfully'}
+        return {"message": "Resource was deleted successfully"}
 
     def get_post_data(self):
         _json = request.get_json()
@@ -126,17 +139,20 @@ class StarlitResource(with_metaclass(StarlitResourceType, Resource)):
             return request.form
         return _json
 
-    def abort(self, obj, status_code=404, message='Resource was not found'):
+    def abort(self, obj, status_code=404, message="Resource was not found"):
         if obj is None:
             flask_abort(status_code, message)
+
 
 class StarlitSchemaOpts(SchemaOpts):
     def __init__(self, meta):
         super(StarlitSchemaOpts, self).__init__(meta)
         self.json_module = json
 
+
 class StarlitModelSchema(ma.ModelSchema):
     OPTIONS_CLASS = StarlitSchemaOpts
+
 
 def initialize_api(app):
     api.init_app(app)

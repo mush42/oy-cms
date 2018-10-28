@@ -7,9 +7,9 @@ from starlit.babel import lazy_gettext, gettext
 
 class StarlitChangePasswordForm(NewPasswordConfirmMixin, Form):
     old_password = PasswordField(
-        label=lazy_gettext('Old Password'),
+        label=lazy_gettext("Old Password"),
         validators=[password_required],
-        render_kw=dict(required=True)
+        render_kw=dict(required=True),
     )
 
     def __init__(self, user, *args, **kwargs):
@@ -20,13 +20,15 @@ class StarlitChangePasswordForm(NewPasswordConfirmMixin, Form):
         if not super(StarlitChangePasswordForm, self).validate():
             return False
         if not verify_and_update_password(self.old_password.data, self.user):
-            self.old_password.errors.append(gettext('Incorrect Password'))
+            self.old_password.errors.append(gettext("Incorrect Password"))
             return False
         if self.old_password.data.strip() == self.password.data.strip():
-            self.password.errors.append(gettext('The new password is the same as the old password'))
+            self.password.errors.append(
+                gettext("The new password is the same as the old password")
+            )
             return False
         return True
 
+
 def change_password(user, password):
     user.password = encrypt_password(password)
-    
