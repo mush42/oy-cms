@@ -115,15 +115,16 @@ def create_project(project_name, templatedir=None):
         for i in templates:
             click.echo(f"  * {i}")
         while rv not in templates:
-            rv = click.prompt("\r\nPlease choose one of the above or press ctrl+c to quit. ", default="default")
+            rv = click.prompt(
+                "\r\nPlease choose one of the above or press ctrl+c to quit. ",
+                default="default",
+            )
         templatedir = os.path.join(templatedir, rv)
     else:
         templatedir = os.path.join(templatedir, templates[0])
     click.echo(f"Creating project {project_name}...")
     click.echo(f"Using project template: {templatedir}...")
     distdir = prepare_directory(project_name)
-    copier = ProjectTemplateCopier(
-        templatedir, distdir, project_name
-    ).copy_all()
+    copier = ProjectTemplateCopier(templatedir, distdir, project_name).copy_all()
     click.echo(f"\r\n.........................\r\n")
     click.echo(f"New project created at {distdir}")
