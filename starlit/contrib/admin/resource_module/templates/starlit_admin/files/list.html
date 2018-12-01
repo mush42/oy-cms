@@ -1,9 +1,0 @@
-{% extends 'admin/file/list.html' %}
-{% import 'starlit/admin/macros.html' as macros with context %}
-
-{% block list_row_actions scoped %}
-{{super()}}
-{% if not is_dir %}
-  {{macros.select_file(name=name, path=path) }}
-{% endif %}
-{% endblock %}

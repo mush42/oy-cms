@@ -2,14 +2,12 @@
 {% set icon_type = item.get_icon_type() %}
 {%- if icon_type %}
   {% set icon_value = item.get_icon_value() %}
-  {% if icon_type == 'glyph' %}
-    <i class="glyphicon {{ icon_value }}"></i>
-  {% elif icon_type == 'fa' %}
+  {% if icon_type == 'fa' %}
     <i class="fa {{ icon_value }}"></i>
   {% elif icon_type == 'image' %}
     <img src="{{ url_for('static', filename=icon_value) }}" alt="menu image">
   {% elif icon_type == 'image-url' %}
-    <img src="item.icon_value" alt="menu image">
+    <img src="{{ icon_value }}" alt="menu image">
   {% endif %}
 {% endif %}
 {%- endmacro %}
@@ -24,14 +22,12 @@
         {%- if item.is_active(admin_view) %}
         <li class="active dropdown">
         {% else -%}
-        <li>
+        <li class="dropdown">
         {%- endif %}
-          {% with unique_html_id = item.name %}
-          <a href="javascript:;" role="button" aria-haspopup="true" data-toggle="collapse" data-target="#{{unique_html_id}}" aria-expanded="false" aria-controls="{{unique_html_id}}">
-            {% if item.class_name %}<span class="{{ item.class_name }}"></span> {% endif %}{{ item.name }} <i class="fa fa-chevron-down menu-indicator"></i>
+          <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+            {% if item.class_name %}<span class="{{ item.class_name }}"></span> {% endif %}{{ item.name }}<b class="caret"></b>
           </a>
-          <ul id="{{unique_html_id}}" class="collapse list-unstyled">
-          {% endwith %}
+          <ul class="nav child_menu">
           {%- for child in children -%}
             {% set class_name = child.get_class_name() %}
             {%- if child.is_active(admin_view) %}

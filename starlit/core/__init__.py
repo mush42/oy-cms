@@ -13,7 +13,7 @@ core = StarlitModule("starlit.core", __name__, viewable_name=lazy_gettext("Gener
 
 @core.record_once
 def configure_app(state):
-    """Configure the app after blueprint registration."""
+    """Configure the app with extra parameters."""
     state.app.url_map.converters["slug"] = PathToSlugConvertor
 
 

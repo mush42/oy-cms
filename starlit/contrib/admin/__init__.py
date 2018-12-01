@@ -37,14 +37,14 @@ class StarlitAdmin(Admin):
             StarlitIndexView(
                 menu_icon_type="fa",
                 menu_icon_value="fa-home",
-                template="starlit_admin/index.html",
+                #template="starlit_admin/index.html",
             ),
         )
         self.auto_register_modules = auto_register_modules
         defaults = {
             "name": lazy_gettext("Dashboard"),
             "template_mode": "bootstrap3",
-            "base_template": "starlit_admin/master.html",
+            #"base_template": "starlit_admin/master.html",
             "index_view": index_view,
             "category_icon_classes": {
                 "Settings": "fa fa-cog",

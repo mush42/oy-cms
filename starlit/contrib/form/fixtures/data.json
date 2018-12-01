@@ -1,5 +1,5 @@
 {
-  "starlit.modules.form.models.Form": [
+  "starlit.contrib.form.models.Form": [
     {
       "id": 141,
       "title": "Contact Us",
@@ -13,7 +13,7 @@
       "submit_message": "<h1>Your message has been received. Thanks a bundle!</h1>"
     }
   ],
-  "starlit.modules.form.models.Field": [
+  "starlit.contrib.form.models.Field": [
     {
       "id": 1,
       "form_id": 141,
