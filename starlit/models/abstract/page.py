@@ -97,7 +97,7 @@ class AbstractPage(Displayable):
 
     @property
     def url(self):
-        return "/{}/".format(self.slug_path)
+        return "/" + self.slug_path
 
     @hybrid_property
     def is_home(self):

@@ -1,6 +1,6 @@
 from functools import partial
 from werkzeug import import_string
-from flask import request, url_for
+from flask import g, request, url_for
 from flask_admin import Admin, helpers as admin_helpers
 from starlit.babel import lazy_gettext, gettext, ngettext
 from starlit.signals import starlit_module_registered
@@ -62,10 +62,12 @@ class StarlitAdmin(Admin):
         self.app.register_module(self.resource_module)
         regsettings = partial(register_settings_admin, self.app, self)
         self.app.before_first_request(regsettings)
+        self.app.add_template_filter(lambda l: set(l), name="remove_double")
         self.app.context_processor(security_ctp_with_admin(self))
-        self.app.context_processor(
-            lambda: {"admin_plugin_static": self.admin_plugin_static}
-        )
+        self.app.context_processor(lambda: {
+            "admin_plugin_static": self.admin_plugin_static,
+            "add_field_static": self.add_form_field_static,
+        })
         self.app.config["SECURITY_POST_LOGIN_VIEW"] = self.url
         if self.auto_register_modules:
             starlit_module_registered.connect(
@@ -74,8 +76,16 @@ class StarlitAdmin(Admin):
 
     def admin_plugin_static(self, filename):
         return url_for(
-            "%s.static" % ("starlit-admin"), filename="starlit-admin/%s" % (filename,)
-        )
+            "starlit-admin.static", filename="starlit-admin/%s" % (filename))
+
+    def add_form_field_static(self, field):
+        if  getattr(g, 'form_field_static', None) is None:
+            g.form_field_static = {'css': [], 'js': []}
+        for filetype in ('css', 'js'):
+            files = getattr(field.Meta, f'extra_{filetype}', [])
+            if callable(files):
+                files = files(field)
+            g.form_field_static[filetype].extend(files)
 
     def register_module_admin(self, sender, **kw):
         func_name = kw["module"].__module__ + ":register_admin"

@@ -79,7 +79,7 @@ class Page(StarlitModule):
                 return rv
 
     def set_page_and_response_if_appropriate(self):
-        if isinstance(request.routing_exception, NotFound) and current_page:
+        if not isinstance(request.routing_exception, NotFound) and current_page:
             return self.page_view()
 
     def _add_contenttype_handler(
