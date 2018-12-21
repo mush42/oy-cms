@@ -145,6 +145,9 @@ class Starlit(Flask, ContentRendererMixin):
         for mod in self.modules.values():
             if mod.template_folder:
                 mod_templates.append(mod.jinja_loader)
+        # Recently registered modules have higher priority
+        mod_templates.reverse()
+
         mod_templates.append(super(Starlit, self).jinja_loader)
         return ChoiceLoader(tuple(mod_templates))
 

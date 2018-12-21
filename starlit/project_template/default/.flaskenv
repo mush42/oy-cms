@@ -7,6 +7,6 @@
 {{ PROJECT_NAME }}_PASSWORD_SALT = 'Aq6V28444baff40e885fa807f45ed454a'
 
 # Flask-specific stuff
-FLASK_APP=app:app
+FLASK_APP={{ project_name }}:app
 FLASK_ENV = 'development'
 FLASK_DEBUG=${{ PROJECT_NAME }}_DEBUG

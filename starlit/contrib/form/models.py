@@ -90,6 +90,9 @@ class Field(db.Model):
 
     @validates("type")
     def validate_field_type(self, key, ftype):
+        # Bypass validation to be able to install fixtures
+        if not current_app._got_first_request:
+            return ftype
         if ftype not in current_app.available_field_types:
             raise ValueError("Field type is not supported.")
         return ftype

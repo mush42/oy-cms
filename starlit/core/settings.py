@@ -17,9 +17,9 @@ class Settings(object):
             return self.storage[key]
         app_settings = chain.from_iterable(current_app.provided_settings_dict.values())
         for setting in app_settings:
-            if setting.name == key:
-                self.edit(key, setting.default)
-                return setting.default
+            if setting['name'] == key:
+                self.edit(key, setting['default'])
+                return setting['default']
         raise SettingDoesNotExist("Setting %s does not exists" % key)
 
     def __setattribute__(self, key, value):

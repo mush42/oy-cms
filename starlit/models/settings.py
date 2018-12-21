@@ -80,7 +80,7 @@ class Settings(ProxiedDictMixin, db.Model, SQLAEvent):
                 if category not in ctx.app_categories:
                     category_obj = SettingCategory(name=category.data)
                     ctx.app_categories[category] = category_obj
-            setting = Setting(key=opt.name)
-            setting.value = opt.default
+            setting = Setting(key=opt['name'])
+            setting.value = opt['default']
             setting.category = ctx.app_categories[category]
-            self.options[opt.name] = setting
+            self.options[opt['name']] = setting

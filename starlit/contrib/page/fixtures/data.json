@@ -1,5 +1,5 @@
 {
-  "starlit.contrib.page.models.Page": [
+  "starlit.models.page.Page": [
     {
       "id": 1,
       "title": "Home",
