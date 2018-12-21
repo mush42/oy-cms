@@ -46,7 +46,7 @@ class SettingsProfileAdmin(StarlitModelView):
 def make_settings_form_for_category(app, category):
     fields = []
     for setting in app.provided_settings_dict[category]:
-        setting.default = getattr(current_settings, setting.name)
+        setting['default'] = getattr(current_settings, setting['name'])
         fields.append(setting)
     return DynamicForm(fields).form
 

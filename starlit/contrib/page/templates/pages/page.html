@@ -1,10 +1,10 @@
-{% extends 'site/base.html' %}
-{% import 'site/macros.html' as macros %}
+{% extends 'pages/base.html' %}
+{% import 'pages/page_macros.html' as macros %}
 
 {% block meta_desc %}{{page.meta_description}}{% endblock %}
 {% block meta_keywords %}{{page.keywords}}{% endblock %}
 
-{% block title %}{{page.title}}{%endblock%}
+{% block subtitle %}{{page.title}}{%endblock%}
 
 {% block content %}
 {{page.content|safe}}

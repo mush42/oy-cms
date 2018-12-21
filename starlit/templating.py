@@ -1,10 +1,21 @@
-from flask import request, render_template, _request_ctx_stack
+# -*- coding: utf-8 -*-
+"""
+    starlit.templating
+    ~~~~~~~~~~
+
+    Working with HTML templates.
+
+    :copyright: (c) 2018 by Musharraf Omer.
+    :license: MIT, see LICENSE for more details.
+"""
+
+from flask import current_app, request, render_template, _request_ctx_stack
 from .globals import current_page
 
 
 def templates_for_page(page):
     if page.is_home:
-        return "site/index.html"
+        return "pages/index.html"
     slug = page.slug_path
     templates = ["page", page.__contenttype__] + slug.split("/")
     templates.reverse()
@@ -12,7 +23,7 @@ def templates_for_page(page):
     rv = []
     if getattr(_request_ctx_stack.top, "module", None):
         rv.extend(built_tpl_path(_request_ctx_stack.top.module + "/"))
-    return rv + built_tpl_path("pages/")
+    return rv + built_tpl_path(current_app.config["PAGE_TEMPLATES_FOLDER"] + "/")
 
 
 def render_page_template(page=None, context=None, template=None):

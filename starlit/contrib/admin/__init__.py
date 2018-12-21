@@ -3,9 +3,8 @@ from werkzeug import import_string
 from flask import g, request, url_for
 from flask_admin import Admin, helpers as admin_helpers
 from starlit.babel import lazy_gettext, gettext, ngettext
-from starlit.signals import starlit_module_registered
 from .wrappers import StarlitIndexView
-from .core import register_settings_admin
+from .core import register_page_admin, register_settings_admin
 from .resource_module import admin_resource_module
 
 
@@ -37,14 +36,14 @@ class StarlitAdmin(Admin):
             StarlitIndexView(
                 menu_icon_type="fa",
                 menu_icon_value="fa-home",
-                #template="starlit_admin/index.html",
+                # template="starlit_admin/index.html",
             ),
         )
         self.auto_register_modules = auto_register_modules
         defaults = {
             "name": lazy_gettext("Dashboard"),
             "template_mode": "bootstrap3",
-            #"base_template": "starlit_admin/master.html",
+            # "base_template": "starlit_admin/master.html",
             "index_view": index_view,
             "category_icon_classes": {
                 "Settings": "fa fa-cog",
@@ -60,35 +59,37 @@ class StarlitAdmin(Admin):
     def _init_extension(self):
         super(StarlitAdmin, self)._init_extension()
         self.app.register_module(self.resource_module)
+        register_page_admin(self.app, self)
+        # TODO: Fix this hack
         regsettings = partial(register_settings_admin, self.app, self)
         self.app.before_first_request(regsettings)
         self.app.add_template_filter(lambda l: set(l), name="remove_double")
         self.app.context_processor(security_ctp_with_admin(self))
-        self.app.context_processor(lambda: {
-            "admin_plugin_static": self.admin_plugin_static,
-            "add_field_static": self.add_form_field_static,
-        })
+        self.app.context_processor(
+            lambda: {
+                "admin_plugin_static": self.admin_plugin_static,
+                "add_field_static": self.add_form_field_static,
+            }
+        )
         self.app.config["SECURITY_POST_LOGIN_VIEW"] = self.url
         if self.auto_register_modules:
-            starlit_module_registered.connect(
-                self.register_module_admin, sender=self.app
-            )
+            self.app.before_first_request(self.register_module_admin)
 
     def admin_plugin_static(self, filename):
-        return url_for(
-            "starlit-admin.static", filename="starlit-admin/%s" % (filename))
+        return url_for("starlit-admin.static", filename="starlit-admin/%s" % (filename))
 
     def add_form_field_static(self, field):
-        if  getattr(g, 'form_field_static', None) is None:
-            g.form_field_static = {'css': [], 'js': []}
-        for filetype in ('css', 'js'):
-            files = getattr(field.Meta, f'extra_{filetype}', [])
+        if getattr(g, "form_field_static", None) is None:
+            g.form_field_static = {"css": [], "js": []}
+        for filetype in ("css", "js"):
+            files = getattr(field.Meta, f"extra_{filetype}", [])
             if callable(files):
                 files = files(field)
             g.form_field_static[filetype].extend(files)
 
-    def register_module_admin(self, sender, **kw):
-        func_name = kw["module"].__module__ + ":register_admin"
-        admin_func = import_string(func_name, silent=True)
-        if admin_func is not None:
-            admin_func(self.app, self)
+    def register_module_admin(self):
+        for module in self.app.modules.values():
+            func_name = module.__module__ + ":register_admin"
+            admin_func = import_string(func_name, silent=True)
+            if admin_func is not None:
+                admin_func(self.app, self)

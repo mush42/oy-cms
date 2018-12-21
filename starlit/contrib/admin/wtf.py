@@ -26,6 +26,11 @@ class TinymceTextAreaField(TextAreaField):
         @staticmethod
         def extra_js(field):
             return [
-                url_for("starlit-admin.static", filename="starlit-admin/vendor/tinymce/tinymce.min.js"),
-                url_for("starlit-admin.static", filename="starlit-admin/js/tinymce-setup.js")
+                url_for(
+                    "starlit-admin.static",
+                    filename="starlit-admin/vendor/tinymce/tinymce.min.js",
+                ),
+                url_for(
+                    "starlit-admin.static", filename="starlit-admin/js/tinymce-setup.js"
+                ),
             ]

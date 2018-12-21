@@ -1,9 +1,10 @@
 from setuptools import setup, find_packages
+import starlit as package
 
 
 setup(
     name="Starlit",
-    version="0.1.dev",
+    version=package.__version__,
     description="A lightweight, modular, and extensible content management system.",
     license="MIT",
     author="Musharraf Omer",

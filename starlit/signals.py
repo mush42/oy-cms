@@ -15,4 +15,8 @@ _signals = Namespace()
 
 
 # All the following signals receives `app` as the sender
+
 starlit_module_registered = _signals.signal("starlit-module-registered")
+
+# When the app receives the first request
+starlit_app_starting = _signals.signal("starlit-app-starting")

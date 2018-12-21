@@ -2,9 +2,11 @@
 {% import 'starlit/contrib/bs4/macros.html' as macros with context %}
 <html lang="{% block html_lang %}en{% endblock %}">
 <head>
+  {% block head_meta %}
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  {% endblock %}
   <title>{%block title %}{% block subtitle %}{% endblock %} &mdash; {{ settings.title }}{%endblock %}</title>
   {% block bs4_css %}
   <link rel="stylesheet" type="text/css" href="{{ bs4_url_for('bs4css') }}">

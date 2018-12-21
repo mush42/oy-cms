@@ -1,9 +1,9 @@
 from flask import url_for
 from starlit.boot.sqla import db
 from starlit.babel import gettext, lazy_gettext
+from starlit.models.page import Page
 from starlit.contrib.admin.core import DisplayableAdmin
 from starlit.contrib.admin.wtf import TinymceTextAreaField
-from .models import Page
 
 
 class PageAdmin(DisplayableAdmin):
@@ -25,10 +25,10 @@ class PageAdmin(DisplayableAdmin):
         return form
 
     def get_preview_url(instance):
-        return instance.slug_path
+        return f'/{instance.slug_path}/'
 
 
-def register_admin(app, admin):
+def register_page_admin(app, admin):
     admin.add_view(
         PageAdmin(
             Page,

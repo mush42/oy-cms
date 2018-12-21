@@ -1,3 +1,14 @@
+# -*- coding: utf-8 -*-
+"""
+    starlit.contrib.form.admin
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    Provides a custom page contenttype.
+
+    :copyright: (c) 2018 by Musharraf Omer.
+    :license: MIT, see LICENSE for more details.
+"""
+
 import time
 import os.path
 from flask import (
@@ -13,10 +24,11 @@ from flask import (
 from werkzeug import secure_filename
 from flask_wtf import Form as HtmlForm
 from starlit.wrappers import StarlitModule
-from starlit.contrib.page.globals import current_page
+from starlit.globals import current_page
 from starlit.boot.sqla import db
 from starlit.dynamicform import DynamicForm
 from starlit.helpers import date_stamp
+from .admin import register_admin
 from . import models
 
 
@@ -29,12 +41,10 @@ class Form(StarlitModule):
             self.init_app(app)
 
     def init_app(self, app):
-        if not hasattr(app, "_page_ext"):
-            raise RuntimeError(
-                "Page extension has not been registered with the application."
-            )
-        app._page_ext.contenttype_handler(self.form_view, methods=("GET", "POST"))
         app.register_module(self)
+        app.add_contenttype_handler(
+            "form", self.form_view, methods=("GET", "POST"), module="form"
+        )
 
     def store_form(self, form):
         entry = FormEntry(form_id=current_page.id)

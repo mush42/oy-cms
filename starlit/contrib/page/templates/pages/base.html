@@ -1,44 +1,18 @@
-<!doctype html>
-{% import 'site/macros.html' as macros with context %}
-<html lang="{% block html_lang %}{{lang}}{% endblock %}">
-  {% block html_head %}
-  <head>
-    {% block html_meta %}
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {% block content_meta %}
-    <meta name="description" content="{% block meta_desc %}{% endblock %}">
-    <meta name="author" content="{% block meta_author %}{{settings.title}}{%endblock %}">
-    <meta name="keywords" content="{% block meta_keywords %}{%endblock %}">
-    {% endblock content_meta %}
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    {% block extra_meta %}{% endblock %}
-    {% endblock html_meta %}
-    {% block html_title %}
-    <title>{% block title %}{% endblock title %} - {{settings.title}}</title>
-    {% endblock html_title %}
-    <link rel="icon" href="../../../../favicon.ico">  
-    {% block core_css %}
-    <!-- Bootstrap Core CSS -->
-    <link href="{{ url_for('starlit-page.static', filename='starlit/site/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link href="{{ url_for('starlit-page.static', filename='starlit/site/css/style.css') }}" rel="stylesheet">
-    {% endblock core_css %}
-    {% block extra_css %}{% endblock extra_css %}
-    {% block extra_head %}{% endblock extra_head %}
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
-  </head>
-  {% endblock html_head %}
-  {% block html_body %}
-  <body id="{%block body_id %}{% endblock %}">
-    {% block header %}
-    {% block navigation %}
+{% extends "starlit/contrib/bs4/base.html" %}
+{% import 'starlit/contrib/bs4/macros.html' as bs4_macros with context %}
+{% import 'pages/page_macros.html' as page_macros with context %}
+
+{% block head_meta %}
+  {{ super() }}
+  <meta name="description" content="{% block meta_desc %}{% endblock %}">
+  <meta name="author" content="{% block meta_author %}{{settings.title}}{%endblock %}">
+  <meta name="keywords" content="{% block meta_keywords %}{%endblock %}">
+{% endblock %}
+
+{% block subtitle %}{{current_page.title}}{% endblock %}
+
+{% block page_header %}
+  {% block navigation %}
     <nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top">
     <a class="navbar-brand" href="/">{{settings.title}}</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="{{_trans('Toggle navigation menu') }}">
@@ -47,41 +21,32 @@
     <div class="collapse navbar-collapse" id="navbarCollapse">
     <ul class="navbar-nav">
     <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-    {{macros.page_menu(pages, current_page)}}
+    {% for page in pages %}
+      {{ page_macros.render_page(page, current_page) }}
+	{% endfor %}
     </ul>
     </div>
     </nav>
-    {% endblock navigation %}
-    {% endblock header %}
-  
-    <div class="container-fluid">
-      <main id="wrapper" class="wrapper">
-        {% block flash_messages %}
-        <aside class="container-fluid">
-          <div class="row">
-            <div class="col-md-8 p-4">
-            {{macros.messages()}}
-            </div>
-          </div>
-        </aside>
-        {% endblock %}
-      
+  {% endblock %}
+{% endblock %}
+
+<aside class="container-fluid">
+  <div class="row">
+	<div class="col-md-8 p-4">
+	{{ bs4_macros.messages() }}
+	</div>
+  </div>
+</aside>
+
+{% block page_body %}
+  <div class="container-fluid">
+    <main id="wrapper" class="wrapper">
       {% block content %}{% endblock %}
-      </main>
-    </div>
-      <hr>
+    </main>
+  </div>
+  <hr>
+{% endblock %}
 
-    {% block footer %}
-    {% include 'site/includes/footer.html' with context %}
-    {% endblock footer %}
-
-    {% block core_js %}
-    <!-- jQuery -->
-    <script src="{{ url_for('starlit-page.static', filename='starlit/site/vendor/jquery/jquery.min.js') }}"></script>
-    <!-- Bootstrap Core JavaScript -->
-    <script src="{{ url_for('starlit-page.static', filename='starlit/site/vendor/bootstrap/js/bootstrap.min.js') }}"></script>
-    {% endblock core_js %}
-    {% block extra_js %}{% endblock extra_js %}
-  </body>
-{% endblock html_body %}
-</html>
+{% block footer %}
+  {% include 'pages/includes/footer.html' with context %}
+{% endblock footer %}

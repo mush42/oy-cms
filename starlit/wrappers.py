@@ -13,6 +13,7 @@
 import sys
 import os
 import json
+from typing import Iterable
 from itertools import chain
 from importlib import import_module
 from warnings import warn
@@ -25,9 +26,10 @@ from flask import Flask, Blueprint
 from flask.config import Config
 from flask.helpers import locked_cached_property, get_root_path
 
+from starlit.content_renderer import ContentRendererMixin
 from starlit.helpers import exec_module, find_modules, import_modules
 from starlit.fixtures import Fixtured
-from starlit.signals import starlit_module_registered
+from starlit.signals import starlit_module_registered, starlit_app_starting
 
 
 class DualValueString(UserString):
@@ -36,57 +38,15 @@ class DualValueString(UserString):
           - a dictionary containing extra values
     """
 
-    def __init__(self, seq, **extra):
+    def __init__(self, seq: Iterable, **extra: dict):
         super(DualValueString, self).__init__(seq)
         self.args = extra
-
-
-class AbstractField(object):
-    """The field interface"""
-
-    def __init__(
-        self,
-        name,
-        type,
-        label="",
-        description=None,
-        required=False,
-        choices=None,
-        default=None,
-        field_options=None,
-    ):
-        kwargs = locals()
-        kwargs.pop("self")
-        self.__dict__.update(kwargs)
-        if self.default is not None:
-            self.default = self.parse_default_value(kwargs["default"])
-        if self.choices is not None:
-            self.choices = self.parse_choices(kwargs["choices"])
-
-    def parse_default_value(self, value):
-        if value is None:
-            return
-        elif callable(value):
-            value = value(self)
-        if self.type == "checkbox" and type(value) is not bool:
-            raise TypeError("Invalid default value for checkbox")
-        return value
-
-    def parse_choices(self, choices):
-        if callable(choices):
-            choices = choices(self)
-        if hasattr(choices, "keys"):
-            return choices.items()
-        elif type(choices) is not str:
-            raise TypeError("{} Invalid value for field choices.".format(choices))
-        for choice in choices.split(";"):
-            yield choice.split(":")
 
 
 class StarlitConfig(Config):
     """Custom config class used by :class:`Starlit`"""
 
-    def from_module_defaults(self, root_path):
+    def from_module_defaults(self, root_path: str):
         """Helper method to import the default config module from
         the given path.
 
@@ -115,14 +75,19 @@ class StarlitConfig(Config):
 class StarlitModule(Blueprint, Fixtured):
     """StarlitModule is a :class:`flask.Blueprint` with some extras
     
-    This class adds the ability to register editable settings which can be safely edited by the user during runtime.
+    This class adds the ability to register editable settings which can be safely
+    edited by the user during runtime.
 
     Basically  you can initialize it like other flask blueprints
     """
 
-    def __init__(self, name, import_name, viewable_name=None, **kwargs):
+    def __init__(
+        self, name: str, import_name: str, viewable_name: str = None, **kwargs
+    ):
         # flask wouldn't serve static files if static_url_path is not set
-        auto_static_url_path = kwargs.get("static_url_path", None) or "/static/" + name
+        auto_static_url_path = kwargs.get(
+            "static_url_path", None
+        ) or "/static/" + name.replace(".", "-")
         self.viewable_name = viewable_name
         # A list of dicts or functions that return a list of dicts
         self.settings = []
@@ -151,7 +116,7 @@ class StarlitModule(Blueprint, Fixtured):
         return decorator
 
 
-class Starlit(Flask):
+class Starlit(Flask, ContentRendererMixin):
     """Wrapps the :class:flask.Flask` to provide additional functionality.
     
     It add the following features:
@@ -166,6 +131,10 @@ class Starlit(Flask):
 
     def __init__(self, *args, **kwargs):
         super(Starlit, self).__init__(*args, **kwargs)
+        ContentRendererMixin.__init__(self)
+        self.before_first_request_funcs.append(
+            lambda: starlit_app_starting.send(self)
+        )
         self.provided_settings_dict = None
         self.modules = OrderedDict()
 
@@ -216,9 +185,7 @@ class Starlit(Flask):
                 for setting in provided:
                     viewable_name = self.modules[cat].viewable_name
                     category = DualValueString(cat, viewable_name=viewable_name)
-                    self.provided_settings_dict.setdefault(category, []).append(
-                        AbstractField(**setting)
-                    )
+                    self.provided_settings_dict.setdefault(category, []).append(setting)
 
     @property
     def provided_settings(self):

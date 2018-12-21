@@ -1,0 +1,42 @@
+{% macro render_page(page, active_page) %}
+{% with active_class='active' if (page==active_page or active_page in page.children) or ''%}
+{% with page_html_id=page.slug|unique_string %}
+{% if page.children %}
+<li class="nav-item dropdown {{active_class}}">
+<a class="nav-link dropdown-toggle" href="#" id="{{ page_html_id }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{page.title}}</a>
+<div class="dropdown-menu bg-dark" aria-labelledby="{{ page_html_id }}">
+<a class="nav-link" href="{{page.slug_path}}" >{{page.title}}</a>
+{% for child in page.children %}
+<a class="dropdown-item bg-dark text-white {{active_class}}" href="{{child.url}}">{{child.title}}</a>
+{% endfor %}
+</div>
+</li>
+{% else %}
+<li  class="nav-item {{active_class}}"><a class="nav-link" href="{{page.url}}">{{page.title}}</a></li>
+{% endif %}
+{% endwith %}
+{% endwith %}
+{% endmacro %}
+
+{% macro render_tree_branch(branch) %}
+<a href="{{branch.url}}" class="list-group-item list-group-item-action footer-tree-link text-white">{{branch.title}}</a>
+{% if branch.children %}
+<div class="list-group list-group-flush submenu">
+{% for b in branch.children %}
+{{render_tree_branch(b)}}
+{% endfor %}
+</div>
+{% endif %}
+{% endmacro %}
+
+{% macro render_footer_tree(pages) %}
+<div class="row m-2">
+{% for page in pages %}
+<div class="col-sm-3">
+  <div class="list-group list-group-flush">
+  {{ render_tree_branch(page) }}
+</div>
+</div>
+{% endfor %}
+</div>
+{% endmacro %}

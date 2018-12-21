@@ -1,13 +1,24 @@
+# -*- coding: utf-8 -*-
+"""
+    starlit.contrib.form.admin
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    Provides sqlalchemy models for the form contenttype.
+
+    :copyright: (c) 2018 by Musharraf Omer.
+    :license: MIT, see LICENSE for more details.
+"""
+
+from sqlalchemy.orm import validates
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.ext.hybrid import hybrid_property
 from flask import current_app
 from starlit.models import db
+from starlit.models.abstract import TimeStampped
 from starlit.models.abstract import ProxiedDictMixin, DynamicProp
 from starlit.babel import lazy_gettext
-from starlit.models.abstract import TimeStampped
-from starlit.dynamicform import FIELD_MAP
-from starlit.contrib.page.models import Page
+from starlit.models.page import Page
 
 
 class Field(db.Model):
@@ -32,16 +43,15 @@ class Field(db.Model):
     )
     description = db.Column(
         db.Unicode(255),
+        default="",
         info=dict(
             label=lazy_gettext("Field Description"),
             description=lazy_gettext("A summary about the field"),
         ),
     )
-    type = db.Column(
-        db.Enum(*FIELD_MAP.keys(), name="field_types"),
+    type = db.Column(db.String(50),
         nullable=False,
         info=dict(
-            choices=[(k, v.name) for k, v in FIELD_MAP.items()],
             label=lazy_gettext("Field Type"),
             description=lazy_gettext("HTML Type of the field"),
         ),
@@ -78,6 +88,12 @@ class Field(db.Model):
     )
     form_id = db.Column(db.Integer, db.ForeignKey("form.id"))
 
+    @validates("type")
+    def validate_field_type(self, key, ftype):
+        if ftype not in current_app.available_field_types:
+            raise ValueError("Field type is not supported.")
+        return ftype
+    
 
 class Form(Page):
     __contenttype__ = "form"

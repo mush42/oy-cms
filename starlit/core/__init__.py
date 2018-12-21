@@ -4,17 +4,10 @@ from flask import current_app, request, _request_ctx_stack
 from flask_babelex import get_locale
 from starlit.wrappers import StarlitModule
 from starlit.babel import gettext, ngettext, lazy_gettext
-from starlit.slugging import PathToSlugConvertor
 from .settings import current_settings_profile, current_settings
 
 
 core = StarlitModule("starlit.core", __name__, viewable_name=lazy_gettext("General"))
-
-
-@core.record_once
-def configure_app(state):
-    """Configure the app with extra parameters."""
-    state.app.url_map.converters["slug"] = PathToSlugConvertor
 
 
 @core.app_context_processor
