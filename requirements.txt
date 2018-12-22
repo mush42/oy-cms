@@ -1,5 +1,5 @@
 Flask==1.0.2
-Flask-Admin==1.5.1
+Flask-Admin==1.5.3
 Flask-BabelEx==0.9.3
 Flask-Cors==3.0.6
 Flask-Login==0.4.1
