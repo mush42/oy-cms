@@ -1,5 +1,5 @@
 import pytest
-from starlit.models.abstract import (
+from oy.models.abstract import (
     Displayable,
     Slugged,
     Titled,

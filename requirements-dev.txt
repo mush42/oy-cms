@@ -1,6 +1,6 @@
 -r requirements.txt
 
-pytest==3.6.3
-waitress==1.1.0
-WebTest==2.0.30
-black>=18.9b0
+pytest
+waitress
+WebTest
+black

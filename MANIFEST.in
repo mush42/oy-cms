@@ -1,3 +1,1 @@
-recursive-include starlit/translations *
-recursive-include starlit/modules/ *
-recursive-include starlit_admin/ *
+recursive-include oy/project_template/default/*

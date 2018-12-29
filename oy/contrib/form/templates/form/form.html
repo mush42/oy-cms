@@ -1,0 +1,11 @@
+{% extends "pages/base.html" %}
+{% import 'oy/contrib/bs4/macros.html' as macros with context %}
+
+
+{% block content %}
+<hr />
+<div class="form-wrapper">
+  <p class="mb-2">{{ current_page.content|safe }}</p>
+  {{macros.render_form(form, legend=page.title, submit_text=current_page.submit_text, id=current_page.slug)}}
+</div>
+{% endblock %}

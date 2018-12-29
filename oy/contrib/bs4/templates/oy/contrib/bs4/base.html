@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+{% import 'oy/contrib/bs4/macros.html' as macros with context %}
+<html lang="{% block html_lang %}en{% endblock %}">
+<head>
+  {% block head_meta %}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  {% endblock %}
+  <title>{%block title %}{% block subtitle %}{% endblock %} &mdash; {{ settings.title }}{%endblock %}</title>
+  {% block bs4_css %}
+  <link rel="stylesheet" type="text/css" href="{{ bs4_url_for('bs4css') }}">
+  {% endblock %}
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="{% block body_class %}bs4{% endblock %}">
+
+  {% block page_header %}{% endblock %}
+
+  {% block messages %}
+    <div class="container">
+      {{ macros.messages() }}
+    </div>
+  {% endblock %}
+  
+  {% block page_body %}{% endblock %}
+
+  {% block bs4_js %}
+  <script src="{{ bs4_url_for('jquery') }}"></script>
+  <script src="{{ bs4_url_for('bs4js') }}"></script>
+  {% endblock %}
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

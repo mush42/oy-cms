@@ -1,1 +1,1 @@
-[![Build Status](https://travis-ci.org/mush42/Starlit-CMS.svg?branch=master)](https://travis-ci.org/mush42/Starlit-CMS)
+[![Build Status](https://travis-ci.org/mush42/Oy-CMS.svg?branch=master)](https://travis-ci.org/mush42/Oy-CMS)

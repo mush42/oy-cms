@@ -1,5 +1,5 @@
 import pytest
-from starlit.models import User
+from oy.models import User
 
 
 def test_add_user(db):

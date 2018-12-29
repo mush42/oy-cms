@@ -1,45 +1,40 @@
 from setuptools import setup, find_packages
-import starlit as package
+import oy as package
+
+
+with open("README.md", "r") as readme:
+    long_description = readme.read()
 
 
 setup(
-    name="Starlit",
+    name="Oy",
     version=package.__version__,
-    description="A lightweight, modular, and extensible content management system.",
-    license="MIT",
     author="Musharraf Omer",
     author_email="ibnomer2011@hotmail.com",
-    packages=find_packages(),
+    description="A lightweight, modular, and extensible content management system.",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    url="https://github.com/mush42/oy-cms",
+    license="MIT",
+    packages=find_packages(exclude=("tests",)),
     platforms="any",
     include_package_data=True,
     zip_safe=False,
-    entry_points={
-        "flask.commands": [
-            "starlit-project=starlit.boot.cli.starlit_project:create_project"
-        ]
-    },
+    entry_points={"console_scripts": ["oy=oy.boot.cli.oy_commands:oy_group"]},
     install_requires=[
         "Flask",
         "Flask-Admin",
         "Flask-BabelEx",
         "Flask-Cors",
-        "Flask-Login",
-        "Flask-Mail",
         "flask-marshmallow",
         "Flask-Migrate",
-        "Flask-Permissions",
-        "Flask-Principal",
-        "Flask-RESTful",
         "Flask-Security",
         "Flask-SQLAlchemy",
         "Flask-WTF",
-        "inflect",
         "marshmallow",
         "marshmallow-sqlalchemy",
         "Pillow",
-        "six",
         "speaklater",
-        "SQLAlchemy-Utils",
         "unicode-slugify",
         "WTForms-Components",
     ],

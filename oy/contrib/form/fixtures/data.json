@@ -1,0 +1,60 @@
+{
+  "oy.contrib.form.models.Form": [
+    {
+      "id": 141,
+      "title": "Contact Us",
+      "slug": "contact-us",
+      "content": "<h1>Contact Us</h1>",
+      "author_id": 1,
+      "status": "published",
+      "publish_date": "2012-01-12 00:00:00",
+      "must_show_in_menu": true,
+      "submit_text": "Send Message",
+      "submit_message": "<h1>Your message has been received. Thanks a bundle!</h1>"
+    }
+  ],
+  "oy.contrib.form.models.Field": [
+    {
+      "id": 1,
+      "form_id": 141,
+      "name": "name",
+      "label": "Your Full Name",
+      "required": true,
+      "type": "text"
+    },
+    {
+      "id": 2,
+      "form_id": 141,
+      "name": "email",
+      "label": "Your Email Address",
+      "required": true,
+      "type": "email"
+    },
+    {
+      "id": 3,
+      "form_id": 141,
+      "name": "subject_type",
+      "label": "Subject",
+      "required": true,
+      "type": "select",
+      "choices": "sales:Sales;issue:Complain;question:Question",
+      "default": "sales"
+    },
+    {
+      "id": 4,
+      "form_id": 141,
+      "name": "should_reply",
+      "label": "Should we contact you for more information?",
+      "type": "checkbox",
+      "default": true
+    },
+    {
+      "id": 5,
+      "form_id": 141,
+      "name": "message",
+      "label": "Your message",
+      "type": "textarea",
+      "description": "Please write in full details."
+    }
+  ]
+}

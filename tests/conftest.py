@@ -1,13 +1,13 @@
 import pytest
-import starlit
+import oy
 from webtest import TestApp
-from starlit.boot.sqla import db as sqla_db
-from starlit.boot.security import user_datastore
+from oy.boot.sqla import db as sqla_db
+from oy.boot.security import user_datastore
 
 
 @pytest.fixture(scope="module")
 def app():
-    app = starlit.create_app(
+    app = oy.create_app(
         __name__,
         config=dict(
             SECRET_KEY="testing-secret-key",
