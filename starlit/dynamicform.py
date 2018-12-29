@@ -94,7 +94,7 @@ class Field:
             self.choices = rv
 
     def to_wtf(self):
-        field_types = current_app.available_field_types
+        field_types = current_app.data['available_field_types']
         metadata = field_types.get(self.type, None)
         if metadata is None:
             raise NotSupportedFieldTypeError(
@@ -197,4 +197,4 @@ def _prepare_fields(app):
     field_types = list(default_field_types)
     if "EXTRA_FIELD_TYPES" in app.config:
         field_types.extend(app.config["EXTRA_FIELD_TYPES"])
-    app.available_field_types = OrderedDict((ftype.name, ftype) for ftype in field_types)
+    app.data['available_field_types'] = OrderedDict((ftype.name, ftype) for ftype in field_types)

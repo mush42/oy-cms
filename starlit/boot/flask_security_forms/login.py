@@ -27,7 +27,7 @@ class StarlitLoginForm(EmailFormMixin, PasswordFormMixin, LoginForm):
         self.lang.choices = current_app.config["SUPPORTED_LOCALES"].items()
 
     lang = SelectField(
-        label=lazy_gettext("Prefered language"),
+        label=lazy_gettext("Choose interface language"),
         validators=[data_required()],
         render_kw=dict(required=True),
     )

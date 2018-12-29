@@ -49,7 +49,6 @@ class StarlitAdmin(Admin):
                 "Settings": "fa fa-cog",
                 "Pages": "fa fa-file-text-o",
                 "Users": "fa fa-users",
-                "Blog": "fa fa-link",
             },
         }
         for k, v in defaults.items():

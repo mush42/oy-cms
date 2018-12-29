@@ -1,7 +1,7 @@
 {% extends 'starlit/contrib/bs4/base.html' %}
 
 {% block extra_css %}
-<link rel="stylesheet" type="text/css" href="{{ url_for('starlit.contrib.security_template_module.static', filename='starlit/contrib/security_template_module/css/security-styles.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('starlit.contrib.flask_security_templates.static', filename='starlit/contrib/security_template_module/css/security-styles.css') }}">
 {% endblock %}
 
 {% block body_class %}bg-dark{% endblock %}

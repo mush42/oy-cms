@@ -17,7 +17,7 @@ from typing import Iterable
 from itertools import chain
 from importlib import import_module
 from warnings import warn
-from collections import UserString, OrderedDict, namedtuple
+from collections import UserString, OrderedDict
 
 from werkzeug import import_string
 from werkzeug.utils import cached_property
@@ -38,15 +38,17 @@ class DualValueString(UserString):
           - a dictionary containing extra values
     """
 
-    def __init__(self, seq: Iterable, **extra: dict):
+    def __init__(self, seq, **extra):
         super(DualValueString, self).__init__(seq)
         self.args = extra
 
+    def __str__(self):
+        return self.data
 
 class StarlitConfig(Config):
     """Custom config class used by :class:`Starlit`"""
 
-    def from_module_defaults(self, root_path: str):
+    def from_module_defaults(self, root_path):
         """Helper method to import the default config module from
         the given path.
 
@@ -82,7 +84,7 @@ class StarlitModule(Blueprint, Fixtured):
     """
 
     def __init__(
-        self, name: str, import_name: str, viewable_name: str = None, **kwargs
+        self, name, import_name, viewable_name=None, **kwargs
     ):
         # flask wouldn't serve static files if static_url_path is not set
         auto_static_url_path = kwargs.get(
@@ -126,8 +128,6 @@ class Starlit(Flask, ContentRendererMixin):
 
     # Custom configuration class :class:`StarlitConfig`
     config_class = StarlitConfig
-    # Holds category information
-    catinfo = namedtuple("catinfo", "name display_name")
 
     def __init__(self, *args, **kwargs):
         super(Starlit, self).__init__(*args, **kwargs)
@@ -137,6 +137,9 @@ class Starlit(Flask, ContentRendererMixin):
         )
         self.provided_settings_dict = None
         self.modules = OrderedDict()
+        # Holds variable data which is useful for this app instance.
+        self.data = {}
+
 
     @locked_cached_property
     def jinja_loader(self):

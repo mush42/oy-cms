@@ -9,14 +9,18 @@ def getenvar(name, default=None):
     """Return the environment variable named `name`
         or `default` else raise RuntimeError
     """
-    val = os.getenv(name, default)
-    if not val:
-        raise RuntimeError(
-            f"Variable {name} was not found among current "
-            "environment variables and no default has been supplied"
-        )
-    return val
-
+    var = os.getenv(name, None)
+    if var is None:
+        if default is not None:
+            return default
+        else:
+            raise RuntimeError(
+                f"Variable {name} was not found among current "
+                "environment variables and no default has been supplied"
+            )
+    if var in ('True', 'False'):
+        return True if var == 'True' else False
+    return var
 
 
 DEBUG = getenvar('{{ PROJECT_NAME }}_DEBUG', False)

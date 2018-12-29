@@ -9,17 +9,19 @@
     :copyright: (c) 2018 by Musharraf Omer.
     :license: MIT, see LICENSE for more details.
 """
-from starlit.wrappers import StarlitModule
+
 from starlit.babel import lazy_gettext
-
-page = StarlitModule(
-    name="starlit.contrib.page",
-    import_name="starlit.contrib.page",
-    template_folder="templates",
-    viewable_name=lazy_gettext("Page"),
-)
+from starlit.contrib.extbase import StarlitExtBase
 
 
-@page.app_template_filter()
-def unique_string(s):
-    return s
+class Page(StarlitExtBase):
+
+    module_args = dict(
+        name = "starlit.contrib.page",
+        import_name = "starlit.contrib.page",
+        template_folder = "templates",
+        viewable_name = lazy_gettext("Page")
+    )
+
+    def init_app(self, app):
+        app.template_filter(name="unique_string")(lambda s: s)

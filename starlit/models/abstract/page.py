@@ -31,7 +31,7 @@ class AbstractPage(Displayable):
     __abstract__ = True
     __metadescription_column__ = "content"
     query_class = PageQuery
-    slug_path = db.Column(db.Unicode(255), unique=True, index=True)
+    slug_path = db.Column(db.Text(), unique=True, index=True)
 
     @declared_attr
     def contenttype(cls):

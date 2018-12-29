@@ -1,8 +1,9 @@
 from itertools import chain
+from sqlalchemy.orm import relationship
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.ext.associationproxy import association_proxy
-from flask import current_app, _app_ctx_stack
+from flask import current_app
 from starlit.boot.sqla import db
 from starlit.models.abstract import SQLAEvent, ProxiedDictMixin, DynamicProp
 
@@ -48,14 +49,22 @@ class SettingsProfile(SQLAEvent, db.Model):
 class SettingCategory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), nullable=False, unique=True)
-    settings = db.relationship("Setting", backref="category")
 
+    @classmethod
+    def get_or_create(cls, name):
+        try:
+            return cls.query.filter_by(name=name).one()
+        except NoResultFound:
+            return cls(name)
 
 class Setting(DynamicProp, db.Model):
     __tablename__ = "setting"
     id = db.Column(db.Integer, primary_key=True)
     parent_id = db.Column(db.Integer, db.ForeignKey("settings.id"))
     category_id = db.Column(db.Integer, db.ForeignKey("setting_category.id"))
+    cat = relationship("SettingCategory", backref="settings")
+
+    category = association_proxy('cat', 'name', creator=SettingCategory.get_or_create)
 
     def __repr__(self):
         return "<Setting key={}><category:{}>".format(self.key, self.category)
@@ -72,15 +81,9 @@ class Settings(ProxiedDictMixin, db.Model, SQLAEvent):
     )
 
     def on_init(self):
-        ctx = _app_ctx_stack.top
-        if not getattr(ctx, "app_categories", None):
-            ctx.app_categories = {}
         for category, opts in current_app.provided_settings:
             for opt in opts:
-                if category not in ctx.app_categories:
-                    category_obj = SettingCategory(name=category.data)
-                    ctx.app_categories[category] = category_obj
-            setting = Setting(key=opt['name'])
-            setting.value = opt['default']
-            setting.category = ctx.app_categories[category]
-            self.options[opt['name']] = setting
+                setting = Setting(key=opt['name'])
+                setting.value = opt['default']
+                setting.category = str(category)
+                self.options[opt['name']] = setting

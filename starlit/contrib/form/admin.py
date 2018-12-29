@@ -46,7 +46,7 @@ def _gen_csv_file_name(form):
     return "-".join((request.host, form.slug, form_updated)) + ".csv"
 
 def field_type_choices():
-    return [(ft.name, ft.display_name) for ft in current_app.available_field_types.values()]
+    return [(ft.name, ft.display_name) for ft in current_app.data['available_field_types'].values()]
 
         
 
@@ -162,6 +162,10 @@ class FormAdmin(PageAdmin):
 def register_admin(app, admin):
     admin.add_view(
         FormAdmin(
-            Form, db.session, name=lazy_gettext("User Forms")
+            Form,
+            db.session,
+            name=lazy_gettext("User Forms"),
+            menu_icon_type="fa",
+            menu_icon_value="fa-wpforms"
         ),
     )

@@ -3,7 +3,7 @@
     starlit.content_renderer
     ~~~~~~~~~~
 
-    The page rendering logic for starlit
+    Implements the page rendering logic for starlit
 
     :copyright: (c) 2018 by Musharraf Omer.
     :license: MIT, see LICENSE for more details.

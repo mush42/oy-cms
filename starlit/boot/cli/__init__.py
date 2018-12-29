@@ -21,7 +21,8 @@ def create_all():
 
 def register_cli_commands():
     """Add starlit command line interface"""
-    starlit_cli = current_app.cli.group(name="starlit")(starlit_group)
+    group_factory = current_app.cli.group(name="starlit")
+    starlit_cli = group_factory(starlit_group)
     starlit_cli.command(name="createall")(create_all)
     starlit_cli.command(name="install-fixtures")(install_fixtures)
     starlit_cli.command(name="create-super-user")(createsuperuser)

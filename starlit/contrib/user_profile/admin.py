@@ -1,7 +1,6 @@
 from collections import OrderedDict
 from flask import current_app, request, url_for, flash, redirect
 from flask_security import current_user
-from flask_security.utils import logout_user
 from flask_admin import expose
 from flask_admin import form
 from flask_admin.model.form import InlineFormAdmin
@@ -11,7 +10,7 @@ from flask_admin.contrib.sqla import ModelView
 from starlit.boot.sqla import db
 from starlit.boot.security import user_datastore
 from starlit.babel import gettext, lazy_gettext
-from starlit.models.user import User, Role
+from starlit.models.user import User
 from starlit.dynamicform import DynamicForm
 from starlit.contrib.admin.wrappers import StarlitModelView
 from .models import Profile
@@ -19,7 +18,9 @@ from .models import Profile
 
 class BaseUserAdmin(StarlitModelView):
     def is_accessible(self):
-        return current_user.has_role("admin")
+        if super().is_accessible():
+            return current_user.has_role("admin")
+        return False
 
 
 class ProfileAdmin(BaseUserAdmin):
@@ -45,27 +46,14 @@ class ProfileAdmin(BaseUserAdmin):
     def form_extra_fields(self):
         """Contribute the fields of profile extras"""
         rv = {}
-        extra_fields = list(current_app.config.get("PROFILE_EXTRA_FIELDS", []))
-        for field in DynamicForm(extra_fields).fields:
-            rv.setdefault("profile_extra__%s" % field[0], field[1])
+        profile_fields = current_app.data['profile_fields']
+        for field in DynamicForm(profile_fields).fields:
+            rv.setdefault(f"profile_extra__{field.name}")
         return rv
-
-
-class RoleAdmin(BaseUserAdmin):
-    column_exclude_list = ["user"]
 
 
 def register_admin(app, admin):
     with app.app_context():
-        admin.add_view(
-            RoleAdmin(
-                Role,
-                db.session,
-                name=lazy_gettext("Roles"),
-                menu_icon_type="fa",
-                menu_icon_value="fa-clock",
-            )
-        )
         admin.add_view(
             ProfileAdmin(
                 Profile,

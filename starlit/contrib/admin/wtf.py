@@ -15,8 +15,11 @@ from wtforms.fields import TextAreaField
 
 class TinymceTextAreaWidget(TextArea):
     def __call__(self, field, **kwargs):
-        kwargs["class"] += " tinymce"
-        return super(TinymceTextAreaWidget, self).__call__(field, **kwargs)
+        if kwargs.get('class'):
+            kwargs["class"] += ' tinymce'
+        else:
+            kwargs.setdefault('class', 'tinymce')
+        return super().__call__(field, **kwargs)
 
 
 class TinymceTextAreaField(TextAreaField):

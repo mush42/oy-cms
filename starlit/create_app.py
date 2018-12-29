@@ -9,7 +9,6 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from typing import Union
 from flask import current_app
 from flask_wtf import CSRFProtect
 from starlit.boot.sqla import db, migrate
@@ -34,7 +33,7 @@ def initialize_builtin_extensions():
     initialize_security(app)
 
 
-def _prepare_app(name: str, app_class: Starlit, **kwargs) -> Starlit:
+def _prepare_app(name, app_class, **kwargs):
     """Internal helper used by :func:`create_app` to initialize the application"""
     if not issubclass(app_class, Starlit):
         raise TypeError(
@@ -46,12 +45,11 @@ def _prepare_app(name: str, app_class: Starlit, **kwargs) -> Starlit:
 
 
 def create_app(
-    name: str,
-    config: Union[str, dict, object] = None,
-    app_class: Starlit = Starlit,
-    envar: str = "STARLIT_CONFIG",
-    **kwargs
-) -> Starlit:
+    name,
+    config=None,
+    app_class=Starlit,
+    envar="STARLIT_CONFIG",
+    **kwargs):
     """This app factory is the main entry point of Starlit.
 
     Use this function to create a new instance of

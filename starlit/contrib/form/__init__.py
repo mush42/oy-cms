@@ -23,25 +23,26 @@ from flask import (
 )
 from werkzeug import secure_filename
 from flask_wtf import Form as HtmlForm
-from starlit.wrappers import StarlitModule
 from starlit.globals import current_page
 from starlit.boot.sqla import db
+from starlit.contrib.extbase import StarlitExtBase
 from starlit.dynamicform import DynamicForm
 from starlit.helpers import date_stamp
 from .admin import register_admin
 from . import models
 
 
-class Form(StarlitModule):
+class Form(StarlitExtBase):
     """Extenssion entry point for starlit forms."""
 
-    def __init__(self, app=None):
-        super().__init__("starlit.contrib.form", __name__, template_folder="templates")
-        if app:
-            self.init_app(app)
+    module_args = dict(
+        name="starlit.contrib.form",
+        import_name="starlit.contrib.form",
+        static_folder="static",
+        template_folder="templates"
+    )
 
     def init_app(self, app):
-        app.register_module(self)
         app.add_contenttype_handler(
             "form", self.form_view, methods=("GET", "POST"), module="form"
         )
@@ -79,7 +80,7 @@ class Form(StarlitModule):
     def form_view(self):
         form = DynamicForm(current_page.fields).form
         if form.validate_on_submit():
-            store_form(form)
+            self.store_form(form)
             flash(current_page.submit_message, "success")
             return redirect(request.path)
         return dict(form=form)
