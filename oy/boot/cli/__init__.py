@@ -15,11 +15,11 @@ def bound_oy_group():
 def create_all():
     """Automatically run essential commands"""
     click.echo()
-    click.secho("~~~~~~~~~~~~~~~~~~~~~~~", fg="green")
+    click.secho("~" * 50, fg="green")
     create_db()
     createsuperuser(noinput=True)
     install_fixtures()
-    click.secho("~~~~~~~~~~~~~~~~~~~~~", fg="green", bold=True)
+    click.secho("~" * 50, fg="green", bold=True)
 
 
 def register_cli_commands():

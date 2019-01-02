@@ -29,11 +29,14 @@ class PageHandler:
 class ContentRendererMixin(object):
     def __init__(self):
         self.contenttype_handlers = {}
-        self.before_request(self.set_page_and_response_if_appropriate)
         self.context_processor(self.page_context)
         self.add_contenttype_handler("page", self.default_contenttype_handler)
 
-    def set_page_and_response_if_appropriate(self):
+    def preprocess_request(self):
+        """Override the :func: `Flask.preprocess_request` to return page responses."""
+        rv = super().preprocess_request()
+        if rv is not None:
+            return rv
         if isinstance(request.routing_exception, NotFound) and current_page:
             return self.page_view()
 

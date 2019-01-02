@@ -10,22 +10,23 @@
 """
 
 from sqlalchemy.ext.declarative import declared_attr
-from flask import current_app
-from flask_security import current_user as security_current_user
+from flask import current_app, _request_ctx_stack
+from flask_security import current_user
 from werkzeug.local import LocalProxy
 from oy.boot.sqla import db
 from oy.babel import lazy_gettext
 from ._sqlaevent import SQLAEvent
 
 
-def _test_aware_current_user():
-    # TODO: a very ugly approach. Remove it ASAP
-    if current_app.config["DEBUG"] and current_app.testing:
-        return current_app.test_user
-    return security_current_user
-
-
-current_user = LocalProxy(lambda: _test_aware_current_user())
+def get_current_user_id():
+    """Returns the current user id or the
+    id for the firstly created user if no
+    request context is present.
+    """
+    if _request_ctx_stack.top is None:
+        user = db.metadata.tables['user']
+        return db.session.query(user).filter(user.c.active == True).first().id
+    return current_user.id
 
 
 class UserRelated(SQLAEvent):
@@ -36,7 +37,7 @@ class UserRelated(SQLAEvent):
         return db.Column(
             db.Integer,
             db.ForeignKey("user.id"),
-            default=lambda: current_user.id,
+            default=get_current_user_id,
             nullable=False,
             info=dict(label=lazy_gettext("Author")),
         )
@@ -55,7 +56,7 @@ class UserRelated(SQLAEvent):
             db.Integer,
             db.ForeignKey("user.id"),
             nullable=True,
-            # onupdate=lambda: current_user.id,
+            onupdate=get_current_user_id,
             info=dict(label=lazy_gettext("Author")),
         )
 

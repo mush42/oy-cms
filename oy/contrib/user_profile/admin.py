@@ -16,14 +16,7 @@ from oy.contrib.admin.wrappers import OyModelView
 from .models import Profile
 
 
-class BaseUserAdmin(OyModelView):
-    def is_accessible(self):
-        if super().is_accessible():
-            return current_user.has_role("admin")
-        return False
-
-
-class ProfileAdmin(BaseUserAdmin):
+class ProfileAdmin(OyModelView):
     can_create = False
     can_delete = False
     column_exclude_list = ["user", "created", "extras"]
@@ -47,19 +40,18 @@ class ProfileAdmin(BaseUserAdmin):
         """Contribute the fields of profile extras"""
         rv = {}
         profile_fields = current_app.data["profile_fields"]
-        for field in DynamicForm(profile_fields).fields:
-            rv.setdefault(f"profile_extra__{field.name}")
+        for name, ufield in DynamicForm(profile_fields).fields:
+            rv.setdefault(f"profile_extra__{name}", ufield)
         return rv
 
 
 def register_admin(app, admin):
-    with app.app_context():
-        admin.add_view(
-            ProfileAdmin(
-                Profile,
-                db.session,
-                name=lazy_gettext("Profiles"),
-                menu_icon_type="fa",
-                menu_icon_value="fa-user",
-            )
+    admin.add_view(
+        ProfileAdmin(
+            Profile,
+            db.session,
+            name=lazy_gettext("Profiles"),
+            menu_icon_type="fa",
+            menu_icon_value="fa-user",
         )
+    )

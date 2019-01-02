@@ -20,10 +20,10 @@ def create_db():
 @click.option("--noinput", "-n", is_flag=True)
 def drop_db(noinput):
     """Drop database tables"""
-    click.secho("!!!!!!!!!", fg="red", blink=True)
+    click.secho("!" * 50, fg="red", blink=True)
     if not noinput:
         message = click.style(
-            "This is a distructive operation. You will loose all  your data.\r\n\tDo you want to drop all database tables?",
+            "This is a distructive operation. You will loose all  your data.\r\n\tAre you sure you want to drop all database tables?",
             fg="red",
             blink=True,
         )
@@ -35,7 +35,7 @@ def drop_db(noinput):
 
 
 def clean_settings():
-    click.secho("~~~~~~~~~~~~~~~~~~~~~~", fg="red")
+    click.secho("~ " * 50, fg="red")
     click.echo("Removing settings that are no longer being used.")
     # sqlalchemy raises exceptions if the tables have not been created
     # so we degrade gracefully
@@ -59,7 +59,7 @@ def clean_settings():
         del active_settings[k]
     db.session.commit()
     click.secho("Database cleaned.", fg="green", bold=True)
-    click.secho("~~~~~~~~~~~~~", fg="green")
+    click.secho("~" * 50, fg="green")
 
 
 def clean_db():

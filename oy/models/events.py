@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 """	
-    oy.models
+    oy.models.events
     ~~~~~~~~~~
 
-    Provides abstract and mixin :mod:`sqlalchemy` classes that are the core
-    building blocks of any content management system.
-
-    Another interesting functionality is the :class:`SQLAEvent` which provides
+    The :class:`SQLAEvent` provides
     a convenient mechanism to hook into sqlalchemy life cycle events. 
 
     :copyright: (c) 2018 by Musharraf Omer.
@@ -21,7 +18,7 @@ from oy.models.abstract import SQLAEvent
 from oy.helpers import get_method_in_all_bases
 
 
-get_event_methods = partial(get_method_in_all_bases, exclude=[SQLAEvent])
+get_event_handlers = partial(get_method_in_all_bases, exclude=[SQLAEvent])
 
 
 def call_all_methods_on_this_instance(methods, instance, *args, **kwargs):
@@ -31,7 +28,7 @@ def call_all_methods_on_this_instance(methods, instance, *args, **kwargs):
 
 def call_method_in_all_bases(instances, method_name, session, is_modified):
     for instance in instances:
-        methods = get_event_methods(instance.__class__, method_name)
+        methods = get_event_handlers(instance.__class__, method_name)
         call_all_methods_on_this_instance(methods, instance, session, is_modified)
 
 
@@ -66,12 +63,12 @@ def receive_before_commit(session):
 
 @event.listens_for(SQLAEvent, "before_update", propagate=True)
 def process_update_event(mapper, connection, target):
-    methods = get_event_methods(target.__class__, "update")
+    methods = get_event_handlers(target.__class__, "update")
     call_all_methods_on_this_instance(methods, target)
 
 
 @event.listens_for(mapper, "init")
 def process_init_cls(target, *args, **kwargs):
     if isinstance(target, SQLAEvent):
-        methods = get_event_methods(target.__class__, "on_init")
+        methods = get_event_handlers(target.__class__, "on_init")
         call_all_methods_on_this_instance(methods, target)

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """	
-    oy.models.abstract.page
+    oy.models.abstract.base_page
     ~~~~~~~~~~
 
     Provides an abstract Page model to be extended
@@ -14,15 +14,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from flask import current_app
 from oy.boot.sqla import db
-from .displayable import Displayable, DisplayableQuery
-
-
-class PageQuery(DisplayableQuery):
-    """Add page specific methodds to the query"""
-
-    @property
-    def viewable(self):
-        return self.published.filter_by(is_live=True)
+from .displayable import Displayable
 
 
 class AbstractPage(Displayable):
@@ -30,12 +22,11 @@ class AbstractPage(Displayable):
 
     __abstract__ = True
     __metadescription_column__ = "content"
-    query_class = PageQuery
     slug_path = db.Column(db.Text(), unique=True, index=True)
 
     @declared_attr
     def contenttype(cls):
-        return db.Column(db.String(50))
+        return db.Column(db.String(128))
 
     @declared_attr
     def must_show_in_menu(cls):
@@ -65,35 +56,41 @@ class AbstractPage(Displayable):
 
     @declared_attr
     def children(cls):
-        return db.relationship(cls, info=dict(label="Children", description=""))
+        return db.relationship(
+            cls,
+            lazy="joined",
+            join_depth=2,
+            cascade="all, delete-orphan",
+            info=dict(label="Children", description=""),
+        )
 
     @declared_attr
     def parent(cls):
         return db.relationship(
             cls,
             remote_side=cls.id,
-            info=dict(label="Parent Page", description="Parent page"),
+            info=dict(
+                label="Parent Page",
+                description="The page under which this page will be added"),
         )
 
     @declared_attr
     def content(cls):
-        return db.Column(
-            db.UnicodeText,
-            nullable=False,
-            info=dict(
-                label="Content",
-                description="Page content",
-                markup=True,
-                markup_type="html",
-            ),
+        return db.deferred(
+            db.Column(
+                db.UnicodeText,
+                nullable=False,
+                info=dict(
+                    label="Content", description="Page content", mimetype="text/html"
+                ),
+            )
         )
 
     @declared_attr
     def __mapper_args__(cls):
-        return {
-            "polymorphic_identity": cls.__contenttype__,
-            "polymorphic_on": cls.contenttype,
-        }
+        return dict(
+            polymorphic_identity=cls.__contenttype__, polymorphic_on=cls.contenttype
+        )
 
     @property
     def url(self):
@@ -104,18 +101,22 @@ class AbstractPage(Displayable):
         return self.slug == current_app.config["HOME_SLUG"]
 
     @hybrid_property
-    def is_primary(self):
-        return self.parent_id == None
+    def is_root(self):
+        return self.parent is None
+
+    @is_root.expression
+    def is_root(cls):
+        return cls.parent_id == None
 
     def change_slug_path(self, parent):
+        # TODO: refactor this one
         if parent is not None:
             self.slug_path = "%s/%s" % (parent.slug_path, self.slug)
         else:
             self.slug_path = self.slug
-        if not self.children:
-            return
-        for c in self.children:
-            c.change_slug_path(parent=self)
+        if self.children:
+            for c in self.children:
+                c.change_slug_path(parent=self)
 
     def before_commit(self, session, is_modified):
         session.flush()

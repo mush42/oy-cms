@@ -13,7 +13,6 @@
 from datetime import datetime
 from sqlalchemy.ext.declarative import declared_attr
 from flask import current_app
-from flask_sqlalchemy import BaseQuery
 from oy.boot.sqla import db
 from oy.babel import lazy_gettext
 
@@ -23,19 +22,6 @@ from .publishable import Publishable
 from .user_related import UserRelated
 
 
-class DisplayableQuery(BaseQuery):
-    """A Custom query that provides additional methods"""
-
-    @property
-    def published(self):
-        pub = self._joinpoint_zero().columns["publish_date"]
-        expire = self._joinpoint_zero().columns["expire_date"]
-        rv = self.filter_by(status="published").filter(pub <= datetime.utcnow())
-        if expire is not None:
-            rv.filter(expire >= datetime.utcnow())
-        return rv
-
-
 class Displayable(db.Model, Titled, Slugged, Metadata, Publishable, UserRelated):
     """The core of all oy content models"""
 
@@ -43,8 +29,3 @@ class Displayable(db.Model, Titled, Slugged, Metadata, Publishable, UserRelated)
     __slugcolumn__ = "title"
     __keywordscolumn__ = "title"
     __metatitle_column__ = "title"
-    query_class = DisplayableQuery
-
-    @declared_attr
-    def __tablename__(cls):
-        return cls.__name__.lower()

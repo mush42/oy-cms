@@ -75,7 +75,10 @@ class OyAdmin(Admin):
             self.app.before_first_request(self.register_module_admin)
 
     def admin_plugin_static(self, filename):
-        return url_for("oy-admin.static", filename="oy-admin/%s" % (filename))
+        return url_for(
+            "oy.contrib.admin.resource_module.static",
+            filename="oy-admin/%s" % (filename),
+        )
 
     def add_form_field_static(self, field):
         if getattr(g, "form_field_static", None) is None:
@@ -88,7 +91,7 @@ class OyAdmin(Admin):
 
     def register_module_admin(self):
         for module in self.app.modules.values():
-            func_name = module.__module__ + ":register_admin"
+            func_name = module.import_name + ":register_admin"
             admin_func = import_string(func_name, silent=True)
             if admin_func is not None:
                 admin_func(self.app, self)

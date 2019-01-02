@@ -9,7 +9,7 @@
 from oy.wrappers import OyModule
 
 admin_resource_module = OyModule(
-    name="oy-admin",
+    name="oy.contrib.admin.resource_module",
     import_name="oy.contrib.admin.resource_module",
     static_folder="static",
     template_folder="templates",

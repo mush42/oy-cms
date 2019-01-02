@@ -38,9 +38,11 @@ class Role(db.Model, RoleMixin):
     def __str__(self):
         return self.name
 
+    def __repr__(self):
+        return f"<Role(name='{self.name}'>"
+
 
 class User(db.Model, UserMixin, SQLAEvent):
-    __slugcolumn__ = "user_name"
     id = db.Column(db.Integer, primary_key=True)
     user_name = db.Column(
         db.Unicode(128),
@@ -82,7 +84,7 @@ class User(db.Model, UserMixin, SQLAEvent):
 
     @validates("password")
     def validate_password(self, key, value):
-        """To be done later"""
+        """TBD later"""
         return value
 
     @validates("email")

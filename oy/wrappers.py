@@ -117,7 +117,7 @@ class OyModule(Blueprint, Fixtured):
         return decorator
 
 
-class Oy(Flask, ContentRendererMixin):
+class Oy(ContentRendererMixin, Flask):
     """Wrapps the :class:flask.Flask` to provide additional functionality.
     
     It add the following features:
@@ -129,9 +129,9 @@ class Oy(Flask, ContentRendererMixin):
     config_class = OyConfig
 
     def __init__(self, *args, **kwargs):
-        super(Oy, self).__init__(*args, **kwargs)
+        Flask.__init__(self, *args, **kwargs)
         ContentRendererMixin.__init__(self)
-        self.before_first_request_funcs.append(lambda: oy_app_starting.send(self))
+        self.before_first_request_funcs.append(self.finalize)
         self.provided_settings_dict = None
         self.modules = OrderedDict()
         # Holds variable data which is useful for this app instance.
@@ -195,3 +195,9 @@ class Oy(Flask, ContentRendererMixin):
         if self.provided_settings_dict is None:
             self._collect_provided_settings()
         yield from self.provided_settings_dict.items()
+
+    def finalize(self):
+        if getattr(self, "_finalized", False):
+            return
+        oy_app_starting.send(self)
+        self._finalized = True

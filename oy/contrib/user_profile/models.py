@@ -54,10 +54,7 @@ class ProfileExtras(DynamicProp, db.Model):
     profile_id = db.Column(db.Integer, db.ForeignKey("profile.id"))
 
 
+@event.listens_for(mapper, "init")
 def add_user_profile(target, *args, **kwargs):
     if isinstance(target, User) and not getattr(target, "profile", None):
         target.profile = Profile()
-
-
-def register_user_profiles_event_listener():
-    event.listen(mapper, "init", add_user_profile)

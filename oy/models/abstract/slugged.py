@@ -14,6 +14,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from flask import current_app
 from oy.boot.sqla import db
 from oy.slugging import slugify
+from oy.helpers import increment_string
 from ._sqlaevent import SQLAEvent
 
 
@@ -21,7 +22,7 @@ class Titled(SQLAEvent):
     """Provide a mandatory title field"""
 
     title = db.Column(
-        db.Unicode(255),
+        db.Unicode(512),
         nullable=False,
         info=dict(
             label="Title", description="The title to display in the browser title bar."
@@ -70,16 +71,14 @@ class Slugged(SQLAEvent):
 
     def _slug_exists(self, session, slug):
         try:
-            obj = self.__class__.query.filter_by(slug=slug).one()
+            obj = self.__class__.query.minimal.filter_by(slug=slug).one()
             return obj is not self
         except NoResultFound:
             return False
 
     def _ensure_slug_uniqueness(self, session, slug):
         original_slug = slug
-        index = 1
         while True:
             if not self._slug_exists(session, slug):
                 return slug
-            index += 1
-            slug = u"%(slug)s-%(index)s" % {"slug": original_slug, "index": index}
+            slug = increment_string(slug, sep='-')
