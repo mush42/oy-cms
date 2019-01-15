@@ -44,6 +44,7 @@ DISPLAYABEL_DEFAULTS = dict(
         "keywords",
     ),
     form_excluded_columns=(
+        "order",
         "site",
         "created",
         "updated",

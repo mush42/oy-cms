@@ -41,9 +41,5 @@ def db(request, app):
         sqla_db.create_all()
         user = create_user()
         sqla_db.session.commit()
-        app.test_user = user
-        if getattr(request.module, "__install_fixtures__", True):
-            for mod in app.modules.values():
-                mod.install_fixtures()
         yield sqla_db
         sqla_db.drop_all()

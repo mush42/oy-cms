@@ -1,7 +1,7 @@
 # -*-coding: utf-8-*-
 """
 
-    {{ project_name }}.models
+    [[ project_name ]].models
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     This file contains your models

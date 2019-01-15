@@ -26,7 +26,7 @@ from flask import Flask, Blueprint
 from flask.config import Config
 from flask.helpers import locked_cached_property, get_root_path
 
-from oy.content_renderer import ContentRendererMixin
+from oy.content_serving import ContentServerMixin
 from oy.helpers import exec_module, find_modules, import_modules
 from oy.fixtures import Fixtured
 from oy.signals import oy_module_registered, oy_app_starting
@@ -117,7 +117,7 @@ class OyModule(Blueprint, Fixtured):
         return decorator
 
 
-class Oy(ContentRendererMixin, Flask):
+class Oy(ContentServerMixin, Flask):
     """Wrapps the :class:flask.Flask` to provide additional functionality.
     
     It add the following features:
@@ -130,7 +130,7 @@ class Oy(ContentRendererMixin, Flask):
 
     def __init__(self, *args, **kwargs):
         Flask.__init__(self, *args, **kwargs)
-        ContentRendererMixin.__init__(self)
+        ContentServerMixin.__init__(self)
         self.before_first_request_funcs.append(self.finalize)
         self.provided_settings_dict = None
         self.modules = OrderedDict()

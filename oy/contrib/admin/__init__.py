@@ -4,7 +4,7 @@ from flask import g, request, url_for
 from flask_admin import Admin, helpers as admin_helpers
 from oy.babel import lazy_gettext, gettext, ngettext
 from .wrappers import OyIndexView
-from .core import register_page_admin, register_settings_admin
+from .core import register_settings_admin
 from .resource_module import admin_resource_module
 
 
@@ -58,7 +58,6 @@ class OyAdmin(Admin):
     def _init_extension(self):
         super(OyAdmin, self)._init_extension()
         self.app.register_module(self.resource_module)
-        register_page_admin(self.app, self)
         # TODO: Fix this hack
         regsettings = partial(register_settings_admin, self.app, self)
         self.app.before_first_request(regsettings)

@@ -7,7 +7,7 @@ from flask_security.utils import hash_password
 from oy.boot.sqla import db
 from oy.babel import lazy_gettext
 from oy.helpers import is_valid_email
-from oy.models.abstract import TimeStampped, ProxiedDictMixin, DynamicProp, SQLAEvent
+from oy.models.abstract import TimeStampped, SQLAEvent
 
 
 roles_users = db.Table(

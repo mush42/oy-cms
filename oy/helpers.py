@@ -31,8 +31,7 @@ def import_modules(basemodule):
 
 
 def get_method_in_all_bases(cls, meth_name, exclude=None):
-    exclude = exclude or list()
-    exclude += [object]
+    exclude = [object] + (exclude or [])
     bases = [c for c in cls.__mro__ if c not in exclude]
     for c in reversed(bases):
         meth = c.__dict__.get(meth_name, None)
@@ -79,4 +78,12 @@ def increment_string(string, sep='_'):
         res.pop(-1)
     except ValueError:
         inc = 1
-    return sep.join(res + [f"{sep}{inc}"])
+    res.append(str(inc))
+    return sep.join(res)
+
+
+def get_owning_table(entity, colname):
+    """in joint table inheritance return the table that owns a certain column"""
+    for tbl in entity.__mapper__.tables:
+        if colname in tbl.columns:
+            return tbl

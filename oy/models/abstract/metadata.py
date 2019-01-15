@@ -9,13 +9,35 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from sqlalchemy import inspect
 from oy.boot.sqla import db
 from ._sqlaevent import SQLAEvent
 
 
-class Metadata(SQLAEvent):
-    """Provides fields which could be used with HTML meta tags"""
+class Orderable(SQLAEvent):
+    """Provide an ordering field."""
+
+    order = db.Column(db.Integer)
+
+    def after_flush(self, session, is_modified):
+        if is_modified:
+            if 'parent' not in db.inspect(self).unmodified:
+                self.order = None
+
+    def after_flush_postexec(self, session, is_modified):
+        if self.order:
+            return
+        cls = self.__class__
+        sel = db.select([db.func.max(cls.order)])
+        if self.parent_id:
+            sel = sel.where(cls.parent_id == self.parent_id)
+        res = session.execute(sel).fetchone()[0]
+        if res is None:
+            res = 0
+        self.order = res + 1
+
+
+class Metadata(Orderable):
+    """Provides metadata about a specific piece of content."""
 
     meta_title = db.Column(
         db.Unicode(255),
@@ -77,7 +99,7 @@ class Metadata(SQLAEvent):
 
     def before_flush(self, session, is_modified):
         if is_modified:
-            state = inspect(self)
+            state = db.inspect(self)
             for attrname, colname, genfunc in self.options:
                 if colname not in state.unmodified:
                     self.set_value(attrname, colname, genfunc)

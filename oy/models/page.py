@@ -28,8 +28,17 @@ class PageQuery(BaseQuery):
         )
 
     @property
+    def roots(self):
+        """Return only root pages."""
+        return self.filter(Page.is_root == True)
+
+    @property
     def minimal(self):
         return self.from_self(self.min_qbundle)
+
+    @property
+    def ordered(self):
+        return self.order_by(Page.order.asc())
 
     @property
     def published(self):
@@ -49,6 +58,11 @@ class PageQuery(BaseQuery):
 
 
 class Page(AbstractPage):
-    id = db.Column(db.Integer, primary_key=True)
-    query_class = PageQuery
+    """The concrete Page model."""
     __contenttype__ = "page"
+    id = db.Column(
+        db.Integer,
+        db.Sequence('page_id_seq', start=1, increment=1),
+        primary_key=True
+    )
+    query_class = PageQuery

@@ -1,5 +1,5 @@
 {
-  "oy.models.page.Page": [
+  "oy.contrib.richtext_page.models.RichTextPage": [
     {
       "id": 1,
       "title": "Home",

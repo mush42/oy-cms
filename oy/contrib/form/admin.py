@@ -25,7 +25,7 @@ from oy.models import db
 from oy.babel import lazy_gettext
 from oy.helpers import paginate_with_args
 from oy.contrib.admin.wrappers import AuthenticationViewMixin
-from oy.contrib.admin.wtf import TinymceTextAreaField
+from oy.contrib.formfields import TinymceTextAreaField
 from oy.contrib.admin.core.page import PageAdmin
 from .models import Form, Field, FormEntry
 
@@ -80,8 +80,7 @@ class FormAdmin(PageAdmin):
     form_rules.insert(6, "fields")
     form_rules.insert(7, "submit_text")
     form_rules.insert(8, "submit_message")
-    form_overrides = dict(PageAdmin.form_overrides)
-    form_overrides.update({"submit_message": TinymceTextAreaField})
+    form_overrides = {"submit_message": TinymceTextAreaField}
     inline_models = [
         (
             Field,
@@ -166,7 +165,7 @@ def register_admin(app, admin):
         FormAdmin(
             Form,
             db.session,
-            name=lazy_gettext("User Forms"),
+            name=lazy_gettext("Forms"),
             menu_icon_type="fa",
             menu_icon_value="fa-wpforms",
         )

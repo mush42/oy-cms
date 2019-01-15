@@ -14,7 +14,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from flask import current_app
 from oy.boot.sqla import db
 from oy.slugging import slugify
-from oy.helpers import increment_string
+from oy.helpers import increment_string, get_owning_table
 from ._sqlaevent import SQLAEvent
 
 
@@ -37,48 +37,46 @@ class Titled(SQLAEvent):
 
 
 class Slugged(SQLAEvent):
-    """A uniquely slugged mixin class"""
+    """A slugged mixin class"""
 
     slug = db.Column(
-        db.Unicode(255),
-        unique=True,
-        index=True,
+        db.Unicode(512),
         info=dict(
             label="Slug",
             description="A Slug is that portion of the URL used to identify this content.",
         ),
     )
+    __slugcolumn__ = 'title'
 
-    def before_flush(self, session, is_modified):
-        if not self.slug or self._slug_exists(session, self.slug):
-            self._update_slug(session)
-        if is_modified and current_app.config["ALLWAYS_UPDATE_SLUGS"]:
-            state = inspect(self)
-            if self.__slugcolumn__ not in state.unmodified:
-                self.slug = None
-                self.before_flush(session, is_modified=False)
+    def create_slug(self):
+        candidate = getattr(self, self.__slugcolumn__)
+        return self.slugify(candidate)
 
-    def _update_slug(self, session):
-        populates_from = getattr(self, "__slugcolumn__", None)
-        if populates_from is None:
-            raise AssertionError(
-                "You must specify the column the slug is populated from."
-            )
-        value = getattr(self, populates_from)
-        slug = slugify(value)
-        slug = self._ensure_slug_uniqueness(session, slug)
-        self.slug = slug
-
-    def _slug_exists(self, session, slug):
-        try:
-            obj = self.__class__.query.minimal.filter_by(slug=slug).one()
-            return obj is not self
-        except NoResultFound:
-            return False
+    def slugify(self, string):
+        return slugify(string)
 
     def _ensure_slug_uniqueness(self, session, slug):
         original_slug = slug
         while True:
-            if not self._slug_exists(session, slug):
+            if not self.slug_exists(session, slug):
                 return slug
             slug = increment_string(slug, sep='-')
+
+    def slug_exists(self, session, slug):
+        cls = self.__class__
+        sel = db.select([cls.slug]).where(db.and_(cls.slug == slug, cls.id != self.id))
+        return session.execute(sel).fetchone() is not None
+
+    def before_flush(self, session, is_modified):
+        if is_modified and self.__slugcolumn__ not in db.inspect(self).unmodified:
+            self.slug = None
+
+    def after_flush_postexec(self, session, is_modified):
+        if self.slug is not None:
+            return
+        slug = self._ensure_slug_uniqueness(session, self.create_slug())
+        slugtbl = get_owning_table(entity=self, colname='slug').name
+        txt = db.text(f"UPDATE {slugtbl} SET slug=:slug WHERE {slugtbl}.id = :id_1")\
+            .bindparams(slug=slug, id_1=self.id)
+        session.execute(txt)
+

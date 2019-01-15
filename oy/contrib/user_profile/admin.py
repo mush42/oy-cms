@@ -23,6 +23,12 @@ class ProfileAdmin(OyModelView):
     column_list = ["first_name", "last_name", "updated"]
     form_excluded_columns = ["user", "extras", "updated", "created"]
 
+    def is_accessible(self):
+        if super().is_accessible():
+            if 'admin' in current_user.roles or current_user.profile.id == request.args.get('id'):
+                return True
+        return False
+
     def on_form_prefill(self, form, id):
         model = self.get_one(id)
         for field in form:

@@ -16,13 +16,13 @@ from flask import current_app
 from oy.boot.sqla import db
 from oy.babel import lazy_gettext
 
-from .slugged import Slugged, Titled
+from .slugged import Titled, Slugged
 from .metadata import Metadata
 from .publishable import Publishable
 from .user_related import UserRelated
 
 
-class Displayable(db.Model, Titled, Slugged, Metadata, Publishable, UserRelated):
+class Displayable(db.Model, Slugged, Titled, Metadata, Publishable, UserRelated):
     """The core of all oy content models"""
 
     __abstract__ = True

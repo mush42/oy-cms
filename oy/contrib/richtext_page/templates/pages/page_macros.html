@@ -1,9 +1,10 @@
 {% macro render_page(page, active_page) %}
 {% with active_class='active' if (page==active_page or active_page in page.children) or ''%}
+{% set aria_current='aria-current="page"'|safe if page==active_page else "" %}
 {% with page_html_id=page.slug|unique_string %}
 {% if page.children %}
 <li class="nav-item dropdown {{active_class}}">
-<a class="nav-link dropdown-toggle" href="#" id="{{ page_html_id }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{page.title}}</a>
+<a {{ aria_current}} class="nav-link dropdown-toggle" href="#" id="{{ page_html_id }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{page.title}}</a>
 <div class="dropdown-menu bg-dark" aria-labelledby="{{ page_html_id }}">
 <a class="nav-link" href="{{page.slug_path}}" >{{page.title}}</a>
 {% for child in page.children %}
@@ -12,7 +13,7 @@
 </div>
 </li>
 {% else %}
-<li  class="nav-item {{active_class}}"><a class="nav-link" href="{{page.url}}">{{page.title}}</a></li>
+<li  class="nav-item {{active_class}}"><a {{ aria_current }} class="nav-link" href="{{page.url}}">{{page.title}}</a></li>
 {% endif %}
 {% endwith %}
 {% endwith %}

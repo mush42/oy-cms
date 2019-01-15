@@ -9,7 +9,7 @@ user_not_created_msg = """
 Super-user required!
 
 Please create at least one super user before attempting to install fixdtures.
-    At anytime, you can use the `create-super-user` command to create a new super-user.
+    At anytime, you can use the `createuser` command to create a new super-user.
 """
 
 
@@ -52,7 +52,13 @@ def _prompt_for_user_details(user_name=None, email=None):
     help="Create a new user with a username of 'admin' and a password of 'adminpassword'",
     is_flag=True,
 )
-def createsuperuser(noinput):
+@click.option(
+    "--superuser",
+    "-su",
+    help="Create a user with the role of *admin*.'",
+    is_flag=True,
+)
+def createuser(noinput, superuser):
     """Create a new super-user account"""
     from oy.boot.security import user_datastore
 
@@ -66,9 +72,12 @@ def createsuperuser(noinput):
         if user_datastore.find_user(user_name=user_name):
             click.secho("User already exists.", fg="red")
             return
-    admin_role = user_datastore.find_or_create_role("admin")
+    if superuser:
+        role = user_datastore.find_or_create_role("admin")
+    else:
+        role = user_datastore.find_or_create_role("staff")
     user_datastore.create_user(
-        user_name=user_name, email=email, password=password, roles=[admin_role]
+        user_name=user_name, email=email, password=password, roles=[role]
     )
     db.session.commit()
     click.echo()

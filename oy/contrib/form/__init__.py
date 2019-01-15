@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    oy.contrib.form.admin
+    oy.contrib.form
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     Provides a custom page contenttype.
@@ -11,6 +11,7 @@
 
 import time
 import os.path
+from jinja2 import Markup
 from flask import (
     current_app,
     request,
@@ -19,36 +20,22 @@ from flask import (
     render_template,
     url_for,
     abort,
-    flash,
+    flash
 )
 from werkzeug import secure_filename
 from flask_wtf import Form as HtmlForm
 from oy.globals import current_page
 from oy.boot.sqla import db
 from oy.contrib.extbase import OyExtBase
+from oy.content_serving import BaseContentRenderer
 from oy.dynamicform import DynamicForm
 from oy.helpers import date_stamp
 from .admin import register_admin
-from . import models
+from .models import FormEntry, FieldEntry, Form, Field
 
-
-class Form(OyExtBase):
-    """Extenssion entry point for oy forms."""
-
-    module_args = dict(
-        name="oy.contrib.form",
-        import_name="oy.contrib.form",
-        static_folder="static",
-        template_folder="templates",
-    )
-
-    def init_app(self, app):
-        app.add_contenttype_handler(
-            "form", self.form_view, methods=("GET", "POST"), module="form"
-        )
-
+class FormContentRenderer(BaseContentRenderer):
     def store_form(self, form):
-        entry = FormEntry(form_id=current_page.id)
+        entry = FormEntry(form_id=self.page.id)
         for f in form:
             field = (
                 Field.query.filter_by(form_id=current_page.id)
@@ -77,10 +64,30 @@ class Form(OyExtBase):
         db.session.add(entry)
         db.session.commit()
 
-    def form_view(self):
-        form = DynamicForm(current_page.fields).form
+    def serve(self):
+        form = DynamicForm(self.page.fields).form
         if form.validate_on_submit():
             self.store_form(form)
-            flash(current_page.submit_message, "success")
+            flash(Markup(self.page.submit_message), "success")
             return redirect(request.path)
         return dict(form=form)
+
+
+class Form(OyExtBase):
+    """Extenssion entry point for oy forms."""
+
+    module_args = dict(
+        name="oy.contrib.form",
+        import_name="oy.contrib.form",
+        static_folder="static",
+        template_folder="templates",
+    )
+
+    def init_app(self, app):
+        app.add_contenttype_handler(
+            "form",
+            FormContentRenderer,
+            methods=("GET", "POST"),
+            module="form"
+        )
+

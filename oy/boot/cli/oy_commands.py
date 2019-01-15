@@ -42,7 +42,14 @@ class ProjectTemplateCopier:
         self.templatedir = templatedir
         self.distdir = distdir
         self.project_name = project_name
-        self.jinja_env = Environment(loader=FileSystemLoader(self.templatedir))
+        self.jinja_env = Environment(
+            loader=FileSystemLoader(self.templatedir),
+            block_start_string="[%",
+            block_end_string="%]",
+            variable_start_string="[[",
+            variable_end_string="]]",
+            optimized=False
+        )
         _build_ctx_mod_path = os.path.join(self.templatedir, "build_context.py")
         if ctx_build_vars is None:
             ctx_build_vars = {}
@@ -52,31 +59,41 @@ class ProjectTemplateCopier:
         for attr in mod.__all__:
             self.render_ctx[attr] = getattr(mod, attr)
 
-    def copy_rendered(self, src, dst, *, follow_symlinks=False):
-        """Render the given template to the output file"""
-        t_file = os.path.relpath(src, self.templatedir)
-        # TODO: Find a better way to handle back-slashes
-        t_file = "/".join(os.path.split(t_file))
-        template = self.jinja_env.get_template(t_file)
-        with open(dst, "w", encoding="utf8") as o_file:
-            rendered = template.render(**self.render_ctx)
-            o_file.write(rendered)
-        return dst
-
     def copy_all(self):
-        shutil.copytree(
-            self.templatedir, self.distdir, copy_function=self.copy_rendered
-        )
-        self.post_copy()
+        try:
+            self.mirror_tree(self.templatedir, self.distdir)
+        except Exception as e:
+            if os.path.isdir(self.distdir):
+                os.unlink(self.distdir)
+            raise e
+        else:
+            os.unlink(os.path.join(self.distdir, 'build_context.py'))
 
-    def post_copy(self):
-        for root, dirnames, files in os.walk(self.distdir):
-            for f in itertools.chain(dirnames, files):
-                if self.jinja_env.variable_start_string in f:
-                    newname = Template(f).render(**self.render_ctx)
-                    pjoin = lambda p: os.path.join(root, p)
-                    os.rename(pjoin(f), pjoin(newname))
-        os.unlink(os.path.join(self.distdir, "build_context.py"))
+    def render_name(self, name, basedir):
+        if self.jinja_env.variable_start_string in name:
+            name = self.jinja_env.from_string(name, globals=self.render_ctx).render()
+        return os.path.join(basedir, os.path.normpath(name))
+
+    def mirror_tree(self, src, dst):
+        if not os.path.exists(dst):
+            os.makedirs(dst)
+        names = os.listdir(src)
+        for name in names:
+            srcname = os.path.join(src, name)
+            dstname = self.render_name(name, dst)
+            if os.path.isdir(srcname):
+                self.mirror_tree(srcname, dstname)
+            elif os.path.isfile(srcname):
+                    if srcname.endswith('.tpl'):
+                        t_file = os.path.relpath(srcname, self.templatedir)
+                        if os.path.sep == '\\':
+                            t_file = "/".join(t_file.split('\\'))
+                        template = self.jinja_env.get_template(t_file, globals=self.render_ctx)
+                        with open(dstname[:-4], "w", encoding="utf8") as o_file:
+                            o_file.write(template.render())
+                    else:
+                        shutil.copy(srcname, dstname)
+
 
 
 @click.group(name="oy")
@@ -97,12 +114,12 @@ def start_project(project_name, templatedir=None):
         )
         raise click.Abort()
     if templatedir is None:
-        templatedir = os.path.join(get_root_path("oy"), "project_template")
+        templatedir = os.path.join(get_root_path("oy"), "project_templates")
     else:
         rv = get_vcs_from_url(templatedir)
         if rv is not None:
             click.echo(f"Cloning template from {rv.url}...")
-            templatedir = clone(rv.url)
+            templatedir = os.path.join(clone(rv.url), 'project_templates')
     if not os.path.isdir(templatedir):
         click.echo(f"Error: Template directory {templatedir} does not exist.")
         raise click.Abort()

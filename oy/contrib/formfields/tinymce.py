@@ -30,7 +30,7 @@ class TinymceTextAreaField(TextAreaField):
         def extra_js(field):
             return [
                 url_for(
-                    "oy-admin.static", filename="oy-admin/vendor/tinymce/tinymce.min.js"
+                    "oy.contrib.admin.resource_module.static", filename="oy-admin/vendor/tinymce/tinymce.min.js"
                 ),
-                url_for("oy-admin.static", filename="oy-admin/js/tinymce-setup.js"),
+                url_for("oy.contrib.admin.resource_module.static", filename="oy-admin/js/tinymce-setup.js"),
             ]

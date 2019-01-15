@@ -1,6 +1,7 @@
 -r requirements.txt
 
 pytest
+psycopg2
 waitress
 WebTest
 black

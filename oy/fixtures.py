@@ -11,7 +11,7 @@ from oy.boot.sqla import db
 
 class Fixtured(object):
     """
-    A Mixin class to enable the installation of fixtures
+    A Mixin class to enable the importing of fixtures
     from the path of an instance of `Oy.wrappers.OyModule`.
     """
 

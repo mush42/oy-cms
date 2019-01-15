@@ -18,7 +18,7 @@ class SQLAEvent(object):
 
     Only models having  this class as
     a base class will be able to react to sqlalchemy events by implementing
-    class methods
+    event handler methods as part of their class definition
     """
 
     def before_flush(self, session, is_modified):
@@ -27,6 +27,9 @@ class SQLAEvent(object):
 
     def after_flush(self, session, is_modified):
         """Called after the session has been flushed"""
+        raise NotImplementedError
+
+    def after_flush_postexec(self, session, is_modified):
         raise NotImplementedError
 
     def update(self):
@@ -39,4 +42,8 @@ class SQLAEvent(object):
 
     def before_commit(self, session, is_modified):
         """Called before the session is commited"""
+        raise NotImplementedError
+
+    def after_commit(self, session, is_modified):
+        """Called after the session is commited"""
         raise NotImplementedError
