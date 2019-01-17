@@ -1,1 +1,1 @@
-[![Build Status](https://travis-ci.org/mush42/Oy-CMS.svg?branch=master)](https://travis-ci.org/mush42/Oy-CMS)
+[![Build Status](https://travis-ci.org/mush42/oy-cms.svg?branch=master)](https://travis-ci.org/mush42/Oy-cms)
