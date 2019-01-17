@@ -2,15 +2,16 @@ import pytest
 from oy.models.abstract import TimeStampped, Publishable, Metadata, Titled
 
 
-def test_timestammped(db, makemodel):
-    timestampped = makemodel("TimeStampped", (TimeStampped, Titled))
-    t = timestampped(title=u"Mushy")
+def test_timestammped(app, db, makemodel):
+    TStampped = makemodel("TimeStampped", (TimeStampped, Titled))
+    t = TStampped(title=u"Mushy")
     db.session.add(t)
     db.session.commit()
     assert t.created
     assert not t.updated
-    t.title = u"That"
-    db.session.commit()
+    with app.test_request_context():
+        t.title = u"That"
+        db.session.commit()
     assert t.updated
 
 

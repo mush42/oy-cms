@@ -13,17 +13,17 @@ from wtforms.widgets import TextArea
 from wtforms.fields import TextAreaField
 
 
-class TinymceTextAreaWidget(TextArea):
+class CkeditorTextAreaWidget(TextArea):
     def __call__(self, field, **kwargs):
         if kwargs.get("class"):
-            kwargs["class"] += " tinymce"
+            kwargs["class"] += " ckeditor"
         else:
-            kwargs.setdefault("class", "tinymce")
+            kwargs.setdefault("class", "ckeditor")
         return super().__call__(field, **kwargs)
 
 
-class TinymceTextAreaField(TextAreaField):
-    widget = TinymceTextAreaWidget()
+class CkeditorTextAreaField(TextAreaField):
+    widget = CkeditorTextAreaWidget()
 
     class Meta:
         @staticmethod
@@ -31,10 +31,10 @@ class TinymceTextAreaField(TextAreaField):
             return [
                 url_for(
                     "oy.contrib.formfields.static",
-                    filename="tinymce/tinymce.min.js",
+                    filename="ckeditor/ckeditor.js",
                 ),
                 url_for(
                     "oy.contrib.formfields.static",
-                    filename="js/tinymce-setup.js",
+                    filename="js/ckeditor-setup.js",
                 ),
             ]

@@ -42,9 +42,7 @@ def test_orderable(db, makemodel):
     Ord = makemodel("Ord", (SelfRelated, Orderable,))
     top1 = Ord()
     top2 = Ord(_sort_order=11)
-    db.session.add(top1)
-    db.session.commit()
-    db.session.add(top2)
+    db.session.add_all((top1, top2,))
     db.session.commit()
     assert top1.sort_order == top1.id
     assert top2.sort_order == top2.id

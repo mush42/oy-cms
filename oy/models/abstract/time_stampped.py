@@ -10,6 +10,7 @@
 """
 
 from datetime import datetime
+from flask import _request_ctx_stack
 from oy.boot.sqla import db
 from ._sqlaevent import SQLAEvent
 
@@ -25,7 +26,10 @@ class TimeStampped(SQLAEvent):
     )
     updated = db.Column(
         db.DateTime,
-        onupdate=datetime.utcnow,
         nullable=True,
         info=dict(label="Last Updated"),
     )
+
+    def before_flush(self, session, is_modified):
+        if is_modified and _request_ctx_stack.top is not None:
+            self.updated = datetime.utcnow()

@@ -18,8 +18,8 @@ from .models import RichTextPage
 
 class RichTextPageAdmin(PageAdmin):
 
-    form_rules = list(PageAdmin.form_rules)
-    form_rules.insert(5, "content")
+    form_columns = list(PageAdmin.form_columns)
+    form_columns.insert(4, "content")
     form_overrides = {"content": TinymceTextAreaField}
 
 

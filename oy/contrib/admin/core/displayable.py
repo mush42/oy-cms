@@ -32,19 +32,19 @@ DISPLAYABEL_DEFAULTS = dict(
     column_formatters={"status": status_formatter},
     column_default_sort=("created", True),
     column_editable_list=("title",),
-    form_rules=(
+    form_columns=(
         "title",
         "status",
         "publish_date",
         "expire_date",
-        "slug",
         "meta_title",
         "meta_description",
-        "should_auto_generate",
         "keywords",
+        "should_auto_generate",
     ),
     form_excluded_columns=(
-        "order",
+        "_sort_order",
+        "sort_order",
         "site",
         "created",
         "updated",
@@ -76,20 +76,6 @@ class DisplayableAdminType(AdminViewMeta):
         for key, value in DISPLAYABEL_DEFAULTS.items():
             if key not in d:
                 d[key] = value
-            else:
-                if type(value) is dict:
-                    d[key].update(value)
-                elif type(value) in (list, tuple):
-                    opt = list()
-                    opt.extend(value)
-                    if key in ["form_rules", "form_columns", "column_list"]:
-                        # Attention: order is important, so a tuple in the
-                        # form (order, field) should be provided for each entry.
-                        for order, field in d[key]:
-                            opt.insert(order, field)
-                    else:
-                        opt.extend(d[key])
-                    d[key] = opt
         row_actions = list(default_row_actions)
         crowactions = d.get("column_extra_row_actions", [])
         if "get_preview_url" in d:

@@ -14,6 +14,7 @@ from oy.contrib.form import Form
 from oy.contrib.user_profile import UserProfile
 from oy.contrib.bs4 import BS4
 from oy.contrib.redirects import Redirects
+from oy.contrib.formfields import OyFormFields
 
 
 # Create our oy app
@@ -30,6 +31,7 @@ admin = OyAdmin(app, auto_register_modules=True)
 # Bootstrap 4 templates
 BS4(app)
 
+OyFormFields(app)
 # Provides a simple implmentation of a page having a rich text content
 RichTextPage(app)
 

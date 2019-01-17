@@ -35,7 +35,7 @@ class PageQuery(BaseQuery):
 
     @property
     def ordered(self):
-        return self.order_by(Page.order.asc())
+        return self.order_by(Page.sort_order.asc())
 
     @property
     def published(self):

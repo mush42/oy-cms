@@ -2,11 +2,13 @@ from flask import url_for
 from oy.boot.sqla import db
 from oy.babel import gettext, lazy_gettext
 from oy.models.page import Page
-from oy.contrib.admin.core import DisplayableAdmin
+from oy.contrib.admin.core import DisplayableAdmin, DISPLAYABEL_DEFAULTS
 
 
 class PageAdmin(DisplayableAdmin):
-    form_rules = [(5, "parent"), (6, "is_live"), (7, "must_show_in_menu")]
+    form_columns = list(DISPLAYABEL_DEFAULTS["form_columns"])
+    form_columns.insert(4, "parent")
+    form_columns.insert(5, "slug")
     form_excluded_columns = ["children", "contenttype", "slug_path"]
     column_list = [(1, "parent")]
 

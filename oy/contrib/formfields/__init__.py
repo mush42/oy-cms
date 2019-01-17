@@ -9,4 +9,15 @@
     :license: MIT, see LICENSE for more details.
 """
 
+from oy.contrib.extbase import OyExtBase
 from .tinymce import TinymceTextAreaField
+from .ckeditor import CkeditorTextAreaField
+
+
+class OyFormFields(OyExtBase):
+
+    module_args = dict(
+        name="oy.contrib.formfields",
+        import_name="oy.contrib.formfields",
+        static_folder="static",
+    )

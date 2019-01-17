@@ -12,21 +12,9 @@
 from sqlalchemy.ext.declarative import declared_attr
 from flask import current_app, _request_ctx_stack
 from flask_security import current_user
-from werkzeug.local import LocalProxy
 from oy.boot.sqla import db
 from oy.babel import lazy_gettext
 from ._sqlaevent import SQLAEvent
-
-
-def get_current_user_id():
-    """Returns the current user id or the
-    id for the firstly created user if no
-    request context is present.
-    """
-    if _request_ctx_stack.top is None:
-        user = db.metadata.tables["user"]
-        return db.session.query(user).filter(user.c.active == True).first().id
-    return current_user.id
 
 
 class UserRelated(SQLAEvent):
@@ -37,7 +25,6 @@ class UserRelated(SQLAEvent):
         return db.Column(
             db.Integer,
             db.ForeignKey("user.id"),
-            default=get_current_user_id,
             nullable=False,
             info=dict(label=lazy_gettext("Author")),
         )
@@ -56,7 +43,6 @@ class UserRelated(SQLAEvent):
             db.Integer,
             db.ForeignKey("user.id"),
             nullable=True,
-            onupdate=get_current_user_id,
             info=dict(label=lazy_gettext("Author")),
         )
 
@@ -67,3 +53,9 @@ class UserRelated(SQLAEvent):
             foreign_keys=[cls.editor_id],
             info=dict(label=lazy_gettext("Author"), description=lazy_gettext("")),
         )
+
+    def before_flush(self, session, is_modified):
+        if _request_ctx_stack.top is not None:
+            self.author_id = current_user.id
+            if is_modified:
+                self.editor_id = current_user.id

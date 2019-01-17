@@ -76,10 +76,10 @@ class FormAdmin(PageAdmin):
         "updated",
         "entries",
     ]
-    form_rules = list(PageAdmin.form_rules)
-    form_rules.insert(6, "fields")
-    form_rules.insert(7, "submit_text")
-    form_rules.insert(8, "submit_message")
+    form_columns = list(PageAdmin.form_columns)
+    form_columns.insert(6, "fields")
+    form_columns.insert(7, "submit_text")
+    form_columns.insert(8, "submit_message")
     form_overrides = {"submit_message": TinymceTextAreaField}
     inline_models = [
         (
