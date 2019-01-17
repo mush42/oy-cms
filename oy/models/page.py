@@ -20,11 +20,8 @@ class PageQuery(BaseQuery):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.min_qbundle = db.Bundle('minq',
-            Page.id,
-            Page.title,
-            Page.slug,
-            Page.slug_path
+        self.min_qbundle = db.Bundle(
+            "minq", Page.id, Page.title, Page.slug, Page.slug_path
         )
 
     @property
@@ -45,10 +42,7 @@ class PageQuery(BaseQuery):
         """Query only published pages."""
         sel = db.and_(
             Page.status == "published",
-            db.or_(
-                Page.expire_date == None,
-                Page.expire_date > datetime.utcnow(),
-            ),
+            db.or_(Page.expire_date == None, Page.expire_date > datetime.utcnow()),
         )
         return self.filter(sel)
 
@@ -59,10 +53,9 @@ class PageQuery(BaseQuery):
 
 class Page(AbstractPage):
     """The concrete Page model."""
+
     __contenttype__ = "page"
     id = db.Column(
-        db.Integer,
-        db.Sequence('page_id_seq', start=1, increment=1),
-        primary_key=True
+        db.Integer, db.Sequence("page_id_seq", start=1, increment=1), primary_key=True
     )
     query_class = PageQuery

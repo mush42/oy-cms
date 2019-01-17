@@ -1,5 +1,10 @@
-from werkzeug.utils import import_string
+from warnings import filterwarnings
 
-
-def get_model(name):
-    return import_string("starlit.models.%s" % name)
+# Avoid flask_sqlalchemy `time.clock` deprecationWarning
+filterwarnings(
+    action="ignore",
+    category=DeprecationWarning,
+    module="flask_sqlalchemy.__init__",
+    lineno=264,
+    append=True,
+)

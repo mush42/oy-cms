@@ -15,9 +15,6 @@ SECURITY_RESET_URL = "/reset-password/"
 
 # Abstract models
 
-# Update the slug of a particular item if the value of its __slugcolum__ changes
-ALLWAYS_UPDATE_SLUGS = False
-
 # Flask Babel support
 DEFAULT_LOCALE = "en"
 SUPPORTED_LOCALES = OrderedDict((("en", "English"),))

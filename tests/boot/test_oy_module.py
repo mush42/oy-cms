@@ -1,7 +1,5 @@
 from oy.wrappers import OyModule
 
-__install_fixtures__ = False
-
 
 def test_load_config_from_package_defaults(app):
     dummy_module = OyModule("dummy", __name__)

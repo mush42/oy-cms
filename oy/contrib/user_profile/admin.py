@@ -25,7 +25,10 @@ class ProfileAdmin(OyModelView):
 
     def is_accessible(self):
         if super().is_accessible():
-            if 'admin' in current_user.roles or current_user.profile.id == request.args.get('id'):
+            if (
+                "admin" in current_user.roles
+                or current_user.profile.id == request.args.get("id")
+            ):
                 return True
         return False
 

@@ -1,5 +1,6 @@
 import pytest
 import oy
+from werkzeug.utils import import_string
 from webtest import TestApp
 from oy.boot.sqla import db as sqla_db
 from oy.boot.security import user_datastore
@@ -30,12 +31,12 @@ def create_user():
     return user_datastore.create_user(
         user_name="admin",
         email="admin@localhost.com",
-        password="mmmaaa",
+        password="adminpass",
         roles=[admin_role],
     )
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def db(request, app):
     with app.app_context():
         sqla_db.create_all()
@@ -43,3 +44,4 @@ def db(request, app):
         sqla_db.session.commit()
         yield sqla_db
         sqla_db.drop_all()
+

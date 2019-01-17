@@ -19,6 +19,7 @@ from .admin import register_admin
 
 class RichTextPageContentRenderer(BaseContentRenderer):
     """Default content renderer for `richtext_page` content type."""
+
     def serve(self):
         return {}
 

@@ -13,30 +13,7 @@ from oy.boot.sqla import db
 from ._sqlaevent import SQLAEvent
 
 
-class Orderable(SQLAEvent):
-    """Provide an ordering field."""
-
-    order = db.Column(db.Integer)
-
-    def after_flush(self, session, is_modified):
-        if is_modified:
-            if 'parent' not in db.inspect(self).unmodified:
-                self.order = None
-
-    def after_flush_postexec(self, session, is_modified):
-        if self.order:
-            return
-        cls = self.__class__
-        sel = db.select([db.func.max(cls.order)])
-        if self.parent_id:
-            sel = sel.where(cls.parent_id == self.parent_id)
-        res = session.execute(sel).fetchone()[0]
-        if res is None:
-            res = 0
-        self.order = res + 1
-
-
-class Metadata(Orderable):
+class Metadata(SQLAEvent):
     """Provides metadata about a specific piece of content."""
 
     meta_title = db.Column(
@@ -70,6 +47,7 @@ class Metadata(Orderable):
 
     @property
     def options(self):
+        # TODO: Gen meta description by stripping tags and making summary
         options = (
             ("meta_title", getattr(self, "__metatitle_column__", None), None),
             (

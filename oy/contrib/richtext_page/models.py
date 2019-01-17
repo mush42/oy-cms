@@ -19,10 +19,12 @@ class RichTextPage(Page):
     __metadescription_column__ = "content"
 
     id = db.Column(db.Integer, db.ForeignKey("page.id"), primary_key=True)
-    content = db.deferred(db.Column(
-        db.UnicodeText,
-        nullable=False,
-        info=dict(
-            label="Content", description="Page content", mimetype="text/html"
+    content = db.deferred(
+        db.Column(
+            db.UnicodeText,
+            nullable=False,
+            info=dict(
+                label="Content", description="Page content", mimetype="text/html"
+            ),
         )
-    ))
+    )

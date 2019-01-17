@@ -32,7 +32,7 @@ class SQLAEvent(object):
     def after_flush_postexec(self, session, is_modified):
         raise NotImplementedError
 
-    def update(self):
+    def onupdate(self):
         """Called when the instance is to be updated"""
         raise NotImplementedError
 

@@ -24,7 +24,7 @@ def get_current_user_id():
     request context is present.
     """
     if _request_ctx_stack.top is None:
-        user = db.metadata.tables['user']
+        user = db.metadata.tables["user"]
         return db.session.query(user).filter(user.c.active == True).first().id
     return current_user.id
 

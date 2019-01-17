@@ -66,7 +66,7 @@ def exec_module(filename, mod_name, globals=None):
         raise FileNotFoundError(f"{filename} does not exist")
 
 
-def increment_string(string, sep='_'):
+def increment_string(string, sep="_"):
     """Make a string unique by adding a number
     at the end of it, or increment that number if it
     does exist

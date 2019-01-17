@@ -53,10 +53,7 @@ def _prompt_for_user_details(user_name=None, email=None):
     is_flag=True,
 )
 @click.option(
-    "--superuser",
-    "-su",
-    help="Create a user with the role of *admin*.'",
-    is_flag=True,
+    "--superuser", "-su", help="Create a user with the role of *admin*.'", is_flag=True
 )
 def createuser(noinput, superuser):
     """Create a new super-user account"""

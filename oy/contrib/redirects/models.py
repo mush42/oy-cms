@@ -12,7 +12,7 @@
 from urllib.parse import urlparse
 from sqlalchemy.orm import validates
 from oy.models import db
-from oy.models.abstract._sqlaevent import SQLAEvent
+from oy.models.events import SQLAEvent
 from oy.babel import lazy_gettext
 from oy.models.page import Page
 
@@ -48,19 +48,20 @@ class Redirect(db.Model, SQLAEvent):
 
     to_page = db.relationship(
         Page,
+        backref="redirects",
         cascade="all",
         info=dict(
             label=lazy_gettext("Select a *Page* to Redirect to"),
-            description=lazy_gettext("")
-        )
+            description=lazy_gettext(""),
+        ),
     )
 
-    @validates('to_url')
+    @validates("to_url")
     def norm_tourl(self, key, to_url):
         if to_url is not None:
             return self.normalize_url(to_url)
 
-    @validates('from_url')
+    @validates("from_url")
     def norm_fromurl(self, key, from_url):
         return self.normalize_url(from_url)
 
@@ -74,30 +75,30 @@ class Redirect(db.Model, SQLAEvent):
         url = url.strip()
         url_parsed = urlparse(url)
         path = url_parsed[2]
-        if not path.startswith('/'):
-            path = '/' + path
-        if path.endswith('/') and len(path) > 1:
+        if not path.startswith("/"):
+            path = "/" + path
+        if path.endswith("/") and len(path) > 1:
             path = path[:-1]
         # Parameters must be sorted alphabetically
         parameters = url_parsed[3]
-        parameters_components = parameters.split(';')
-        parameters = ';'.join(sorted(parameters_components))
+        parameters_components = parameters.split(";")
+        parameters = ";".join(sorted(parameters_components))
         # Query string components must be sorted alphabetically
         query_string = url_parsed[4]
-        query_string_components = query_string.split('&')
-        query_string = '&'.join(sorted(query_string_components))
+        query_string_components = query_string.split("&")
+        query_string = "&".join(sorted(query_string_components))
         if parameters:
-            path = path + ';' + parameters
+            path = path + ";" + parameters
         # Add query string to path
         if query_string:
-            path = path + '?' + query_string
+            path = path + "?" + query_string
         return path
 
     def __repr__(self):
         return f"<Redirect(from_url={self.from_url}, to_url={self.link}, permanent={self.permanent})>"
 
     def before_flush(self, session, is_modified):
-        if self.to_url and any((self.to_page_id, self.to_page,)):
+        if self.to_url and any((self.to_page_id, self.to_page)):
             raise ValueError("Cannot set both URL and Page for the same redirect")
         elif not any((self.to_url, self.to_page, self.to_page_id)):
             raise ValueError("You must provide either a URL or a page to redirect to.")

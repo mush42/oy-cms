@@ -25,27 +25,26 @@ class ContentRendererType(type):
     """
 
     func_to_middleware = dict(
-        serve='get_response',
-        get_templates='get_templates',
-        get_context='get_context'
+        serve="get_response", get_templates="get_templates", get_context="get_context"
     )
 
     def __new__(cls, name, bases, d):
         for k, v in d.items():
             if k in cls.func_to_middleware:
                 d[k] = cls.wrap_with_middlewares(cls.func_to_middleware[k], v)
-        d['middlewares'] = list()
+        d["middlewares"] = list()
         return type.__new__(cls, name, bases, d)
 
     @staticmethod
     def wrap_with_middlewares(middleware_funcname, actual_func):
         def wrapper(self, *args, **kwargs):
             rv = actual_func(self, *args, **kwargs)
-            for mw in  (m() for m in self.middlewares):
+            for mw in (m() for m in self.middlewares):
                 func = getattr(mw, middleware_funcname, None)
                 if func is not None:
                     rv = func(rv)
             return rv
+
         return update_wrapper(wrapper, actual_func)
 
 
@@ -62,12 +61,14 @@ class BaseContentRenderer(metaclass=ContentRendererType):
     def get_templates(self):
         if self.template is not None:
             return self.template
-        if self.page.is_home and current_app.config.get('HOME_PAGE_TEMPLATE', ''):
-            return current_app.config['HOME_PAGE_TEMPLATE']
+        if self.page.is_home and current_app.config.get("HOME_PAGE_TEMPLATE", ""):
+            return current_app.config["HOME_PAGE_TEMPLATE"]
         slug = self.page.slug_path
         templates = ["page", self.page.__contenttype__] + slug.split("/")
         templates.reverse()
-        built_tpl_path = lambda prefix: [prefix + "{}.html".format(t) for t in templates]
+        built_tpl_path = lambda prefix: [
+            prefix + "{}.html".format(t) for t in templates
+        ]
         rv = []
         if getattr(_request_ctx_stack.top, "module", None):
             rv.extend(built_tpl_path(_request_ctx_stack.top.module + "/"))
@@ -102,7 +103,6 @@ class PageHandler:
 
 
 class ContentServerMixin(object):
-
     def __init__(self):
         self.contenttype_handlers = {}
         self.context_processor(self.page_context)
@@ -127,11 +127,11 @@ class ContentServerMixin(object):
             elif callable(view):
                 return current_app.make_response(view())
             else:
-                raise TypeError(f"Unrecognized view handler {view} for contenttype {current_page.contenttype}")
+                raise TypeError(
+                    f"Unrecognized view handler {view} for contenttype {current_page.contenttype}"
+                )
 
-    def add_contenttype_handler(
-        self, contenttype, view, methods=("GET",), module=None
-    ):
+    def add_contenttype_handler(self, contenttype, view, methods=("GET",), module=None):
         self.contenttype_handlers[contenttype] = PageHandler(view, methods, module)
 
     def contenttype_handler(self, contenttype, methods):
@@ -159,9 +159,13 @@ class ContentServerMixin(object):
     def get_handler_for(self, contenttype):
         return self.contenttype_handlers.get(contenttype)
 
-    def add_middleware(self, middleware, handler='*'):
-        if handler == '*':
-            views = [c .view for c in self.contenttype_handlers.values() if type(c.view) is ContentRendererType]
+    def add_middleware(self, middleware, handler="*"):
+        if handler == "*":
+            views = [
+                c.view
+                for c in self.contenttype_handlers.values()
+                if type(c.view) is ContentRendererType
+            ]
         elif handler in self.contenttype_handlers:
             views = (self.contenttype_handlers[handler].view,)
         else:
@@ -171,8 +175,4 @@ class ContentServerMixin(object):
 
     def page_context(self):
         pages = Page.query.viewable.roots.ordered.all()
-        return {
-            "pages": pages,
-            "current_page": current_page,
-            "page": current_page,
-        }
+        return {"pages": pages, "current_page": current_page, "page": current_page}

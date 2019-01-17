@@ -48,6 +48,14 @@ class Publishable(TimeStampped):
             description="The content will not be publish After this date.",
         ),
     )
+    is_live = db.Column(
+        db.Boolean,
+        default=True,
+        info=dict(
+            label="Go Live",
+            description="If the page is live, the visitors can view this page, otherwise they will get a page not found error.",
+        ),
+    )
 
     @hybrid_property
     def is_published(self):

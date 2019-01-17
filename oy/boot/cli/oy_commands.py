@@ -48,7 +48,7 @@ class ProjectTemplateCopier:
             block_end_string="%]",
             variable_start_string="[[",
             variable_end_string="]]",
-            optimized=False
+            optimized=False,
         )
         _build_ctx_mod_path = os.path.join(self.templatedir, "build_context.py")
         if ctx_build_vars is None:
@@ -67,7 +67,7 @@ class ProjectTemplateCopier:
                 os.unlink(self.distdir)
             raise e
         else:
-            os.unlink(os.path.join(self.distdir, 'build_context.py'))
+            os.unlink(os.path.join(self.distdir, "build_context.py"))
 
     def render_name(self, name, basedir):
         if self.jinja_env.variable_start_string in name:
@@ -84,16 +84,17 @@ class ProjectTemplateCopier:
             if os.path.isdir(srcname):
                 self.mirror_tree(srcname, dstname)
             elif os.path.isfile(srcname):
-                    if srcname.endswith('.tpl'):
-                        t_file = os.path.relpath(srcname, self.templatedir)
-                        if os.path.sep == '\\':
-                            t_file = "/".join(t_file.split('\\'))
-                        template = self.jinja_env.get_template(t_file, globals=self.render_ctx)
-                        with open(dstname[:-4], "w", encoding="utf8") as o_file:
-                            o_file.write(template.render())
-                    else:
-                        shutil.copy(srcname, dstname)
-
+                if srcname.endswith(".tpl"):
+                    t_file = os.path.relpath(srcname, self.templatedir)
+                    if os.path.sep == "\\":
+                        t_file = "/".join(t_file.split("\\"))
+                    template = self.jinja_env.get_template(
+                        t_file, globals=self.render_ctx
+                    )
+                    with open(dstname[:-4], "w", encoding="utf8") as o_file:
+                        o_file.write(template.render())
+                else:
+                    shutil.copy(srcname, dstname)
 
 
 @click.group(name="oy")
@@ -119,7 +120,7 @@ def start_project(project_name, templatedir=None):
         rv = get_vcs_from_url(templatedir)
         if rv is not None:
             click.echo(f"Cloning template from {rv.url}...")
-            templatedir = os.path.join(clone(rv.url), 'project_templates')
+            templatedir = os.path.join(clone(rv.url), "project_templates")
     if not os.path.isdir(templatedir):
         click.echo(f"Error: Template directory {templatedir} does not exist.")
         raise click.Abort()

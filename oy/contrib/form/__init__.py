@@ -20,7 +20,7 @@ from flask import (
     render_template,
     url_for,
     abort,
-    flash
+    flash,
 )
 from werkzeug import secure_filename
 from flask_wtf import Form as HtmlForm
@@ -32,6 +32,7 @@ from oy.dynamicform import DynamicForm
 from oy.helpers import date_stamp
 from .admin import register_admin
 from .models import FormEntry, FieldEntry, Form, Field
+
 
 class FormContentRenderer(BaseContentRenderer):
     def store_form(self, form):
@@ -85,9 +86,5 @@ class Form(OyExtBase):
 
     def init_app(self, app):
         app.add_contenttype_handler(
-            "form",
-            FormContentRenderer,
-            methods=("GET", "POST"),
-            module="form"
+            "form", FormContentRenderer, methods=("GET", "POST"), module="form"
         )
-
