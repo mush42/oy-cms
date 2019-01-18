@@ -1,35 +1,13 @@
 import click
-from flask import current_app
-from .database import database_group, create_db, drop_db, clean_db
-from .user import createuser
-from .fixtures import install_fixtures
+from flask.cli import FlaskGroup
 
 
-def bound_oy_group():
-    """Perform tasks related to Oy CMS.
-    It is being used when an application
-    context is available.
-    """
+oy_group = FlaskGroup(name="oy", add_default_commands=False, add_version_option=False, load_dotenv=True)
 
 
-def create_all():
-    """Automatically run essential commands"""
-    click.echo()
-    click.secho("~" * 50, fg="green")
-    create_db()
-    createuser(noinput=True, superuser=True)
-    install_fixtures()
-    click.secho("~" * 50, fg="green", bold=True)
+from . import database
+from . import user
 
 
-def register_cli_commands():
-    """Add oy command line interface"""
-    group_factory = current_app.cli.group(name="oy")
-    oy_cli = group_factory(bound_oy_group)
-    oy_cli.command(name="createall")(create_all)
-    oy_cli.command(name="install-fixtures")(install_fixtures)
-    oy_cli.command(name="createuser")(createuser)
-    database_cli = oy_cli.group(name="db")(database_group)
-    database_cli.command(name="create")(create_db)
-    database_cli.command(name="drop")(drop_db)
-    database_cli.command(name="clean")(clean_db)
+if __name__=='__main__':
+    oy_group.main()

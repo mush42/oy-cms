@@ -14,8 +14,8 @@ from oy.contrib.form import Form
 from oy.contrib.user_profile import UserProfile
 from oy.contrib.bs4 import BS4
 from oy.contrib.redirects import Redirects
-from oy.contrib.formfields import OyFormFields
-
+from oy.contrib.form_fields import OyFormFields
+from oy.contrib.demo_content import DemoContent
 
 # Create our oy app
 app = create_app(
@@ -46,3 +46,5 @@ FlaskSecurityTemplates(app)
 
 # Setup custom redirects
 Redirects(app)
+
+DemoContent(app)

@@ -1,16 +1,10 @@
 import click
 from flask import current_app
+from flask.cli import with_appcontext
 from oy.boot.sqla import db
 from oy.helpers import is_valid_email
 from oy.models.user import User, Role
-
-
-user_not_created_msg = """
-Super-user required!
-
-Please create at least one super user before attempting to install fixdtures.
-    At anytime, you can use the `createuser` command to create a new super-user.
-"""
+from . import oy_group
 
 
 def _prompt_for_user_details(user_name=None, email=None):
@@ -46,6 +40,7 @@ def _prompt_for_user_details(user_name=None, email=None):
     return user_name, email, password
 
 
+@oy_group.command(name="createuser")
 @click.option(
     "--noinput",
     "-n",
@@ -55,6 +50,7 @@ def _prompt_for_user_details(user_name=None, email=None):
 @click.option(
     "--superuser", "-su", help="Create a user with the role of *admin*.'", is_flag=True
 )
+@with_appcontext
 def createuser(noinput, superuser):
     """Create a new super-user account"""
     from oy.boot.security import user_datastore

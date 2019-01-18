@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    oy
+    oy.create_app
     ~~~~~~~~~~~~~~~~~~
 
     Initialize the application.
@@ -14,11 +14,11 @@ from flask_wtf import CSRFProtect
 from oy.boot.sqla import db, migrate
 from oy.boot.babel import babel, init_babel
 from oy.boot.security import initialize_security
+from oy.boot.shell import make_shell_context
+from oy.boot import boot_config
+from oy.boot.cli import oy_group
 from oy.wrappers import Oy
 from oy.exceptions import OyException
-from oy.boot.shell import make_shell_context
-from oy.boot.cli import register_cli_commands
-from oy.boot import boot_config
 from oy.core import core
 from oy.models import *
 
@@ -94,7 +94,7 @@ def create_app(name, config=None, app_class=Oy, envar="STARLIT_CONFIG", **kwargs
         app.config.from_object(config)
     with app.app_context():
         initialize_builtin_extensions()
-        register_cli_commands()
+    app.cli.add_command(oy_group)
     app.shell_context_processor(make_shell_context)
     app.register_module(core)
     return app

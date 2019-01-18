@@ -10,15 +10,15 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from oy.content_serving import BaseContentRenderer
+from oy.views import ContentView
 from oy.babel import lazy_gettext
 from oy.contrib.extbase import OyExtBase
 from . import models
 from .admin import register_admin
 
 
-class RichTextPageContentRenderer(BaseContentRenderer):
-    """Default content renderer for `richtext_page` content type."""
+class RichTextPageView(ContentView):
+    """Default view for `richtext_page` content type."""
 
     def serve(self):
         return {}
@@ -34,5 +34,5 @@ class RichTextPage(OyExtBase):
     )
 
     def init_app(self, app):
-        app.add_contenttype_handler("richtext_page", RichTextPageContentRenderer)
+        app.add_contenttype_handler("richtext_page", RichTextPageView)
         app.template_filter(name="unique_string")(lambda s: s)

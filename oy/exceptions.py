@@ -27,10 +27,6 @@ class OyConfigurationError(OyException):
     """Miss configuration of oy"""
 
 
-class BadlyFormattedFixture(OyException):
-    """Raised when a fixture could not be decoded"""
-
-
 class SettingDoesNotExist(OyException):
     """Raised when accessing a setting that does
     not exist in the database nor the current_app settings

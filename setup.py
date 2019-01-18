@@ -20,7 +20,12 @@ setup(
     platforms="any",
     include_package_data=True,
     zip_safe=False,
-    entry_points={"console_scripts": ["oy=oy.boot.cli.oy_commands:oy_group"]},
+    entry_points={
+        "console_scripts": [
+            "oy=oy.boot.cli:oy_group",
+            "oyinit=oy.boot.cli.oyinit:init_oy_project"
+        ]
+    },
     install_requires=[
         "Flask",
         "Flask-Admin",

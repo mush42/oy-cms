@@ -45,3 +45,24 @@ def db(request, app):
         yield sqla_db
         sqla_db.drop_all()
 
+
+def concrete_model(db, cls_name, bases, d):
+    bases = list(bases) + [db.Model]
+    d = d or {}
+    defaults = dict(
+        id=db.Column(db.Integer, primary_key=True), __tablename__=cls_name.lower()
+    )
+    for k in defaults:
+        if k not in d:
+            d[k] = defaults[k]
+    model = type(cls_name, tuple(bases), d)
+    db.create_all()
+    return model
+
+
+@pytest.fixture()
+def makemodel(db):
+    def func(clsname, bases=(), d=None):
+        return concrete_model(db, clsname, bases, d)
+
+    return func

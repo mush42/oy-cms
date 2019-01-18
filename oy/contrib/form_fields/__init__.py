@@ -17,7 +17,7 @@ from .ckeditor import CkeditorTextAreaField
 class OyFormFields(OyExtBase):
 
     module_args = dict(
-        name="oy.contrib.formfields",
-        import_name="oy.contrib.formfields",
+        name="oy.contrib.form_fields",
+        import_name="oy.contrib.form_fields",
         static_folder="static",
     )

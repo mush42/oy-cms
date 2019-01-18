@@ -30,7 +30,7 @@ def qs_args(url, qs):
 
 
 @core.settings_provider()
-def provide_page_settings(app):
+def provide_core_settings(app):
     return [
         dict(
             name="title",

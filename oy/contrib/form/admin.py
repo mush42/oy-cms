@@ -25,7 +25,7 @@ from oy.models import db
 from oy.babel import lazy_gettext
 from oy.helpers import paginate_with_args
 from oy.contrib.admin.wrappers import AuthenticationViewMixin
-from oy.contrib.formfields import TinymceTextAreaField
+from oy.contrib.form_fields import TinymceTextAreaField
 from oy.contrib.admin.core.page import PageAdmin
 from .models import Form, Field, FormEntry
 

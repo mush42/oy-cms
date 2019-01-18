@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-    oy.boot.cli.oy_commands
+    oy.boot.cli.oyinit
     ~~~~~~~~~~~
-    Offers commands to perform the following:
-        * Create a project using a configurable template.
+
+    Offers commands to create a project using a configurable template.
 
     :copyright: (c) 2018 by Musharraf Omer.
     :license: MIT, see LICENSE for more details.
@@ -17,6 +17,7 @@ import click
 from jinja2 import Template, Environment, FileSystemLoader
 from flask.helpers import get_root_path
 from oy.helpers import exec_module
+from . import oy_group
 from ._vcs import get_vcs_from_url, clone
 
 
@@ -97,21 +98,15 @@ class ProjectTemplateCopier:
                     shutil.copy(srcname, dstname)
 
 
-@click.group(name="oy")
-def oy_group():
-    """Common oy cms commands used for various purposes."""
-
-
-@oy_group.command(name="start")
+@click.command(name="oyinit")
 @click.argument("project_name")
 @click.option("--templatedir", help="The template to be used", default=None)
-def start_project(project_name, templatedir=None):
+def init_oy_project(project_name, templatedir=None):
     """Start a new oy project"""
     if not is_valid_pkg_name(project_name):
         click.echo(
             f"{project_name} is not valid as a project name. \r\n\
-            Please use a valid python identifier, consisting only of \
-            numbers, letters, and underscores."
+            Please use a valid python identifier."
         )
         raise click.Abort()
     if templatedir is None:

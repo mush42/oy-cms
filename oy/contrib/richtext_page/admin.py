@@ -12,7 +12,7 @@
 from oy.models import db
 from oy.babel import lazy_gettext
 from oy.contrib.admin.core.page import PageAdmin
-from oy.contrib.formfields import TinymceTextAreaField
+from oy.contrib.form_fields import TinymceTextAreaField
 from .models import RichTextPage
 
 

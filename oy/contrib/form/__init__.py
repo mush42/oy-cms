@@ -26,15 +26,15 @@ from werkzeug import secure_filename
 from flask_wtf import Form as HtmlForm
 from oy.globals import current_page
 from oy.boot.sqla import db
-from oy.contrib.extbase import OyExtBase
-from oy.content_serving import BaseContentRenderer
+from oy.views import ContentView
 from oy.dynamicform import DynamicForm
 from oy.helpers import date_stamp
+from oy.contrib.extbase import OyExtBase
 from .admin import register_admin
 from .models import FormEntry, FieldEntry, Form, Field
 
 
-class FormContentRenderer(BaseContentRenderer):
+class FormView(ContentView):
     def store_form(self, form):
         entry = FormEntry(form_id=self.page.id)
         for f in form:
@@ -86,5 +86,5 @@ class Form(OyExtBase):
 
     def init_app(self, app):
         app.add_contenttype_handler(
-            "form", FormContentRenderer, methods=("GET", "POST"), module="form"
+            "form", FormView, methods=("GET", "POST"), module="form"
         )

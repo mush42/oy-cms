@@ -9,11 +9,13 @@
 from oy import create_app
 from oy.contrib.admin import OyAdmin
 from oy.contrib.flask_security_templates import FlaskSecurityTemplates
+from oy.contrib.form_fields import OyFormFields
 from oy.contrib.richtext_page import RichTextPage
 from oy.contrib.form import Form
 from oy.contrib.user_profile import UserProfile
 from oy.contrib.bs4 import BS4
 from oy.contrib.redirects import Redirects
+from oy.contrib.demo_content import DemoContent
 
 
 # Create our oy app
@@ -42,5 +44,11 @@ UserProfile(app)
 # Styled pages for login and registration
 FlaskSecurityTemplates(app)
 
-# Setup custom redirects
+# Adds shell commands to install demo data
+DemoContent(app)
+
+# Allows you to setup custom redirects
 Redirects(app)
+
+# Provides custom wtform fields
+OyFormFields(app)

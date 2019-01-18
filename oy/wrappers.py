@@ -26,9 +26,8 @@ from flask import Flask, Blueprint
 from flask.config import Config
 from flask.helpers import locked_cached_property, get_root_path
 
-from oy.content_serving import ContentServerMixin
+from oy.views import ContentViewProcessorMixin
 from oy.helpers import exec_module, find_modules, import_modules
-from oy.fixtures import Fixtured
 from oy.signals import oy_module_registered, oy_app_starting
 
 
@@ -75,7 +74,7 @@ class OyConfig(Config):
                 self[key] = getattr(d, key)
 
 
-class OyModule(Blueprint, Fixtured):
+class OyModule(Blueprint):
     """OyModule is a :class:`flask.Blueprint` with some extras
     
     This class adds the ability to register editable settings which can be safely
@@ -117,7 +116,7 @@ class OyModule(Blueprint, Fixtured):
         return decorator
 
 
-class Oy(ContentServerMixin, Flask):
+class Oy(ContentViewProcessorMixin, Flask):
     """Wrapps the :class:flask.Flask` to provide additional functionality.
     
     It add the following features:
@@ -130,7 +129,7 @@ class Oy(ContentServerMixin, Flask):
 
     def __init__(self, *args, **kwargs):
         Flask.__init__(self, *args, **kwargs)
-        ContentServerMixin.__init__(self)
+        ContentViewProcessorMixin.__init__(self)
         self.before_first_request_funcs.append(self.finalize)
         self.provided_settings_dict = None
         self.modules = OrderedDict()
@@ -151,7 +150,7 @@ class Oy(ContentServerMixin, Flask):
         return ChoiceLoader(tuple(mod_templates))
 
     def register_module(self, module, **options):
-        """Register a oy module with this application"""
+        """Register an oy module with this application"""
         super(Oy, self).register_blueprint(blueprint=module, **options)
         self.modules[module.name] = module
         # Force-refresh provided settings

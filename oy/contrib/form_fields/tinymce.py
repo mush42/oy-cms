@@ -30,11 +30,11 @@ class TinymceTextAreaField(TextAreaField):
         def extra_js(field):
             return [
                 url_for(
-                    "oy.contrib.formfields.static",
+                    "oy.contrib.form_fields.static",
                     filename="tinymce/tinymce.min.js",
                 ),
                 url_for(
-                    "oy.contrib.formfields.static",
+                    "oy.contrib.form_fields.static",
                     filename="js/tinymce-setup.js",
                 ),
             ]

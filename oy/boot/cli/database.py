@@ -1,14 +1,19 @@
 import click
 from itertools import chain
 from flask import current_app
+from flask.cli import with_appcontext
 from oy.boot.sqla import db
 from oy.models.settings import SettingsProfile
+from . import oy_group
 
 
+@oy_group.group(name='database')
 def database_group():
-    """Perform database operations"""
+    """Create, drop, and clean database tables."""
 
 
+@database_group.command(name="create")
+@with_appcontext
 def create_db():
     """Create database tables."""
     click.echo("Creating database tables...")
@@ -17,7 +22,10 @@ def create_db():
     click.secho("Database tables created.", fg="green", bold=True)
 
 
+
+@database_group.command(name="drop")
 @click.option("--noinput", "-n", is_flag=True)
+@with_appcontext
 def drop_db(noinput):
     """Drop database tables"""
     click.secho("!" * 50, fg="red", blink=True)
@@ -62,6 +70,8 @@ def clean_settings():
     click.secho("~" * 50, fg="green")
 
 
+@database_group.command(name="clean")
+@with_appcontext
 def clean_db():
     """Clean the database tables."""
     click.echo("Cleaning database tables..")

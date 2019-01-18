@@ -30,11 +30,11 @@ class CkeditorTextAreaField(TextAreaField):
         def extra_js(field):
             return [
                 url_for(
-                    "oy.contrib.formfields.static",
+                    "oy.contrib.form_fields.static",
                     filename="ckeditor/ckeditor.js",
                 ),
                 url_for(
-                    "oy.contrib.formfields.static",
+                    "oy.contrib.form_fields.static",
                     filename="js/ckeditor-setup.js",
                 ),
             ]

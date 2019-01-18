@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """	
-    oy.content_serving
+    oy.views
     ~~~~~~~~~~
 
-    Implements content serving logic for oy
+    Implements view logic for oy content.
 
     :copyright: (c) 2018 by Musharraf Omer.
     :license: MIT, see LICENSE for more details.
@@ -19,13 +19,17 @@ from oy.models.page import Page
 from oy.globals import current_page
 
 
-class ContentRendererType(type):
-    """Metaclass for :class:`BaseContentRenderer` that wrapps selected functions with
+class ContentViewType(type):
+    """Metaclass for :class:`ContentView` that wrapps selected functions with
     another function that applies all  middlewares.
     """
 
     func_to_middleware = dict(
-        serve="get_response", get_templates="get_templates", get_context="get_context"
+        render="process_render",
+        serve="process_response",
+        get_templates="process_templates",
+        get_context="process_context",
+        make_response="process_final_response"
     )
 
     def __new__(cls, name, bases, d):
@@ -39,24 +43,25 @@ class ContentRendererType(type):
     def wrap_with_middlewares(middleware_funcname, actual_func):
         def wrapper(self, *args, **kwargs):
             rv = actual_func(self, *args, **kwargs)
-            for mw in (m() for m in self.middlewares):
+            for mw in (m() for m in self.handler.middlewares):
                 func = getattr(mw, middleware_funcname, None)
                 if func is not None:
-                    rv = func(rv)
+                    rv = func(rv, handler=self.handler)
             return rv
 
         return update_wrapper(wrapper, actual_func)
 
 
-class BaseContentRenderer(metaclass=ContentRendererType):
-    """A configurational object that contains content rendering data
+class ContentView(metaclass=ContentViewType):
+    """A configurational object that contains content response data
     it also applies middlewares.
     """
 
-    def __init__(self, template=None, context=None):
-        self.page = current_page._get_current_object()
+    def __init__(self, handler, template=None, context=None):
+        self.handler = handler
         self.template = template
         self.context = context or {}
+        self.page = current_page._get_current_object()
 
     def get_templates(self):
         if self.template is not None:
@@ -96,13 +101,15 @@ class BaseContentRenderer(metaclass=ContentRendererType):
 
 @dataclass(frozen=True)
 class PageHandler:
-    view: Union[Callable, BaseContentRenderer]
+    view: Union[Callable, ContentView]
     methods: Tuple[str]
     module: str
-    render_kwargs: dict = field(default_factory=dict)
+    view_kwargs: dict = field(default_factory=dict)
+    middlewares: list = field(default_factory=list)
 
 
-class ContentServerMixin(object):
+class ContentViewProcessorMixin(object):
+    """A mixin that knows how to serve content."""
     def __init__(self):
         self.contenttype_handlers = {}
         self.context_processor(self.page_context)
@@ -122,10 +129,16 @@ class ContentServerMixin(object):
             if request.method not in handler.methods:
                 abort(405)
             view = handler.view
-            if type(view) is ContentRendererType:
-                return view(**handler.render_kwargs).make_response()
+            if type(view) is ContentViewType:
+                return view(handler=handler).make_response()
+            elif type(view) is ContentView:
+                view.handler = handler
+                return view.make_response()
             elif callable(view):
-                return current_app.make_response(view())
+                rv = view(**handler.view_kwargs)
+                for mw in view.middlewares:
+                    rv = mw(rv)
+                return current_app.make_response(rv)
             else:
                 raise TypeError(
                     f"Unrecognized view handler {view} for contenttype {current_page.contenttype}"
@@ -139,7 +152,7 @@ class ContentServerMixin(object):
         registered with the application
 
         .. Note::
-            This decorator accepts either a function or a subclass of :class: `ContentRenderer`
+            This decorator accepts either a function or a subclass of :class: `ContentView`
             
             The return value of view callables is treated as follows:
             - if it is a dictionary, the content of that dictionary will
@@ -150,8 +163,10 @@ class ContentServerMixin(object):
         :param methods: a list of HTTP methods that are accepted by this handler
         """
 
-        def wrapper(func):
-            self.add_contenttype_handler(func, contenttype, methods)
+        def wrapper(func_or_class):
+            if not hasattr(func_or_class, "middlewares"):
+                func_or_class.middlewares = []
+            self.add_contenttype_handler(func_or_class, contenttype, methods)
             return func
 
         return wrapper
@@ -159,19 +174,17 @@ class ContentServerMixin(object):
     def get_handler_for(self, contenttype):
         return self.contenttype_handlers.get(contenttype)
 
-    def add_middleware(self, middleware, handler="*"):
-        if handler == "*":
-            views = [
-                c.view
-                for c in self.contenttype_handlers.values()
-                if type(c.view) is ContentRendererType
-            ]
-        elif handler in self.contenttype_handlers:
-            views = (self.contenttype_handlers[handler].view,)
+    def apply_middleware(self, contenttype="*", middleware=None):
+        if middleware is None:
+            raise ValueError("'apply_middleware' invalid argument: 'middleware=None'")
+        if contenttype == "*":
+            handlers = (c for c in self.contenttype_handlers.values())
+        elif contenttype in self.contenttype_handlers:
+            handlers = (self.contenttype_handlers[contenttype],)
         else:
-            raise ValueError(f"{handler} is not a name of a content type handler")
-        for vw in views:
-            vw.middlewares.append(middleware)
+            raise ValueError(f"{contenttype} is not a name of a content type handler")
+        for hnd in handlers:
+            hnd.middlewares.append(middleware)
 
     def page_context(self):
         pages = Page.query.viewable.roots.ordered.all()

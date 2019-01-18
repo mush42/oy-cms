@@ -37,15 +37,18 @@ from wtforms.fields.html5 import (
 )
 from wtforms.validators import data_required, email, length, url
 
-Validator = Callable[[wtForm, WTField], None]
+
+class NotSupportedFieldTypeError(Exception):
+    """Raised during the construction of the field"""
 
 
 @dataclasses.dataclass(frozen=True)
 class FieldType:
+    _Validator = Callable[[wtForm, WTField], None]
     name: str
     display_name: str
     field: WTField
-    validators: Tuple[Validator] = ()
+    validators: Tuple[_Validator] = ()
 
 
 default_field_types = (
@@ -124,10 +127,6 @@ class Field:
         return self.name, ConcreteField, kwargs
 
 
-class NotSupportedFieldTypeError(Exception):
-    """Raised during the construction of the field"""
-
-
 class DynamicForm(object):
     """
     A Dynamic form generator:
@@ -140,7 +139,7 @@ class DynamicForm(object):
     optionally description and several other attributes.
     
     You can access the scaffolded form using the form property
-    and the generated unbound fields using the field property
+    and the generated unbound fields using the fields property
     """
 
     def __init__(self, fieldset, base_form=FlaskForm):
