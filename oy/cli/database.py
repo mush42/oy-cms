@@ -7,12 +7,7 @@ from oy.models.settings import SettingsProfile
 from . import oy_group
 
 
-@oy_group.group(name='database')
-def database_group():
-    """Create, drop, and clean database tables."""
-
-
-@database_group.command(name="create")
+@oy_group.command("createdb")
 @with_appcontext
 def create_db():
     """Create database tables."""
@@ -23,11 +18,14 @@ def create_db():
 
 
 
-@database_group.command(name="drop")
+@oy_group.command("dropdb")
 @click.option("--noinput", "-n", is_flag=True)
 @with_appcontext
 def drop_db(noinput):
     """Drop database tables"""
+    if not current_app.debug:
+        click.secho("This command is only available in debug mode.", fg="green")
+        raise click.Abort()
     click.secho("!" * 50, fg="red", blink=True)
     if not noinput:
         message = click.style(
@@ -70,7 +68,7 @@ def clean_settings():
     click.secho("~" * 50, fg="green")
 
 
-@database_group.command(name="clean")
+@oy_group.command("cleandb")
 @with_appcontext
 def clean_db():
     """Clean the database tables."""

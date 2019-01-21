@@ -4,7 +4,7 @@
       "id": 1,
       "title": "Home",
       "slug": "index",
-      "content": "Wellcome to Home",
+      "content": "__files__/home.html",
       "author_id": 1,
       "status": "published",
       "must_show_in_menu": true,

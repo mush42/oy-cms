@@ -89,7 +89,7 @@ class OyModule(Blueprint):
             "static_url_path", None
         ) or "/static/" + name.replace(".", "-")
         self.viewable_name = viewable_name
-        # A list of dicts or functions that return a list of dicts
+        # A list of dicts or functions that return list of dicts
         self.settings = []
         self.__module__ = import_name
         super(OyModule, self).__init__(
@@ -101,6 +101,16 @@ class OyModule(Blueprint):
         # Update the app.config with our defaults
         app.config.from_module_defaults(self.root_path)
         oy_module_registered.send(app, module=self)
+
+    def before_page_request(self, func):
+        self.record_once(lambda s: s.app.before_page_request(func))
+        return func
+
+    def contenttype_handler(self, contenttype, methods=("GET",), view_kwargs=None):
+        def wrapper(func_or_class):
+            self.record(lambda s: s.app.add_contenttype_handler(contenttype, func_or_class, methods, view_kwargs))
+            return func_or_class
+        return wrapper
 
     def settings_provider(self, category=None):
         """Record a function as a setting provider

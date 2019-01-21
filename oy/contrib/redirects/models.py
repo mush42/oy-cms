@@ -39,7 +39,7 @@ class Redirect(db.Model, SQLAEvent):
     to_page_id = db.Column(db.Integer, db.ForeignKey(Page.id))
     permanent = db.Column(
         db.Boolean,
-        default=True,
+        default=False,
         info=dict(
             label=lazy_gettext("Permanent Redirect"),
             description=lazy_gettext("Check this to make this a permanent redirect"),

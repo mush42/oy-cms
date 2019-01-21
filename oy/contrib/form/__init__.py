@@ -86,5 +86,5 @@ class Form(OyExtBase):
 
     def init_app(self, app):
         app.add_contenttype_handler(
-            "form", FormView, methods=("GET", "POST"), module="form"
+            "form", FormView, methods=("GET", "POST")
         )

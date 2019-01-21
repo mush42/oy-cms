@@ -11,8 +11,8 @@ from flask.cli import with_appcontext
 from oy.exceptions import OyException
 from oy.boot.sqla import db
 from oy.models.user import User
-from oy.boot.cli.database import  create_db
-from oy.boot.cli.user import createuser
+from oy.cli.database import  create_db
+from oy.cli.user import createuser
 
 
 user_not_created_msg = """
@@ -38,9 +38,9 @@ class FixtureInstaller(object):
         this will return an instance of model with the fields
         """
         for k, v in obj.items():
-            if hasattr(v, "strip") and v.startswith("_file"):
+            if hasattr(v, "strip") and v.startswith("__files__"):
                 to_read = os.path.join(
-                    self.root_path, "fixtures", "_files", v.lstrip("_file:")
+                    self.module.root_path, "fixtures", "__files__", v[10:]
                 )
                 obj[k] = open(to_read, "r").read()
             elif "date" in k:

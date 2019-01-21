@@ -9,13 +9,10 @@
     :license: MIT, see LICENSE for more details.
 """
 
-import six
 import sqlalchemy.types as types
+from sqlalchemy import literal_column, event
 from sqlalchemy.orm.interfaces import PropComparator
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy import event
-from sqlalchemy import literal_column
-from sqlalchemy_utils.types.choice import ChoiceType
 from oy.boot.sqla import db
 
 
@@ -50,8 +47,8 @@ class ProxiedDictMixin(object):
 
 
 class ReadOnlyProxiedDictMixin(ProxiedDictMixin):
-    """Like :class:`ProxiedDictMixin` but disables the assignment
-    and deletion of items
+    """Like :class:`ProxiedDictMixin` but disables the addition of
+    new keys and deletion of existing ones
     """
 
     def __setitem__(self, key, value):
@@ -143,8 +140,8 @@ def on_new_class(mapper, cls_):
 
 
 class DynamicProp(PolymorphicVerticalProperty):
-    key = db.Column(db.String(128))
+    key = db.Column(db.String(128), nullable=False)
     type = db.Column(db.String(64))
     int_value = db.Column(db.Integer, info={"type": (int, "integer")})
-    str_value = db.Column(db.Unicode(255), info={"type": (six.text_type, "string")})
+    str_value = db.Column(db.Unicode(5120), info={"type": (str, "string")})
     bool_value = db.Column(db.Boolean, info={"type": (bool, "boolean")})

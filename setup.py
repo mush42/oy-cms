@@ -22,8 +22,8 @@ setup(
     zip_safe=False,
     entry_points={
         "console_scripts": [
-            "oy=oy.boot.cli:oy_group",
-            "oyinit=oy.boot.cli.oyinit:init_oy_project"
+            "oy=oy.cli:oy_group",
+            "oyinit=oy.cli.oyinit:init_oy_project"
         ]
     },
     install_requires=[

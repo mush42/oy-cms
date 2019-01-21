@@ -31,5 +31,6 @@ def register_admin(app, admin):
             name=lazy_gettext("Rich Text Pages"),
             menu_icon_type="fa",
             menu_icon_value="fa-newspaper-o",
+            menu_order=700
         )
     )

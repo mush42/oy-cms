@@ -1,3 +1,14 @@
+# -*- coding: utf-8 -*-
+"""	
+    oy.models.settings
+    ~~~~~~~~~~
+
+    Provides the settings model.
+
+    :copyright: (c) 2018 by Musharraf Omer.
+    :license: MIT, see LICENSE for more details.
+"""
+
 from itertools import chain
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.collections import attribute_mapped_collection
@@ -7,6 +18,7 @@ from flask import current_app
 from oy.boot.sqla import db
 from oy.models.abstract import SQLAEvent, ProxiedDictMixin, DynamicProp
 from oy.dynamicform import Field
+from oy.helpers import get_owning_table
 
 
 class SettingsProfile(SQLAEvent, db.Model):
@@ -34,11 +46,13 @@ class SettingsProfile(SQLAEvent, db.Model):
         if self.settings is None:
             self.settings = Settings()
 
-    def before_flush(self, session, is_modified):
-        active = session.query(self.__class__).filter_by(is_active=True).all()
-        if active:
-            for instance in active:
-                instance.is_active = False
+    def after_flush_postexec(self, session, is_modified):
+        if self.is_active:
+            thistbl = get_owning_table(self, "is_active")
+            up = db.update(thistbl).where(
+                db.and_(thistbl.c.id != self.id, thistbl.c.is_active == True)
+            ).values(is_active=False)
+            db.session.execute(up)
 
     def __str__(self):
         return self.name

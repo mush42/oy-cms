@@ -5,6 +5,7 @@
     
     Admin module for the editable settings features
 """
+import math
 from itertools import chain
 from sqlalchemy.exc import SQLAlchemyError
 from flask import current_app, request, flash, url_for, redirect
@@ -55,18 +56,21 @@ def update_settings_from_form(data):
 
 
 def register_settings_admin(app, admin):
+    settings_category = gettext("Settings")
+    admin.category_menu_orders[settings_category] = 200
     admin.add_view(
         SettingsProfileAdmin(
             SettingsProfile,
             db.session,
             name=lazy_gettext("Settings Profiles"),
-            category=gettext("Settings"),
+            category=settings_category,
             menu_icon_type="fa",
             menu_icon_value="fa-flag",
+            menu_order=math.inf
         )
     )
     categories = set()
-    for category, settings in app.provided_settings:
+    for order, (category, settings) in enumerate(app.provided_settings):
 
         class SettingsAdmin(OyBaseView):
             settings_category = category
@@ -87,8 +91,9 @@ def register_settings_admin(app, admin):
                 name=category.args["viewable_name"],
                 menu_icon_type="fa",
                 menu_icon_value="fa-gear",
-                category=gettext("Settings"),
+                category=settings_category,
                 endpoint="admin-settings-{}".format(category),
                 url="settings/{}".format(category),
+                menu_order=order
             )
         )

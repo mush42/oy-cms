@@ -6,7 +6,7 @@ from oy.boot.sqla import db as sqla_db
 from oy.boot.security import user_datastore
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def app():
     app = oy.create_app(
         __name__,
@@ -21,7 +21,7 @@ def app():
     yield app
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def client(app):
     yield TestApp(app)
 

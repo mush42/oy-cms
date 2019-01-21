@@ -20,9 +20,6 @@ from .admin import register_admin
 class RichTextPageView(ContentView):
     """Default view for `richtext_page` content type."""
 
-    def serve(self):
-        return {}
-
 
 class RichTextPage(OyExtBase):
 
@@ -30,9 +27,9 @@ class RichTextPage(OyExtBase):
         name="oy.contrib.richtext_page",
         import_name="oy.contrib.richtext_page",
         template_folder="templates",
+        static_folder="static",
         viewable_name=lazy_gettext("Rich Text Page"),
     )
 
     def init_app(self, app):
         app.add_contenttype_handler("richtext_page", RichTextPageView)
-        app.template_filter(name="unique_string")(lambda s: s)

@@ -8,7 +8,7 @@ from oy.boot.sqla import db
 from oy.babel import gettext, lazy_gettext
 
 
-class AuthenticationViewMixin(object):
+class AuthenticationViewMixin:
     def is_accessible(self):
         if not current_user.is_active or not current_user.is_authenticated:
             return False
@@ -24,24 +24,24 @@ class AuthenticationViewMixin(object):
                 return redirect(url_for("security.login", next=request.url))
 
 
-class OyModelFormConvertor(form.AdminModelConverter):
+class OyModelFormConverter(form.AdminModelConverter):
     def _get_label(self, name, field_args):
         info = getattr(self.view.model, name).info
         if info.get("label"):
             return info["label"]
-        return super(OyModelFormConvertor, self)._get_label(name, field_args)
+        return super(OyModelFormConverter, self)._get_label(name, field_args)
 
     def _get_description(self, name, field_args):
         info = getattr(self.view.model, name).info
         if info.get("description"):
             return info["description"]
-        return super(OyModelFormConvertor, self)._get_description(name, field_args)
+        return super(OyModelFormConverter, self)._get_description(name, field_args)
 
 
 class OyModelView(AuthenticationViewMixin, ModelView):
     """Automatic authentication and some extras"""
 
-    model_form_converter = OyModelFormConvertor
+    model_form_converter = OyModelFormConverter
 
     def get_column_name(self, field):
         if self.column_labels and field in self.column_labels:

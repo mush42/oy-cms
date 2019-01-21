@@ -16,6 +16,8 @@ from oy.contrib.bs4 import BS4
 from oy.contrib.redirects import Redirects
 from oy.contrib.form_fields import OyFormFields
 from oy.contrib.demo_content import DemoContent
+from oy.contrib.media import Media
+
 
 # Create our oy app
 app = create_app(
@@ -48,3 +50,5 @@ FlaskSecurityTemplates(app)
 Redirects(app)
 
 DemoContent(app)
+
+Media(app)

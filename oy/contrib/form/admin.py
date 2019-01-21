@@ -168,5 +168,6 @@ def register_admin(app, admin):
             name=lazy_gettext("Forms"),
             menu_icon_type="fa",
             menu_icon_value="fa-wpforms",
+            menu_order=600
         )
     )

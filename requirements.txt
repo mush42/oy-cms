@@ -4,7 +4,7 @@
 #
 #    pip-compile --output-file requirements.txt setup.py
 #
-alembic==1.0.5            # via flask-migrate
+alembic==1.0.6            # via flask-migrate
 babel==2.6.0              # via flask-babelex
 blinker==1.4              # via flask-mail, flask-principal
 click==7.0                # via flask
@@ -28,18 +28,18 @@ jinja2==2.10              # via flask, flask-babelex
 mako==1.0.7               # via alembic
 markupsafe==1.1.0         # via jinja2, mako
 marshmallow-sqlalchemy==0.15.0
-marshmallow==2.17.0
+marshmallow==2.18.0
 passlib==1.7.1            # via flask-security
-pillow==5.3.0
+pillow==5.4.1
 python-dateutil==2.7.5    # via alembic
 python-editor==1.0.3      # via alembic
-pytz==2018.7              # via babel
+pytz==2018.9              # via babel
 six==1.12.0               # via flask-cors, flask-marshmallow, python-dateutil, unicode-slugify, validators, wtforms-components
 speaklater==1.3
-sqlalchemy==1.2.15        # via alembic, flask-sqlalchemy, marshmallow-sqlalchemy
+sqlalchemy==1.2.16        # via alembic, flask-sqlalchemy, marshmallow-sqlalchemy
 unicode-slugify==0.1.3
 unidecode==1.0.23         # via unicode-slugify
-validators==0.12.3        # via wtforms-components
+validators==0.12.4        # via wtforms-components
 werkzeug==0.14.1          # via flask
 wtforms-components==0.10.3
 wtforms==2.2.1            # via flask-admin, flask-wtf, wtforms-components

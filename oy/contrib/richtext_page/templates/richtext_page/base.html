@@ -1,6 +1,6 @@
 {% extends "oy/contrib/bs4/base.html" %}
 {% import 'oy/contrib/bs4/macros.html' as bs4_macros with context %}
-{% import 'pages/page_macros.html' as page_macros with context %}
+{% import 'richtext_page/page_macros.html' as page_macros with context %}
 
 {% block head_meta %}
   {{ super() }}
@@ -10,6 +10,10 @@
 {% endblock %}
 
 {% block subtitle %}{{current_page.title}}{% endblock %}
+
+{% block extra_head %}
+  <link rel="stylesheet" type="text/css" href="{{ url_for('oy.contrib.richtext_page.static', filename='css/custom.css') }}">
+{% endblock %}
 
 {% block page_header %}
   {% block navigation %}
@@ -29,6 +33,10 @@
   {% endblock %}
 {% endblock %}
 
+{% block body_wrapper %}
+<main class="container" id="pagewrapper">
+
+{% if messages %}
 <aside class="container-fluid">
   <div class="row">
 	<div class="col-md-8 p-4">
@@ -36,16 +44,15 @@
 	</div>
   </div>
 </aside>
+{% endif %}
 
 {% block page_body %}
-  <div class="container-fluid">
-    <main id="wrapper" class="wrapper">
-      {% block content %}{% endblock %}
-    </main>
-  </div>
+  {% block content %}{% endblock %}
   <hr>
 {% endblock %}
 
 {% block footer %}
-  {% include 'pages/includes/footer.html' with context %}
+  {% include 'richtext_page/includes/footer.html' with context %}
 {% endblock footer %}
+</main>
+{% endblock %}

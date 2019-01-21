@@ -12,18 +12,23 @@
   <link rel="stylesheet" type="text/css" href="{{ bs4_url_for('bs4css') }}">
   {% endblock %}
   {% block extra_css %}{% endblock %}
+  {% block extra_head %}{% endblock %}
 </head>
 <body class="{% block body_class %}bs4{% endblock %}">
 
   {% block page_header %}{% endblock %}
 
-  {% block messages %}
+  {% block body_wrapper %}
+
+    {% block messages %}
     <div class="container">
       {{ macros.messages() }}
     </div>
-  {% endblock %}
+    {% endblock %}
   
-  {% block page_body %}{% endblock %}
+      {% block page_body %}{% endblock %}
+
+  {% endblock %}
 
   {% block bs4_js %}
   <script src="{{ bs4_url_for('jquery') }}"></script>
