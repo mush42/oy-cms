@@ -12,7 +12,7 @@
 from urllib.parse import urlparse
 from sqlalchemy.orm import validates
 from oy.models import db
-from oy.models.events import SQLAEvent
+from oy.models.abstract import SQLAEvent
 from oy.babel import lazy_gettext
 from oy.models.page import Page
 
@@ -66,7 +66,7 @@ class Redirect(db.Model, SQLAEvent):
         return self.normalize_url(from_url)
 
     @property
-    def link(self):
+    def url(self):
         return self.to_url or self.to_page.url
 
     @staticmethod
@@ -95,7 +95,7 @@ class Redirect(db.Model, SQLAEvent):
         return path
 
     def __repr__(self):
-        return f"<Redirect(from_url={self.from_url}, to_url={self.link}, permanent={self.permanent})>"
+        return f"<Redirect from: {self.from_url}, to={self.url}, permanent: {self.permanent}>"
 
     def before_flush(self, session, is_modified):
         if self.to_url and any((self.to_page_id, self.to_page)):

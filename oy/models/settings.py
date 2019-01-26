@@ -49,9 +49,11 @@ class SettingsProfile(SQLAEvent, db.Model):
     def after_flush_postexec(self, session, is_modified):
         if self.is_active:
             thistbl = get_owning_table(self, "is_active")
-            up = db.update(thistbl).where(
-                db.and_(thistbl.c.id != self.id, thistbl.c.is_active == True)
-            ).values(is_active=False)
+            up = (
+                db.update(thistbl)
+                .where(db.and_(thistbl.c.id != self.id, thistbl.c.is_active == True))
+                .values(is_active=False)
+            )
             db.session.execute(up)
 
     def __str__(self):

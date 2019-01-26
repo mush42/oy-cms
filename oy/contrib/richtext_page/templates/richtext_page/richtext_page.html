@@ -1,0 +1,11 @@
+{% extends 'oy/contrib/bs4/page/base.html' %}
+{% import 'oy/contrib/bs4/page/page_macros.html' as macros %}
+
+{% block meta_desc %}{{page.meta_description}}{% endblock %}
+{% block meta_keywords %}{{page.keywords}}{% endblock %}
+
+{% block subtitle %}{{page.title}}{%endblock%}
+
+{% block content %}
+{{page.content|safe}}
+{% endblock %}

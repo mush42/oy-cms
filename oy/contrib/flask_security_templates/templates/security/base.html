@@ -1,15 +1,16 @@
 {% extends 'oy/contrib/bs4/base.html' %}
 
 {% block extra_css %}
-<link rel="stylesheet" type="text/css" href="{{ url_for('oy.contrib.flask_security_templates.static', filename='css/security-styles.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('oy.contrib.flask_security_templates.static', filename='css/styles.css') }}">
 {% endblock %}
 
-{% block body_class %}bg-dark{% endblock %}
+{% block body_class %}security-form{% endblock %}
 
 {% block page_body %}
-<main class="container">
+<main id="wrapper">
+<div class="container">
   {% block content %}{% endblock %}
+</div>
 </main>
 {% endblock %}
 
-{% block bs4_js %}{% endblock %}

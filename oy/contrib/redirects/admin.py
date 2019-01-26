@@ -29,6 +29,6 @@ def register_admin(app, admin):
             name=lazy_gettext("Redirects"),
             menu_icon_type="fa",
             menu_icon_value="fa-refresh",
-            menu_order=300
+            menu_order=300,
         )
     )

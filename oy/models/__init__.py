@@ -14,6 +14,7 @@
 """
 
 from oy.boot.sqla import db
-from .events import *
-from .user import *
-from .settings import *
+from . import _events
+from .user import User, Role
+from .settings import SettingsProfile, SettingCategory, Settings
+from .page import Page, PageQuery

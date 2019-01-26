@@ -25,7 +25,6 @@ class UserRelated(SQLAEvent):
         return db.Column(
             db.Integer,
             db.ForeignKey("user.id"),
-            nullable=False,
             info=dict(label=lazy_gettext("Author")),
         )
 
@@ -56,6 +55,7 @@ class UserRelated(SQLAEvent):
 
     def before_flush(self, session, is_modified):
         if _request_ctx_stack.top is not None:
-            self.author_id = current_user.id
-            if is_modified:
+            if not is_modified:
+                self.author_id = current_user.id
+            else:
                 self.editor_id = current_user.id

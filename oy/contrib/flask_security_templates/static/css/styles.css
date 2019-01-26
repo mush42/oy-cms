@@ -1,0 +1,19 @@
+.security-form {
+	background-color: #ccc;
+}
+
+#wrapper {
+	margin: 10% auto;
+}
+
+.card-login {
+  max-width: 75%;
+}
+
+.card-body {
+	padding: 5% 20%;
+}
+
+.card-register {
+	max-width: 75%;
+}

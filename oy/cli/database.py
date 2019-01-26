@@ -17,7 +17,6 @@ def create_db():
     click.secho("Database tables created.", fg="green", bold=True)
 
 
-
 @oy_group.command("dropdb")
 @click.option("--noinput", "-n", is_flag=True)
 @with_appcontext
@@ -55,7 +54,7 @@ def clean_settings():
     current_app.provided_settings_dict = {}
     current_app._collect_provided_settings()
     app_settings = chain.from_iterable(current_app.provided_settings_dict.values())
-    valid_settings = {s.name for s in app_settings}
+    valid_settings = {s["name"] for s in app_settings}
     to_remove = set(active_settings) - valid_settings
     if not to_remove:
         click.secho("------- Great: No unused settings ----------", fg="green")

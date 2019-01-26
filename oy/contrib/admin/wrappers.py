@@ -58,6 +58,5 @@ class OyIndexView(AuthenticationViewMixin, AdminIndexView):
         return super(OyIndexView, self).index()
 
 
-class OyBaseView(BaseView):
-    def create_blueprint(self, admin):
-        return super(OyBaseView, self).create_blueprint(admin)
+class OyBaseView(BaseView, AuthenticationViewMixin):
+    pass

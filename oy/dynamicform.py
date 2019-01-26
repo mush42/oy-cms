@@ -38,17 +38,19 @@ from wtforms.fields.html5 import (
 from wtforms.validators import data_required, email, length, url
 
 
+TValidator = Callable[[wtForm, WTField], None]
+
+
 class NotSupportedFieldTypeError(Exception):
     """Raised during the construction of the field"""
 
 
 @dataclasses.dataclass(frozen=True)
 class FieldType:
-    _Validator = Callable[[wtForm, WTField], None]
     name: str
     display_name: str
     field: WTField
-    validators: Tuple[_Validator] = ()
+    validators: Tuple[TValidator] = ()
 
 
 default_field_types = (

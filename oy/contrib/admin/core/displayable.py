@@ -1,4 +1,3 @@
-from six import with_metaclass
 from flask import flash, abort
 from flask_admin import expose
 from flask_admin.model import typefmt
@@ -27,13 +26,10 @@ DEFAULT_FORMATTERS.update({})
 DISPLAYABEL_DEFAULTS = dict(
     can_view_details=False,
     page_size=10,
-    column_list=("title", "status", "updated"),
     column_type_formatters=DEFAULT_FORMATTERS,
     column_formatters={"status": status_formatter},
-    column_default_sort=("created", True),
-    column_editable_list=("title",),
-    form_columns=(
-        "title",
+    column_sortable_list=["created", "updated"],
+    form_columns=[
         "status",
         "publish_date",
         "expire_date",
@@ -41,17 +37,15 @@ DISPLAYABEL_DEFAULTS = dict(
         "meta_description",
         "keywords",
         "should_auto_generate",
-    ),
-    form_excluded_columns=(
-        "_sort_order",
-        "sort_order",
+    ],
+    form_excluded_columns=[
         "site",
         "created",
         "updated",
         "versions",
         "author",
         "last_edited_by",
-    ),
+    ],
     form_extra_fields={
         "status": SelectField(
             label=lazy_gettext("Status"), choices=Displayable.STATUS_CHOICES
@@ -69,34 +63,27 @@ default_row_actions = (
 )
 
 
-class DisplayableAdminType(AdminViewMeta):
-    def __new__(cls, name, bases, d):
-        if "DisplayableAdmin" not in [c.__name__ for c in bases]:
-            return type.__new__(cls, name, bases, d)
+class DisplayableAdmin(OyModelView):
+    """Base ModelAdmin for Displayable."""
+
+    def __init_subclass__(cls):
         for key, value in DISPLAYABEL_DEFAULTS.items():
-            if key not in d:
-                d[key] = value
-        row_actions = list(default_row_actions)
-        crowactions = d.get("column_extra_row_actions", [])
-        if "get_preview_url" in d:
-            crowactions.append(
-                LinkRowAction(
-                    icon_class="fa fa-eye",
-                    url=lambda v, i, r: d["get_preview_url"](r),
-                    title=lazy_gettext("Preview in site"),
+            if getattr(cls, key, None) is None:
+                setattr(cls, key, value)
+        if not getattr(cls, "column_extra_row_actions", None):
+            row_actions = list(default_row_actions)
+            crowactions = getattr(cls, "column_extra_row_actions", None) or []
+            if hasattr(cls, "get_preview_url"):
+                crowactions.append(
+                    LinkRowAction(
+                        icon_class="fa fa-eye",
+                        url=lambda v, i, r: cls.get_preview_url(r),
+                        title=lazy_gettext("Preview in site"),
+                    )
                 )
-            )
-        crowactions.extend(row_actions)
-        d["column_extra_row_actions"] = crowactions
-        return type.__new__(cls, name, bases, d)
-
-
-class DisplayableAdmin(with_metaclass(DisplayableAdminType, OyModelView)):
-    def get_column_name(self, field):
-        try:
-            return self.model.__mapper__.columns[field].info["label"]
-        except:
-            return super(DisplayableAdmin, self).get_column_name(field)
+            crowactions.extend(row_actions)
+            setattr(cls, "column_extra_row_actions", crowactions)
+        return cls
 
     @expose("/<int:pk>/versions/")
     def versioning_index(self, pk):

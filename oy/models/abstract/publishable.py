@@ -3,7 +3,7 @@
     oy.models.abstract.publishable
     ~~~~~~~~~~
 
-    Provides a mixin classe for publishing content 
+    Provides a mixin classe for publishable content 
 
     :copyright: (c) 2018 by Musharraf Omer.
     :license: MIT, see LICENSE for more details.
@@ -12,6 +12,7 @@
 from datetime import datetime
 from sqlalchemy.ext.hybrid import hybrid_property
 from oy.boot.sqla import db
+from oy.babel import lazy_gettext
 from .time_stampped import TimeStampped
 
 
@@ -19,9 +20,8 @@ class Publishable(TimeStampped):
     """Add fields to track the publish status of the content """
 
     STATUS_CHOICES = [
-        ("published", "Published"),
-        ("draft", "Draft"),
-        ("expired", "Expired"),
+        ("published", lazy_gettext("Published")),
+        ("draft", lazy_gettext("Draft"))
     ]
     status = db.Column(
         db.Enum(*[value for value, label in STATUS_CHOICES], name="status"),
@@ -46,14 +46,6 @@ class Publishable(TimeStampped):
         info=dict(
             label="Expiration Date",
             description="The content will not be publish After this date.",
-        ),
-    )
-    is_live = db.Column(
-        db.Boolean,
-        default=True,
-        info=dict(
-            label="Go Live",
-            description="If the page is live, the visitors can view this page, otherwise they will get a page not found error.",
         ),
     )
 

@@ -62,6 +62,6 @@ def register_admin(app, admin):
             name=lazy_gettext("Profiles"),
             menu_icon_type="fa",
             menu_icon_value="fa-user",
-            menu_order=100
+            menu_order=100,
         )
     )

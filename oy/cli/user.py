@@ -54,7 +54,7 @@ def _prompt_for_user_details(user_name=None, email=None):
 def createuser(noinput, superuser):
     """Create a new super-user account"""
     from oy.boot.security import user_datastore
-    
+
     usertype = "super" if superuser else ""
     click.echo(f"Creating a new {usertype} user account...")
     if not noinput:

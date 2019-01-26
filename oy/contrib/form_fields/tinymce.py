@@ -25,16 +25,8 @@ class TinymceTextAreaWidget(TextArea):
 class TinymceTextAreaField(TextAreaField):
     widget = TinymceTextAreaWidget()
 
-    class Meta:
-        @staticmethod
-        def extra_js(field):
-            return [
-                url_for(
-                    "oy.contrib.form_fields.static",
-                    filename="tinymce/tinymce.min.js",
-                ),
-                url_for(
-                    "oy.contrib.form_fields.static",
-                    filename="js/tinymce-setup.js",
-                ),
-            ]
+    def get_field_js(self):
+        return [
+            url_for("oy.contrib.form_fields.static", filename="tinymce/tinymce.min.js"),
+            url_for("oy.contrib.form_fields.static", filename="js/tinymce-setup.js"),
+        ]

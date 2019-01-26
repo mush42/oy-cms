@@ -19,24 +19,17 @@ from .models import Image, Document
 
 
 class GenericMediaAdmin(BaseView, AuthenticationViewMixin):
-
     @expose("/")
     def index(self):
         return self.render("oy/contrib/media/admin/index.html")
 
     def get_form(self, obj=None):
-        return DynamicForm(fieldset=(
-            {
-                "name": "title",
-                "label": "Title",
-                "type": "text"
-            },
-            {
-                "name": "file",
-                "label": "File",
-                "type": "file"
-            },
-        )).form
+        return DynamicForm(
+            fieldset=(
+                {"name": "title", "label": "Title", "type": "text"},
+                {"name": "file", "label": "File", "type": "file"},
+            )
+        ).form
 
 
 def register_admin(app, admin):
@@ -47,7 +40,7 @@ def register_admin(app, admin):
             url="media/images/",
             menu_icon_type="fa",
             menu_icon_value="fa-photo",
-            menu_order=500
+            menu_order=500,
         )
     )
     admin.add_view(
@@ -57,6 +50,6 @@ def register_admin(app, admin):
             url="media/documents/",
             menu_icon_type="fa",
             menu_icon_value="fa-file",
-            menu_order=400
+            menu_order=400,
         )
     )

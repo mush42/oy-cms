@@ -21,10 +21,7 @@ from oy.contrib.media import Media
 
 # Create our oy app
 app = create_app(
-    "dev_app",
-    "config.py",
-    template_folder="templates",
-    static_folder="static"
+    "dev_app", "config.py", template_folder="templates", static_folder="static"
 )
 
 # Register the admin plugin

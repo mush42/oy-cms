@@ -1,10 +1,10 @@
 from functools import partial
 from werkzeug import import_string
-from flask import g, request, url_for
+from flask import request, url_for
 from flask_admin import Admin, helpers as admin_helpers
 from oy.babel import lazy_gettext, gettext, ngettext
-from .wrappers import OyIndexView
-from .core import register_settings_admin
+from .wrappers import AuthenticationViewMixin, OyModelView, OyBaseView, OyIndexView
+from .core import DisplayableAdmin, PageAdmin, register_settings_admin
 from .resource_module import admin_resource_module
 
 
@@ -34,6 +34,7 @@ class OyAdmin(Admin):
         index_view = kwargs.pop(
             "index_view",
             OyIndexView(
+                name=lazy_gettext("Dashboard Home"),
                 menu_icon_type="fa",
                 menu_icon_value="fa-home",
                 # template="oy_admin/index.html",
@@ -66,7 +67,6 @@ class OyAdmin(Admin):
         self.app.context_processor(
             lambda: {
                 "admin_plugin_static": self.admin_plugin_static,
-                "add_field_static": self.add_form_field_static,
             }
         )
         self.app.config["SECURITY_POST_LOGIN_VIEW"] = self.url
@@ -78,15 +78,6 @@ class OyAdmin(Admin):
             "oy.contrib.admin.resource_module.static",
             filename="oy-admin/%s" % (filename),
         )
-
-    def add_form_field_static(self, field):
-        if getattr(g, "form_field_static", None) is None:
-            g.form_field_static = {"css": [], "js": []}
-        for filetype in ("css", "js"):
-            files = getattr(field.Meta, f"extra_{filetype}", [])
-            if callable(files):
-                files = files(field)
-            g.form_field_static[filetype].extend(files)
 
     def register_module_admin(self):
         for module in self.app.modules.values():

@@ -25,16 +25,8 @@ class CkeditorTextAreaWidget(TextArea):
 class CkeditorTextAreaField(TextAreaField):
     widget = CkeditorTextAreaWidget()
 
-    class Meta:
-        @staticmethod
-        def extra_js(field):
-            return [
-                url_for(
-                    "oy.contrib.form_fields.static",
-                    filename="ckeditor/ckeditor.js",
-                ),
-                url_for(
-                    "oy.contrib.form_fields.static",
-                    filename="js/ckeditor-setup.js",
-                ),
-            ]
+    def get_field_js(self):
+        return [
+            url_for("oy.contrib.form_fields.static", filename="ckeditor/ckeditor.js"),
+            url_for("oy.contrib.form_fields.static", filename="js/ckeditor-setup.js"),
+        ]

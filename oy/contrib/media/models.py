@@ -24,7 +24,8 @@ from oy.babel import lazy_gettext
 
 class UploadableMediaMixin(Titled, Publishable, TimeStampped, UserRelated):
 
-    __depot_args__ = {"upload_storage": "media_storage",}
+    container = db.Column(db.String(255))
+    __depot_args__ = {"upload_storage": "media_storage"}
 
     @declared_attr
     def file(cls):
@@ -35,15 +36,15 @@ class UploadableMediaMixin(Titled, Publishable, TimeStampped, UserRelated):
 class Image(db.Model, UploadableMediaMixin):
     id = db.Column(db.Integer, primary_key=True)
     image = synonym("file")
+    album = synonym("container")
     __depot_args__ = {
         "upload_storage": "image_storage",
-        "filters": (WithThumbnailFilter,)
+        "filters": (WithThumbnailFilter,),
     }
 
 
 class Document(db.Model, UploadableMediaMixin):
     id = db.Column(db.Integer, primary_key=True)
     document = synonym("file")
-    __depot_args__ = {
-        "upload_storage": "document_storage",
-    }
+    folder = synonym("container")
+    __depot_args__ = {"upload_storage": "document_storage"}

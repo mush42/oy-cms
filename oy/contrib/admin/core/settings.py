@@ -66,7 +66,7 @@ def register_settings_admin(app, admin):
             category=settings_category,
             menu_icon_type="fa",
             menu_icon_value="fa-flag",
-            menu_order=math.inf
+            menu_order=math.inf,
         )
     )
     categories = set()
@@ -94,6 +94,6 @@ def register_settings_admin(app, admin):
                 category=settings_category,
                 endpoint="admin-settings-{}".format(category),
                 url="settings/{}".format(category),
-                menu_order=order
+                menu_order=order,
             )
         )

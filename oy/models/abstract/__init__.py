@@ -9,11 +9,13 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from .slugged import Slugged, Titled
+from ._sqlaevent import SQLAEvent
+from .polymorphic_prop import ProxiedDictMixin, DynamicProp
+from .slugged import Titled, Slugged, ScopedUniquelySlugged, MPSlugged
 from .metadata import Metadata
 from .time_stampped import TimeStampped
 from .publishable import Publishable
+from .misc import Orderable, SelfRelated
+from .user_related import UserRelated
 from .displayable import Displayable
-from .base_page import AbstractPage
-from .polymorphic_prop import ProxiedDictMixin, DynamicProp
-from ._sqlaevent import SQLAEvent
+from .abstract_page import AbstractPage

@@ -82,7 +82,7 @@ class Slugged(SQLAEvent):
 
     @staticmethod
     def generate_unique_slug(slug):
-        return increment_string(slug, sep="-") 
+        return increment_string(slug, sep="-")
 
 
 class ScopedUniquelySlugged(Slugged):

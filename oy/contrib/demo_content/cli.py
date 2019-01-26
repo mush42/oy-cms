@@ -11,7 +11,7 @@ from flask.cli import with_appcontext
 from oy.exceptions import OyException
 from oy.boot.sqla import db
 from oy.models.user import User
-from oy.cli.database import  create_db
+from oy.cli.database import create_db
 from oy.cli.user import createuser
 
 
@@ -110,5 +110,3 @@ def create_all(ctx):
     ctx.invoke(createuser, noinput=True, superuser=True)
     ctx.invoke(install_fixtures)
     click.secho("~" * 50, fg="green", bold=True)
-
-

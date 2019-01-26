@@ -15,7 +15,22 @@ from oy.boot.sqla import db
 from oy.models.abstract import AbstractPage
 
 
-class PageQuery(BaseQuery):
+class TreeExplorerMixin:
+    """Provides methods to explore the page tree."""
+
+    @classmethod
+    def get_root(cls, page): ...
+    @classmethod
+    def get_ancestors(cls, page): ...
+    @classmethod
+    def get_descendants(cls, page): ...
+    @classmethod
+    def get_depth(cls, Page): ...
+    @classmethod
+    def is_descendant_of(cls, page): ...
+
+
+class PageQuery(BaseQuery, TreeExplorerMixin):
     """Add page specific filters to the query"""
 
     def __init__(self, *args, **kwargs):
@@ -42,13 +57,14 @@ class PageQuery(BaseQuery):
         """Query only published pages."""
         sel = db.and_(
             Page.status == "published",
+            Page.publish_date != None,
             db.or_(Page.expire_date == None, Page.expire_date > datetime.utcnow()),
         )
         return self.filter(sel)
 
     @property
     def viewable(self):
-        return self.published.filter(Page.is_live == True)
+        return self.published
 
 
 class Page(AbstractPage):

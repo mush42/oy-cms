@@ -12,7 +12,7 @@
 from flask import current_app
 from flask_wtf import CSRFProtect
 from oy.boot.sqla import db, migrate
-from oy.boot.babel import babel, init_babel
+from oy.boot.babel import babel
 from oy.boot.security import initialize_security
 from oy.boot.shell import make_shell_context
 from oy.boot import boot_config
@@ -28,7 +28,7 @@ def initialize_builtin_extensions():
     CSRFProtect(app)
     db.init_app(app)
     migrate.init_app(app, db=db)
-    init_babel(app)
+    babel.init_app(app)
     initialize_security(app)
 
 

@@ -1,5 +1,13 @@
 # -*- coding: utf-8 -*-
+"""
+    oy.babel
+    ~~~~~~~~~~~~~~~~~~
 
-# TODO: Remove this module and import directly from the extension
+    A proxy module to save some typing when
+    importing babel translation functions. 
 
-from oy.boot.babel import gettext, lazy_gettext, ngettext
+    :copyright: (c) 2018 by Musharraf Omer.
+    :license: MIT, see LICENSE for more details.
+"""
+
+from oy.boot.babel import gettext, ngettext, lazy_gettext

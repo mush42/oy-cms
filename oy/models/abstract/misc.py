@@ -23,7 +23,7 @@ class SelfRelated(object):
 
     __allowed_child_types__ = ()
     __allowed_parent_types__ = ()
-    __children_ordering_column__ = 'id'
+    __children_ordering_column__ = "id"
 
     @declared_attr
     def parent_id(cls):
@@ -73,7 +73,9 @@ class Orderable(SQLAEvent):
     @sort_order.setter
     def sort_order(self, value):
         if not self.id:
-            raise RuntimeError("Cannot change order before flushing instance to database")
+            raise RuntimeError(
+                "Cannot change order before flushing instance to database"
+            )
         ordtbl = get_owning_table(self, "_sort_order")
         whr = [ordtbl.c.id != self.id]
         if "parent" in ordtbl.columns:
@@ -84,8 +86,11 @@ class Orderable(SQLAEvent):
         whrcount = list(whr) + [ordtbl.c._sort_order == value]
         if self.query.filter(db.and_(*whrcount)).count():
             whr.append(ordtbl.c._sort_order >= value)
-            up = db.update(ordtbl)\
-                .where(db.and_(*whr)).values(_sort_order=ordtbl.c._sort_order + 1)
+            up = (
+                db.update(ordtbl)
+                .where(db.and_(*whr))
+                .values(_sort_order=ordtbl.c._sort_order + 1)
+            )
             db.session.execute(up)
         self._sort_order = value
 

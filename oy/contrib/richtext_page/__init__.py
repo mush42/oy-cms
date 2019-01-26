@@ -3,8 +3,7 @@
     oy.contrib.page
     ~~~~~~~~~~~~~~~~~~~~~~~~
 
-    Provides default page templates
-    as well as fixtures.
+    Provides a simple page that have a rich-text  field.
 
     :copyright: (c) 2018 by Musharraf Omer.
     :license: MIT, see LICENSE for more details.
@@ -27,7 +26,6 @@ class RichTextPage(OyExtBase):
         name="oy.contrib.richtext_page",
         import_name="oy.contrib.richtext_page",
         template_folder="templates",
-        static_folder="static",
         viewable_name=lazy_gettext("Rich Text Page"),
     )
 

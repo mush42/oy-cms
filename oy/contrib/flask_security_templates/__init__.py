@@ -25,7 +25,7 @@ class FlaskSecurityTemplates(OyExtBase):
 
     @locked_cached_property
     def jinja_loader(self):
-        if "oy.contrib.bs4" not in current_app.modules:
+        if "oy.contrib.bootstrap4" not in current_app.modules:
             raise TemplateNotFound(
                 "oy.contrib.bs4 .BS4 (bootstrap4) module is needed for rendering this template, and it was not registered with the application"
             )

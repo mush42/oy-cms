@@ -14,6 +14,7 @@ import sys
 import os
 import json
 from typing import Iterable
+from functools import update_wrapper
 from itertools import chain
 from importlib import import_module
 from warnings import warn
@@ -85,16 +86,13 @@ class OyModule(Blueprint):
 
     def __init__(self, name, import_name, viewable_name=None, **kwargs):
         # flask wouldn't serve static files if static_url_path is not set
-        auto_static_url_path = kwargs.get(
-            "static_url_path", None
-        ) or "/static/" + name.replace(".", "-")
+        if "static_folder" in kwargs and "static_url_path" not in kwargs:
+            kwargs["static_url_path"] = "/static/" + name.replace(".", "-")
         self.viewable_name = viewable_name
         # A list of dicts or functions that return list of dicts
         self.settings = []
         self.__module__ = import_name
-        super(OyModule, self).__init__(
-            name, import_name, static_url_path=auto_static_url_path, **kwargs
-        )
+        super(OyModule, self).__init__(name, import_name, **kwargs)
 
     def register(self, app, *args, **kwargs):
         super(OyModule, self).register(app, *args, **kwargs)
@@ -108,8 +106,11 @@ class OyModule(Blueprint):
 
     def contenttype_handler(self, contenttype, methods=("GET",), view_kwargs=None):
         def wrapper(func_or_class):
-            self.record(lambda s: s.app.add_contenttype_handler(contenttype, func_or_class, methods, view_kwargs))
+            self.record(
+                lambda s: s.app.contenttype_handler(contenttype, methods, view_kwargs)(
+                    func_or_class))
             return func_or_class
+
         return wrapper
 
     def settings_provider(self, category=None):

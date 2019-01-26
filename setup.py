@@ -23,7 +23,7 @@ setup(
     entry_points={
         "console_scripts": [
             "oy=oy.cli:oy_group",
-            "oyinit=oy.cli.oyinit:init_oy_project"
+            "oyinit=oy.cli.oyinit:init_oy_project",
         ]
     },
     install_requires=[

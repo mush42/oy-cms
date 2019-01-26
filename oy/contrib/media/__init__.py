@@ -28,7 +28,9 @@ class Media(OyExtBase):
     def init_app(self, app):
         storage_conf = app.config.get("DEPOT_STORAGES", None)
         if storage_conf is None:
-            raise LookupError("Couldn't find depot storage configuration in app config.")
+            raise LookupError(
+                "Couldn't find depot storage configuration in app config."
+            )
         elif "media_storage" not in storage_conf:
             raise LookupError("The media storage is not configured.")
         for name, args in storage_conf.items():

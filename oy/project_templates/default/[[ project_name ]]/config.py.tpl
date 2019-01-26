@@ -28,4 +28,3 @@ DEBUG = getenvar('[[ PROJECT_NAME ]]_DEBUG', False)
 SECRET_KEY = getenvar('[[ PROJECT_NAME ]]_SECRET_KEY')
 SQLALCHEMY_DATABASE_URI = getenvar('[[ PROJECT_NAME ]]_DB_URI', 'sqlite:///:memory:')
 SECURITY_PASSWORD_SALT = getenvar('[[ PROJECT_NAME ]]_PASSWORD_SALT')
-HOME_PAGE_TEMPLATE = "[[ project_name ]]/home.html"

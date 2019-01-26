@@ -25,9 +25,10 @@ class Redirects(OyExtBase):
             0, self.redirects_middleware
         )
 
-    def redirects_middleware(self):
+    @staticmethod
+    def redirects_middleware():
         from_url = RedirectModel.normalize_url(request.url)
         redirect = RedirectModel.query.filter_by(from_url=from_url).one_or_none()
         if redirect is not None:
             status = 301 if redirect.permanent else 307
-            return flask_redirect(redirect.link, code=status)
+            return flask_redirect(redirect.url, code=status)

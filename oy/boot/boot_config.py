@@ -13,11 +13,6 @@ SECURITY_CONFIRMABLE = False
 SECURITY_RECOVERABLE = True
 SECURITY_RESET_URL = "/reset-password/"
 
-# Abstract models
-
 # Flask Babel support
 DEFAULT_LOCALE = "en"
 SUPPORTED_LOCALES = OrderedDict((("en", "English"),))
-
-# Oy specific configurations
-STARLIT_LOAD_SETTINGS_JSON = False
