@@ -9,10 +9,8 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy_utils import observes
 from oy.boot.sqla import db
 from oy.helpers import get_owning_table
 from ._sqlaevent import SQLAEvent
@@ -53,11 +51,7 @@ class SelfRelated(object):
 
     @hybrid_property
     def is_root(self):
-        return self.parent is None
-
-    @is_root.expression
-    def is_root(cls):
-        return cls.parent_id == None
+        return self.parent_id == None
 
 
 class Orderable(SQLAEvent):

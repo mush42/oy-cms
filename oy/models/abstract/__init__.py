@@ -19,3 +19,4 @@ from .misc import Orderable, SelfRelated
 from .user_related import UserRelated
 from .displayable import Displayable
 from .abstract_page import AbstractPage
+from .tagable import Tagable

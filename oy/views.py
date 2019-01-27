@@ -133,7 +133,7 @@ class PageHandler:
 
 
 class ContentViewProcessorMixin:
-    """A mixin that knows how to serve content."""
+    """A mixin that make flask apps cabable of serving oy content."""
 
     def __init__(self):
         self.contenttype_handlers = {}
