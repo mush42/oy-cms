@@ -8,7 +8,7 @@ from oy.boot.security import user_datastore
 
 @pytest.fixture(scope="function")
 def app():
-    app = oy.create_app(
+    app = oy.prepare_app(
         __name__,
         config=dict(
             SECRET_KEY="testing-secret-key",

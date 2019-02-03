@@ -16,7 +16,7 @@ from oy.helpers import get_owning_table
 from ._sqlaevent import SQLAEvent
 
 
-class SelfRelated(object):
+class SelfRelated:
     """A class that have one-to-many relationship with itself."""
 
     __allowed_child_types__ = ()
@@ -54,7 +54,7 @@ class SelfRelated(object):
         return self.parent_id == None
 
 
-class Orderable(SQLAEvent):
+class Ordered(SQLAEvent):
     """Provide an ordering field."""
 
     _sort_order = db.Column(db.Integer)
@@ -94,4 +94,4 @@ class Orderable(SQLAEvent):
 
     def after_flush_postexec(self, session, is_modified):
         if self._sort_order is None:
-            self._sort_order = self.id
+            self._sort_order = db.inspect(self).mapper.primary_key[0]

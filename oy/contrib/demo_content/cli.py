@@ -67,12 +67,16 @@ class FixtureInstaller(object):
             model = import_string(model_import_path)
             for obj in objs:
                 instance = self.deserialize_instance(model, **obj)
+                errors = []
                 try:
                     db.session.add(instance)
                     db.session.commit()
-                except IntegrityError:
+                except IntegrityError as err:
                     db.session.rollback()
+                    errors.append(err)
                     continue
+                for e in errors:
+                    click.secho(repr(e), fg="red")
 
 
 @click.command("install-fixtures")

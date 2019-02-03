@@ -14,9 +14,10 @@ from .polymorphic_prop import ProxiedDictMixin, DynamicProp
 from .slugged import Titled, Slugged, ScopedUniquelySlugged, MPSlugged
 from .metadata import Metadata
 from .time_stampped import TimeStampped
-from .publishable import Publishable
-from .misc import Orderable, SelfRelated
+from .published import Published
+from .misc import Ordered, SelfRelated
 from .user_related import UserRelated
 from .displayable import Displayable
 from .abstract_page import AbstractPage
-from .tagable import Tagable
+from .classifiable import Tagged, Categorized
+from .has_comments import HasComments

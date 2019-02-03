@@ -26,7 +26,7 @@ class Titled(SQLAEvent):
         db.Unicode(512),
         nullable=False,
         info=dict(
-            label="Title", description="The title to display in the browser title bar."
+            label="Title", description="The title to display for the end user."
         ),
     )
 
@@ -45,7 +45,8 @@ class Slugged(SQLAEvent):
     @declared_attr
     def slug(cls):
         return db.Column(
-            db.Unicode(512),
+            db.Unicode(255),
+            nullable=False,
             info=dict(
                 label="Slug",
                 description="A Slug is that portion of the URL used to identify this content.",
@@ -63,7 +64,7 @@ class Slugged(SQLAEvent):
                 return slug
             slug = self.generate_unique_slug(slug)
 
-    def before_flush(self, session, is_modified):
+    def before_insert(self, mapper, connection):
         if self.slug is None:
             self.slug = self.slugify(getattr(self, self.__slugcolumn__))
 
@@ -101,28 +102,23 @@ class ScopedUniquelySlugged(Slugged):
 
 
 class MPSlugged(SQLAEvent):
-    """A Mixin that adds a slug path field."""
+    """A Mixin that adds a slug path field.
+    The slug_path acts like a materialized path.
+    """
 
-    slug_path = db.Column(db.String(5120), unique=True, index=True)
+    slug_path = db.Column(db.String(5120), unique=True, nullable=False, index=True)
 
-    def before_flush(self, session, is_modified):
-        mods = ("slug", "parent", "parent_id")
-        unmod_cols = db.inspect(self).unmodified
-        if is_modified and any(m not in unmod_cols for m in mods):
-            self.slug_path = None
-        elif not is_modified:
-            self.slug_path = None
-
-    def create_or_update_slug_path(self, parent):
-        if parent is not None:
-            self.slug_path = f"{parent.slug_path}/{self.slug}"
-        else:
+    def before_insert(self, mapper, connection):
+        if self.parent is None:
             self.slug_path = self.slug
-        children = self.query.filter_by(parent_id=self.id).all()
-        if children:
-            for child in children:
-                child.create_or_update_slug_path(parent=self)
+        else:
+            self.slug_path = f"{self.parent.slug_path}/{self.slug}"
 
-    def after_flush_postexec(self, session, is_modified):
-        if self.slug_path is None:
-            self.create_or_update_slug_path(parent=self.parent)
+    def before_update(self, mapper, connection):
+        state = db.inspect(self)
+        if not all(state.attrs[attr].history.unchanged for attr in ("slug", "parent",)):
+            self.before_insert(None, None)
+            with db.session.no_autoflush:
+                for child in self.children:
+                    child.slug_path = f"{self.slug_path}/{child.slug}"
+                    child.before_update(mapper, connection)

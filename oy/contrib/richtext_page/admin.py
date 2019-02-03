@@ -11,8 +11,8 @@
 
 from oy.models import db
 from oy.babel import lazy_gettext
-from oy.contrib.admin.core.page import PageAdmin
-from oy.contrib.form_fields import TinymceTextAreaField
+from oy.contrib.admin import PageAdmin
+from oy.contrib.admin.fields import TinymceTextAreaField
 from .models import RichTextPage
 
 

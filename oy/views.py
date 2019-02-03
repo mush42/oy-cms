@@ -199,7 +199,9 @@ class ContentViewProcessorMixin:
         """
 
         def wrapper(func_or_class):
-            self.add_contenttype_handler(contenttype, func_or_class, methods, view_kwargs)
+            self.add_contenttype_handler(
+                contenttype, func_or_class, methods, view_kwargs
+            )
             return func_or_class
 
         return wrapper
@@ -222,5 +224,5 @@ class ContentViewProcessorMixin:
             handler.add_middleware(middleware)
 
     def page_context(self):
-        pages = Page.query.viewable.roots.ordered.all()
+        pages = Page.query.menu_pages.all()
         return {"pages": pages, "current_page": current_page, "page": current_page}

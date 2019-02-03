@@ -13,8 +13,8 @@ class OyModelMixin:
         if obj:
             return obj
         return cls(**kwargs)
-        
 
-db = SQLAlchemy(model_class=(OyModelMixin, Model,))
+
+db = SQLAlchemy(model_class=(OyModelMixin, Model))
 migrate = Migrate()
 make_versioned(plugins=[FlaskPlugin()])

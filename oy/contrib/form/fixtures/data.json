@@ -7,7 +7,7 @@
       "author_id": 1,
       "status": "published",
       "publish_date": "2012-01-12 00:00:00",
-      "must_show_in_menu": true,
+      "show_in_menu": true,
       "submit_text": "Send Message",
       "submit_message": "<h1>Your message has been received. Thanks a bundle!</h1>"
     }

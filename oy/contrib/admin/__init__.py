@@ -1,11 +1,15 @@
 from functools import partial
+from wtforms.form import BaseForm
+from jinja2 import Markup, contextfunction
 from werkzeug import import_string
-from flask import request, url_for
-from flask_admin import Admin, helpers as admin_helpers
+from flask import request, url_for, abort
+from flask_admin import Admin, expose, helpers as admin_helpers
+from oy.wrappers import OyModule
 from oy.babel import lazy_gettext, gettext, ngettext
 from .wrappers import AuthenticationViewMixin, OyModelView, OyBaseView, OyIndexView
-from .core import DisplayableAdmin, PageAdmin, register_settings_admin
-from .resource_module import admin_resource_module
+from .displayable_admin import DisplayableAdmin
+from .page_admin import PageAdmin
+from .settings_admin import register_settings_admin
 
 
 def security_ctp_with_admin(admin):
@@ -24,11 +28,27 @@ def security_ctp_with_admin(admin):
     return security_context_processor
 
 
+class OyAdminResourceModule(OyModule, AuthenticationViewMixin):
+    def __init__(self):
+        super().__init__(
+            "oy-admin-resource-module",
+            __name__,
+            template_folder="templates",
+            static_folder="static",
+            static_url_path="/admin/static/assets",
+        )
+        self.before_request(self.permit)
+
+    def permit(self):
+        if not self.is_accessible():
+            abort(404)
+
+
 class OyAdmin(Admin):
     """Provides integration with Flask-Admin"""
 
-    # Resource module that provides templates and static files
-    resource_module = admin_resource_module
+    # Resource module that provides custom admin templates and static files
+    resource_module = OyAdminResourceModule()
 
     def __init__(self, app=None, auto_register_modules=False, **kwargs):
         index_view = kwargs.pop(
@@ -58,26 +78,55 @@ class OyAdmin(Admin):
 
     def _init_extension(self):
         super(OyAdmin, self)._init_extension()
-        self.app.register_module(self.resource_module)
-        # TODO: Fix this hack
-        regsettings = partial(register_settings_admin, self.app, self)
-        self.app.before_first_request(regsettings)
-        self.app.add_template_filter(lambda l: set(l), name="remove_double")
-        self.app.context_processor(security_ctp_with_admin(self))
-        self.app.context_processor(
-            lambda: {
-                "admin_plugin_static": self.admin_plugin_static,
-            }
-        )
         self.app.config["SECURITY_POST_LOGIN_VIEW"] = self.url
+        if "oy-admin-resource-module" not in self.app.modules:
+            self.app.register_module(self.resource_module)
+        self.app.before_first_request(self.before_first_request_tasks)
+        [
+            self.app.context_processor(func)
+            for func in (
+                security_ctp_with_admin(self),
+                lambda: dict(
+                    admin_plugin_static=self.admin_plugin_static,
+                    get_form_css=self.get_form_static("css"),
+                    get_form_js=self.get_form_static("js"),
+                ),
+            )
+        ]
+
+    def before_first_request_tasks(self):
+        register_settings_admin(self.app, self)
         if self.auto_register_modules:
-            self.app.before_first_request(self.register_module_admin)
+            self.register_module_admin()
+
+    def _get_static_for_field(self, field, type_):
+        files = getattr(field, f"get_field_{type_}", [])
+        if callable(files):
+            files = files()
+        return files
+
+    def get_form_static(self, type_):
+        @contextfunction
+        def form_static_getter(context):
+            rv = [] if type_ == "css" else dict(urls=[], markup=[])
+            for form in (v for v in context.values() if isinstance(v, BaseForm)):
+                for field in form:
+                    for asset in (
+                        asst
+                        for asst in self._get_static_for_field(field, type_)
+                        if asst not in rv
+                    ):
+                        if type_ == "css":
+                            rv.append(asset)
+                        else:
+                            key = "markup" if type(asset) is Markup else "urls"
+                            rv[key].append(asset)
+            return rv
+
+        return form_static_getter
 
     def admin_plugin_static(self, filename):
-        return url_for(
-            "oy.contrib.admin.resource_module.static",
-            filename="oy-admin/%s" % (filename),
-        )
+        return url_for("oy-admin-resource-module.static", filename=filename)
 
     def register_module_admin(self):
         for module in self.app.modules.values():

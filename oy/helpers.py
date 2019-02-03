@@ -4,6 +4,7 @@ from importlib import import_module
 from pkgutil import iter_modules
 from datetime import datetime
 from flask import request
+from oy.boot.sqla import db
 
 
 _email_re = re.compile(
@@ -87,3 +88,12 @@ def get_owning_table(entity, colname):
     for tbl in entity.__mapper__.tables:
         if colname in tbl.columns:
             return tbl
+
+
+def _prepare_association_table(table_name, remote1, remote2):
+    return db.Table(
+        table_name,
+        db.metadata,
+        db.Column(f"{remote1}_id", db.Integer, db.ForeignKey(f"{remote1}.id")),
+        db.Column(f"{remote2}_id", db.Integer, db.ForeignKey(f"{remote2}.id")),
+    )

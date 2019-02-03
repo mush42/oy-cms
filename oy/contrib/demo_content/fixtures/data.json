@@ -1,11 +1,7 @@
 {
-  "oy.models.settings.SettingsProfile": [
+  "oy.models:SettingsProfile": [
     {
-      "name": "Oy Settings",
-      "is_active": false
-    },
-    {
-      "name": "Special Settings",
+      "name": "Default Settings",
       "is_active": true
     }
   ]

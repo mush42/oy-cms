@@ -11,10 +11,9 @@
 
 from urllib.parse import urlparse
 from sqlalchemy.orm import validates
-from oy.models import db
+from oy.models import Page, db
 from oy.models.abstract import SQLAEvent
 from oy.babel import lazy_gettext
-from oy.models.page import Page
 
 
 class Redirect(db.Model, SQLAEvent):

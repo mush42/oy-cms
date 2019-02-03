@@ -18,9 +18,8 @@ def test_basic_redirects(app, client, db):
     assert resp.status == "200 OK"
 
     redirect = RedirectModel(
-        from_url="/never-reached",
-        to_url="/reachable",
-        permanent=True)
+        from_url="/never-reached", to_url="/reachable", permanent=True
+    )
     db.session.add(redirect)
     db.session.commit()
 

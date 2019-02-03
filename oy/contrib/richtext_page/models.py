@@ -10,8 +10,7 @@
 """
 
 from flask import current_app
-from oy.models import db
-from oy.models.page import Page
+from oy.models import Page, db
 
 
 class RichTextPage(Page):

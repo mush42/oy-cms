@@ -108,7 +108,9 @@ class OyModule(Blueprint):
         def wrapper(func_or_class):
             self.record(
                 lambda s: s.app.contenttype_handler(contenttype, methods, view_kwargs)(
-                    func_or_class))
+                    func_or_class
+                )
+            )
             return func_or_class
 
         return wrapper

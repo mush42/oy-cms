@@ -1,0 +1,12 @@
+{% extends "admin/model/list.html" %}
+
+{% block main_menu %}
+{% if not request.args.get("embedded") %}
+{{ super() }}
+{% endif %}
+{% endblock %}
+{% block menu_links %}
+{% if not request.args.get("embedded") %}
+{{ super() }}
+{% endif %}
+{% endblock %}

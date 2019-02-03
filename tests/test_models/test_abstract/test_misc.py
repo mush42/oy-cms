@@ -1,5 +1,5 @@
 import pytest
-from oy.models.abstract.misc import SelfRelated, Orderable
+from oy.models.abstract.misc import SelfRelated, Ordered
 
 
 def test_self_related(db, makemodel):
@@ -33,8 +33,8 @@ def test_self_related(db, makemodel):
     assert not SelfRel.query.all()
 
 
-def test_orderable(db, makemodel):
-    Ord = makemodel("Ord", (SelfRelated, Orderable))
+def test_ordered(db, makemodel):
+    Ord = makemodel("Ord", (SelfRelated, Ordered))
     top1 = Ord()
     top2 = Ord(_sort_order=11)
     db.session.add_all((top1, top2))

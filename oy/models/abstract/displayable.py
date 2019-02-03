@@ -18,11 +18,11 @@ from oy.babel import lazy_gettext
 
 from .slugged import Titled
 from .metadata import Metadata
-from .publishable import Publishable
+from .published import Published
 from .user_related import UserRelated
 
 
-class Displayable(db.Model, Titled, Metadata, Publishable, UserRelated):
+class Displayable(db.Model, Titled, Metadata, Published, UserRelated):
     """The core of all oy content models"""
 
     __abstract__ = True
@@ -35,7 +35,7 @@ class Displayable(db.Model, Titled, Metadata, Publishable, UserRelated):
         return db.Column(db.String(128))
 
     @declared_attr
-    def must_show_in_menu(cls):
+    def show_in_menu(cls):
         return db.Column(
             db.Boolean,
             default=True,
@@ -48,5 +48,6 @@ class Displayable(db.Model, Titled, Metadata, Publishable, UserRelated):
     @declared_attr
     def __mapper_args__(cls):
         return dict(
-            polymorphic_identity=cls.__contenttype__, polymorphic_on=cls.contenttype
+            polymorphic_identity=cls.__contenttype__, polymorphic_on=cls.contenttype,
+            batch=False
         )

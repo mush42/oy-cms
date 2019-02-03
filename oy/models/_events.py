@@ -12,8 +12,6 @@
 """
 
 from functools import partial
-from sqlalchemy import event, inspect
-from sqlalchemy.orm import mapper
 from oy.boot.sqla import db
 from oy.models.abstract import SQLAEvent
 from oy.helpers import get_method_in_all_bases
@@ -41,42 +39,56 @@ def process_events(event_name, session):
         call_method_in_all_bases(instances, event_name, session, modified)
 
 
-@event.listens_for(db.Session, "before_flush")
+@db.event.listens_for(db.Session, "before_flush")
 def receive_before_flush(session, flush_context, instances):
     process_events("before_flush", session)
 
 
-@event.listens_for(db.Session, "after_flush")
+@db.event.listens_for(db.Session, "after_flush")
 def receive_after_flush(session, flush_context):
     process_events("after_flush", session)
 
 
-@event.listens_for(db.Session, "after_flush_postexec")
+@db.event.listens_for(db.Session, "after_flush_postexec")
 def receive_after_flush_postexec(session, flush_context):
     call_method_in_all_bases(
         (obj for obj in session), "after_flush_postexec", session, True
     )
 
 
-@event.listens_for(db.session, "before_commit")
+@db.event.listens_for(db.session, "before_commit")
 def receive_before_commit(session):
     process_events("before_commit", session)
 
 
-@event.listens_for(db.session, "after_commit")
+@db.event.listens_for(db.session, "after_commit")
 def receive_after_commit(session):
     call_method_in_all_bases((obj for obj in session), "after_commit", session, True)
 
 
-@event.listens_for(SQLAEvent, "before_update", propagate=True)
-def process_update_event(mapper, connection, target):
-    methods = get_event_handlers(target.__class__, "update")
-    call_all_methods_on_this_instance(methods, target)
-
-
-@event.listens_for(mapper, "init")
+@db.event.listens_for(db.mapper, "init")
 def process_init_cls(target, *args, **kwargs):
     if isinstance(target, SQLAEvent):
         methods = get_event_handlers(target.__class__, "on_init")
         call_all_methods_on_this_instance(methods, target)
 
+
+def _call_dml_events(evt, instance, mapper, connection):
+    if isinstance(instance, SQLAEvent):
+        methods = get_event_handlers(instance.__class__, evt)
+        call_all_methods_on_this_instance(methods, instance, mapper=mapper, connection=connection)
+
+
+@db.event.listens_for(db.Mapper, "before_insert")
+def _before_insert_dispatch(mapper, connection, instance):
+    _call_dml_events("before_insert", instance, mapper, connection)
+
+
+@db.event.listens_for(db.Mapper, "before_update")
+def _before_update_dispatch(mapper, connection, instance):
+    _call_dml_events("before_update", instance, mapper, connection)
+
+
+@db.event.listens_for(db.Mapper, "before_delete")
+def _before_delete_dispatch(mapper, connection, instance):
+    _call_dml_events("before_delete", instance, mapper, connection)

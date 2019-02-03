@@ -9,42 +9,98 @@
     :license: MIT, see LICENSE for more details.
 """
 
+from secrets import token_urlsafe
 from sqlalchemy.orm import synonym
 from sqlalchemy.ext.declarative import declared_attr
 from depot.fields.sqlalchemy import UploadedFileField
-from depot.fields.filters.thumbnails import WithThumbnailFilter
+from flask import current_app, url_for
 from oy.models import db
-from oy.models.events import SQLAEvent
-from oy.models.abstract.slugged import Titled
-from oy.models.abstract.publishable import Publishable
-from oy.models.abstract.time_stampped import TimeStampped
-from oy.models.abstract.user_related import UserRelated
+from oy.models.abstract import Titled, TimeStampped, UserRelated, Tagged
 from oy.babel import lazy_gettext
+from .filters import FileTypeCheckFilter, WithThumbnailFilter
 
 
-class UploadableMediaMixin(Titled, Publishable, TimeStampped, UserRelated):
+class UploadableMediaMixin(Titled, TimeStampped, UserRelated, Tagged):
+    file_id = db.Column(
+        db.String(64),
+        unique=True,
+        nullable=False,
+        index=True,
+        default=lambda: token_urlsafe(16)
+    )
+    description = db.Column(
+        db.Text, nullable=True, info=dict(lable=lazy_gettext("Description"))
+    )
 
-    container = db.Column(db.String(255))
     __depot_args__ = {"upload_storage": "media_storage"}
 
     @declared_attr
-    def file(cls):
-        depot_args = cls.__depot_args__
-        return db.Column(UploadedFileField(**depot_args), nullable=False)
+    def uploaded_file(cls):
+        depot_args = dict(cls.__depot_args__)
+        filters = depot_args.pop("filters", [])
+        allowed_files = getattr(cls, "__allowed_file_types__", [])
+        if allowed_files:
+            filters.insert(0, FileTypeCheckFilter(filetypes=allowed_files))
+        return db.Column(
+            UploadedFileField(filters=filters, **depot_args),
+            nullable=False,
+            info=dict(label=lazy_gettext("Select a file")),
+        )
+
+    def before_insert(self, mapper, connection):
+        tbl = mapper.mapped_table
+        sel = db.select([tbl.c.id])
+        token = token_urlsafe(14)
+        while connection.scalar(sel.where(tbl.c.file_id == token).count()):
+            token = token_urlsafe(14)
+        self.file_id = token
+
+    @classmethod
+    def get_upload_storage(cls):
+        return db.inspect(cls).get_property("uploaded_file").columns[0].type._upload_storage
 
 
 class Image(db.Model, UploadableMediaMixin):
     id = db.Column(db.Integer, primary_key=True)
-    image = synonym("file")
-    album = synonym("container")
+
+    # Nicer aliases for template designers
+    file = synonym("uploaded_file")
+    alt = synonym("title")
+    caption = synonym("description")
+
+    # Uploaded file arguments
+    __allowed_file_types__ = ("raster-image",)
+    IMG_SIZES = dict(xs=(64, 64), sm=(128, 128), md=(320, 320), lg=(512, 512))
     __depot_args__ = {
         "upload_storage": "image_storage",
-        "filters": (WithThumbnailFilter,),
+        "filters": [
+            WithThumbnailFilter(name=name, size=size, format="png")
+            for name, size in IMG_SIZES.items()
+        ],
     }
+
+    @property
+    def url(self):
+        if "media" in current_app.blueprints:
+            return url_for("media.images", file_id=self.file_id)
+
+    def get_thumbnail_id(self, size):
+        """ Returns the thumbnail id with the given size (e.g. 'sm').
+        """
+        name = "thumbnail_" + size
+        if name not in self.uploaded_file:
+            return
+        return self.uploaded_file[name]["id"]
 
 
 class Document(db.Model, UploadableMediaMixin):
     id = db.Column(db.Integer, primary_key=True)
-    document = synonym("file")
-    folder = synonym("container")
+    file = synonym("uploaded_file")
+
+    __allowed_file_types__ = ("document",)
     __depot_args__ = {"upload_storage": "document_storage"}
+
+    @property
+    def url(self):
+        if "media" in current_app.blueprints:
+            return url_for("media.documents", file_id=self.file_id)

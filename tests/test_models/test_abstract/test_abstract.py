@@ -1,5 +1,5 @@
 import pytest
-from oy.models.abstract import TimeStampped, Publishable, Metadata, Titled
+from oy.models.abstract import TimeStampped, Metadata, Titled
 
 
 def test_timestammped(app, db, makemodel):

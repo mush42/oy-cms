@@ -14,12 +14,10 @@ from flask import current_app
 from oy.boot.sqla import db
 from .displayable import Displayable
 from .slugged import ScopedUniquelySlugged, MPSlugged
-from .misc import SelfRelated, Orderable
+from .misc import SelfRelated, Ordered
 
 
-class AbstractPage(
-    Displayable, ScopedUniquelySlugged, MPSlugged, Orderable, SelfRelated
-):
+class AbstractPage(Displayable, ScopedUniquelySlugged, MPSlugged, Ordered, SelfRelated):
     """Extends :class:`Displayable` with special fields"""
 
     __abstract__ = True

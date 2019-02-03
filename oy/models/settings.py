@@ -70,15 +70,6 @@ class SettingCategory(db.Model):
     def __init__(self, name):
         self.name = name
 
-    @staticmethod
-    def get_or_create(name):
-        try:
-            return SettingCategory.query.filter(SettingCategory.name == name).one()
-        except NoResultFound:
-            cat = SettingCategory(name)
-            db.session.add(cat)
-            return cat
-
 
 class Setting(DynamicProp, db.Model):
     __tablename__ = "setting"
@@ -87,7 +78,9 @@ class Setting(DynamicProp, db.Model):
     category_id = db.Column(db.Integer, db.ForeignKey("setting_category.id"))
     cat = relationship("SettingCategory", backref="settings")
 
-    category = association_proxy("cat", "name", creator=SettingCategory.get_or_create)
+    category = association_proxy(
+        "cat", "name", creator=lambda n: SettingCategory.get_or_create(name=n)
+    )
 
     def __repr__(self):
         return "<Setting key={}><category:{}>".format(self.key, self.category)
@@ -111,4 +104,5 @@ class Settings(ProxiedDictMixin, db.Model, SQLAEvent):
                 setting = Setting(key=opt.name)
                 setting.value = opt.default
                 setting.category = str(category)
+                db.session.add(setting)
                 self.store[opt.name] = setting

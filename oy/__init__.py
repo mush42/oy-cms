@@ -12,7 +12,7 @@
 """
 
 from oy.wrappers import Oy, OyModule
-from oy.create_app import create_app
+from oy.prepare_app import prepare_app
 from oy.views import ContentView
 from oy.globals import current_page, current_handler
 from oy.core.settings import current_settings_profile, current_settings

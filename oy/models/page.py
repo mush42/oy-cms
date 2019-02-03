@@ -19,15 +19,24 @@ class TreeExplorerMixin:
     """Provides methods to explore the page tree."""
 
     @classmethod
-    def get_root(cls, page): ...
+    def get_root(cls, page):
+        ...
+
     @classmethod
-    def get_ancestors(cls, page): ...
+    def get_ancestors(cls, page):
+        ...
+
     @classmethod
-    def get_descendants(cls, page): ...
+    def get_descendants(cls, page):
+        ...
+
     @classmethod
-    def get_depth(cls, Page): ...
+    def get_depth(cls, Page):
+        ...
+
     @classmethod
-    def is_descendant_of(cls, page): ...
+    def is_descendant_of(cls, page):
+        ...
 
 
 class PageQuery(BaseQuery, TreeExplorerMixin):
@@ -50,7 +59,7 @@ class PageQuery(BaseQuery, TreeExplorerMixin):
 
     @property
     def ordered(self):
-        return self.order_by(Page.sort_order.asc())
+        return self.order_by(Page.sort_order.desc())
 
     @property
     def published(self):
@@ -64,7 +73,11 @@ class PageQuery(BaseQuery, TreeExplorerMixin):
 
     @property
     def viewable(self):
-        return self.published
+        return self.published.ordered
+
+    @property
+    def menu_pages(self):
+        return self.roots.viewable.filter(Page.show_in_menu == True)
 
 
 class Page(AbstractPage):
