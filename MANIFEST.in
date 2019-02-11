@@ -1,1 +1,1 @@
-recursive-include oy/project_templates/*
+recursive-include oy/project_templates/default/*

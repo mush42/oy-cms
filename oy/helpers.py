@@ -3,13 +3,18 @@ import re
 from importlib import import_module
 from pkgutil import iter_modules
 from datetime import datetime
-from flask import request
+from flask import request, current_app
 from oy.boot.sqla import db
 
 
 _email_re = re.compile(
     r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b", flags=re.IGNORECASE
 )
+
+
+def url_for_page(page):
+    """TBD"""
+    return f"/{page.url}/"
 
 
 def is_valid_email(email):

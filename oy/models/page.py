@@ -10,56 +10,19 @@
 """
 
 from datetime import datetime
+from sqlalchemy_utils import observes
 from flask_sqlalchemy import BaseQuery
 from oy.boot.sqla import db
 from oy.models.abstract import AbstractPage
 
 
-class TreeExplorerMixin:
-    """Provides methods to explore the page tree."""
-
-    @classmethod
-    def get_root(cls, page):
-        ...
-
-    @classmethod
-    def get_ancestors(cls, page):
-        ...
-
-    @classmethod
-    def get_descendants(cls, page):
-        ...
-
-    @classmethod
-    def get_depth(cls, Page):
-        ...
-
-    @classmethod
-    def is_descendant_of(cls, page):
-        ...
-
-
-class PageQuery(BaseQuery, TreeExplorerMixin):
+class PageQuery(BaseQuery):
     """Add page specific filters to the query"""
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.min_qbundle = db.Bundle(
-            "minq", Page.id, Page.title, Page.slug, Page.slug_path
-        )
 
     @property
     def roots(self):
         """Return only root pages."""
-        return self.filter(Page.is_root == True)
-
-    @property
-    def minimal(self):
-        return self.from_self(self.min_qbundle)
-
-    @property
-    def ordered(self):
-        return self.order_by(Page.sort_order.desc())
+        return self.filter(Page.left == Page.get_default_level())
 
     @property
     def published(self):
@@ -73,7 +36,7 @@ class PageQuery(BaseQuery, TreeExplorerMixin):
 
     @property
     def viewable(self):
-        return self.published.ordered
+        return self.published.order_by(Page.tree_id.desc())
 
     @property
     def menu_pages(self):

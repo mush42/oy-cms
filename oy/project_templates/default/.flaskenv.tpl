@@ -7,6 +7,6 @@
 [[ PROJECT_NAME ]]_PASSWORD_SALT = "[[ password_sult ]]"
 
 # Flask-specific stuff
-FLASK_APP=[[ project_name ]]:app
+FLASK_APP=[[ project_name ]]:create_app
 FLASK_ENV = 'development'
 FLASK_DEBUG= True

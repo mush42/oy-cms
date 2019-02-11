@@ -10,13 +10,10 @@ class PageAdmin(DisplayableAdmin):
     form_columns.insert(0, "title")
     form_columns.insert(4, "parent")
     form_columns.insert(5, "slug")
-    form_excluded_columns = DISPLAYABEL_DEFAULTS["form_excluded_columns"] + [
-        "sort_order",
-        "_sort_order",
-    ]
+    form_excluded_columns = DISPLAYABEL_DEFAULTS["form_excluded_columns"] + []
     column_list = ["title", "status", "updated"]
     column_editable_list = ["title"]
-    column_default_sort = ("sort_order", False)
+    column_default_sort = ("tree_id", False)
 
     def edit_form(self, obj):
         return self.modify_edit_form(super(PageAdmin, self).edit_form(obj), page=obj)
@@ -26,4 +23,5 @@ class PageAdmin(DisplayableAdmin):
         return form
 
     def get_preview_url(instance):
-        return f"/{instance.slug_path}/"
+        return f"/{instance.url}/"
+

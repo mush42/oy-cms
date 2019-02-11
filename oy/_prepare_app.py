@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    oy.prepare_app
+    oy._prepare_app
     ~~~~~~~~~~~~~~~~~~
 
     Initialize the application.

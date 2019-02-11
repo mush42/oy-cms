@@ -11,7 +11,7 @@
 
 from ._sqlaevent import SQLAEvent
 from .polymorphic_prop import ProxiedDictMixin, DynamicProp
-from .slugged import Titled, Slugged, ScopedUniquelySlugged, MPSlugged
+from .slugged import Titled, Slugged, ScopedUniquelySlugged
 from .metadata import Metadata
 from .time_stampped import TimeStampped
 from .published import Published

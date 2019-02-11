@@ -18,17 +18,12 @@ from oy.models.page import Page
 
 
 def _get_page_for_request():
-    if request is None:
+    if not request:
         raise RuntimeError(_request_ctx_err_msg)
-    requested_slug_path = request.path
-    blueprint = request.blueprint
-    if blueprint is not None:
-        requested_slug_path = requested_slug_path.lstrip(
-            current_app.blueprints[blueprint].url_prefix or ""
-        )
-    requested_slug_path = requested_slug_path.strip("/")
-    requested_slug_path = requested_slug_path or current_app.config["HOME_SLUG"]
-    return Page.query.filter(Page.slug_path == requested_slug_path).one_or_none()
+    url_path = request.path.strip("/")
+    if not url_path:
+        return Page.query.filter_by(slug=current_app.config["HOME_SLUG"]).one()
+    return Page.query.filter_by(url_path=url_path).one_or_none()
 
 
 current_handler = LocalProxy(lambda: getattr(_app_ctx_stack.top, "handler", None))

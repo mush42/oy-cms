@@ -7,7 +7,7 @@ from flask_admin.form import rules
 from flask_admin.form import SecureForm
 from flask_admin.actions import action
 from flask_admin.helpers import get_current_view
-from wtforms.fields import SelectField
+from wtforms.fields import StringField, SelectField
 from datetime import date
 from oy.boot.sqla import db
 from oy.models.abstract import Displayable
@@ -50,7 +50,8 @@ DISPLAYABEL_DEFAULTS = dict(
     form_extra_fields={
         "status": SelectField(
             label=lazy_gettext("Status"), choices=Displayable.STATUS_CHOICES
-        )
+        ),
+        "slug": StringField(label=lazy_gettext("Slug"), description=lazy_gettext("A user-friendly identifier used as a part of the URL."))
     },
 )
 

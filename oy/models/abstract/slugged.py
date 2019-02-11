@@ -33,9 +33,6 @@ class Titled(SQLAEvent):
     def __str__(self):
         return self.title
 
-    def __repr__(self):
-        return "{0}(title={1})".format(self.__class__.__name__, self.title)
-
 
 class Slugged(SQLAEvent):
     """A slugged mixin class"""
@@ -46,7 +43,6 @@ class Slugged(SQLAEvent):
     def slug(cls):
         return db.Column(
             db.Unicode(255),
-            nullable=False,
             info=dict(
                 label="Slug",
                 description="A Slug is that portion of the URL used to identify this content.",
@@ -64,8 +60,8 @@ class Slugged(SQLAEvent):
                 return slug
             slug = self.generate_unique_slug(slug)
 
-    def before_insert(self, mapper, connection):
-        if self.slug is None:
+    def before_flush(self, session, is_modified):
+        if not self.slug:
             self.slug = self.slugify(getattr(self, self.__slugcolumn__))
 
     def after_flush(self, session, is_modified):
@@ -100,25 +96,3 @@ class ScopedUniquelySlugged(Slugged):
             q = q.filter(cls.parent == None)
         return q.count()
 
-
-class MPSlugged(SQLAEvent):
-    """A Mixin that adds a slug path field.
-    The slug_path acts like a materialized path.
-    """
-
-    slug_path = db.Column(db.String(5120), unique=True, nullable=False, index=True)
-
-    def before_insert(self, mapper, connection):
-        if self.parent is None:
-            self.slug_path = self.slug
-        else:
-            self.slug_path = f"{self.parent.slug_path}/{self.slug}"
-
-    def before_update(self, mapper, connection):
-        state = db.inspect(self)
-        if not all(state.attrs[attr].history.unchanged for attr in ("slug", "parent",)):
-            self.before_insert(None, None)
-            with db.session.no_autoflush:
-                for child in self.children:
-                    child.slug_path = f"{self.slug_path}/{child.slug}"
-                    child.before_update(mapper, connection)

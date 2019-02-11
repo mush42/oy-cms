@@ -1,10 +1,10 @@
-#-*-coding: utf-8-*-
+# -*-coding: utf-8-*-
 """
 [[ project_name ]] configuration file
 """
 
 import os
-[% set PROJECT_NAME = project_name|upper %]
+
 
 def getenvar(name, default=None):
     """Return the environment variable named `name`
@@ -19,12 +19,17 @@ def getenvar(name, default=None):
                 f"Variable {name} was not found among current "
                 "environment variables and no default has been supplied"
             )
-    if var in ('True', 'False'):
-        return True if var == 'True' else False
+    if var in ("True", "False"):
+        return True if var == "True" else False
     return var
 
 
-DEBUG = getenvar('[[ PROJECT_NAME ]]_DEBUG', False)
-SECRET_KEY = getenvar('[[ PROJECT_NAME ]]_SECRET_KEY')
-SQLALCHEMY_DATABASE_URI = getenvar('[[ PROJECT_NAME ]]_DB_URI', 'sqlite:///:memory:')
-SECURITY_PASSWORD_SALT = getenvar('[[ PROJECT_NAME ]]_PASSWORD_SALT')
+DEBUG = getenvar("[[ project_name ]]_DEBUG", False)
+SECRET_KEY = getenvar("[[ project_name ]]_SECRET_KEY")
+SQLALCHEMY_DATABASE_URI = getenvar("[[ project_name ]]_DB_URI", "sqlite:///:memory:")
+SECURITY_PASSWORD_SALT = getenvar("[[ project_name ]]_PASSWORD_SALT")
+
+# Depot storage config for user uploaded files
+DEPOT_MEDIA_STORAGES = dict(
+    media_storage={"depot.storage_path": os.path.abspath(os.path.join(os.getcwd(), "media"))}
+)

@@ -20,13 +20,16 @@ from oy.babel import lazy_gettext
 from .filters import FileTypeCheckFilter, WithThumbnailFilter
 
 
+NUMBYTES = 16
+
+
 class UploadableMediaMixin(Titled, TimeStampped, UserRelated, Tagged):
     file_id = db.Column(
         db.String(64),
         unique=True,
         nullable=False,
         index=True,
-        default=lambda: token_urlsafe(16)
+        default=lambda: token_urlsafe(NUMBYTES)
     )
     description = db.Column(
         db.Text, nullable=True, info=dict(lable=lazy_gettext("Description"))
@@ -52,7 +55,7 @@ class UploadableMediaMixin(Titled, TimeStampped, UserRelated, Tagged):
         sel = db.select([tbl.c.id])
         token = token_urlsafe(14)
         while connection.scalar(sel.where(tbl.c.file_id == token).count()):
-            token = token_urlsafe(14)
+            token = token_urlsafe(NUMBYTES)
         self.file_id = token
 
     @classmethod

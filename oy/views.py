@@ -18,6 +18,7 @@ from flask import _app_ctx_stack, current_app, render_template, request
 from oy.babel import lazy_gettext
 from oy.models.page import Page
 from oy.globals import current_page
+from oy.helpers import url_for_page
 
 
 class ContentViewType(type):
@@ -47,7 +48,8 @@ class ContentViewType(type):
         def wrapper(self, *args, **kwargs):
             rv = actual_func(self, *args, **kwargs)
             for mw in self.handler.middlewares[middleware_funcname]:
-                func = getattr(mw, middleware_funcname)
+                middleare = mw()
+                func = getattr(middleare, middleware_funcname)
                 rv = func(rv)
             return rv
 
@@ -71,7 +73,7 @@ class ContentView(metaclass=ContentViewType):
     def get_template(self):
         if self.template is not None:
             return self.template
-        slug = self.page.slug_path
+        slug = self.page.url
         templates = [self.page.contenttype, "page"]
         [templates.insert(0, sl) for sl in slug.split("/")]
         built_tpl_path = lambda prefix: [f"{prefix}/{t}.html" for t in templates]
@@ -121,9 +123,8 @@ class PageHandler:
     def _add_class_middleware(self, middleware):
         sortfuncs = self.middlewares.keys()
         mwk = (sf for sf in sortfuncs if hasattr(middleware, sf))
-        initialized_middleware = middleware()
         for k in mwk:
-            self.middlewares[k].append(initialized_middleware)
+            self.middlewares[k].append(middleware)
 
     def add_middleware(self, middleware):
         if type(self.view) is ContentViewType:
@@ -133,7 +134,7 @@ class PageHandler:
 
 
 class ContentViewProcessorMixin:
-    """A mixin that make flask apps cabable of serving oy content."""
+    """A mixin that make flask apps cabable of serving oy content (pages)."""
 
     def __init__(self):
         self.contenttype_handlers = {}
@@ -161,8 +162,6 @@ class ContentViewProcessorMixin:
             view = handler.view
             if type(view) is ContentViewType:
                 return view(handler=handler).make_response()
-            elif type(view) is ContentView:
-                return view.make_response()
             elif callable(view):
                 rv = view(**handler.view_kwargs)
                 for middleware in handler.middlewares:
@@ -225,4 +224,4 @@ class ContentViewProcessorMixin:
 
     def page_context(self):
         pages = Page.query.menu_pages.all()
-        return {"pages": pages, "current_page": current_page, "page": current_page}
+        return {"pages": pages, "current_page": current_page, "page": current_page, "page_url": url_for_page}

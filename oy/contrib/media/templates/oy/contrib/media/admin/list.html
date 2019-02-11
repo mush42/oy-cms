@@ -1,12 +1,13 @@
 {% extends "admin/model/list.html" %}
 
-{% block main_menu %}
-{% if not request.args.get("embedded") %}
-{{ super() }}
-{% endif %}
-{% endblock %}
-{% block menu_links %}
-{% if not request.args.get("embedded") %}
-{{ super() }}
-{% endif %}
+{% block tail %}
+<script type="text/javascript">
+  var top_level = (window.frameElement && window.dialogArguments) || opener || parent || top;
+
+  if (top_level) {
+    $("#sidebar-menu").hide();
+    $("#menu-links").hide();
+  }
+  
+</script>
 {% endblock %}

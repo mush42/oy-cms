@@ -1,5 +1,5 @@
 import pytest
-from oy.models.abstract.slugged import Titled, Slugged, ScopedUniquelySlugged, MPSlugged
+from oy.models.abstract.slugged import Titled, Slugged, ScopedUniquelySlugged
 from oy.models.abstract.misc import SelfRelated
 
 
@@ -47,25 +47,3 @@ def test_scoped_slugged(db, makemodel):
     assert toplevel.slug == "child"
 
 
-def test_mp_slugged(db, makemodel):
-    MPS = makemodel(
-        "MPSluggedTest", (Titled, ScopedUniquelySlugged, MPSlugged, SelfRelated)
-    )
-    parent = MPS(title="parent")
-    child_level1 = MPS(title="Child")
-    child_level2 = MPS(title="Sub Child")
-    child_level1.parent = parent
-    child_level2.parent = child_level1
-    db.session.add_all((parent, child_level1, child_level2))
-    db.session.commit()
-    assert parent.slug_path == "parent"
-    assert child_level1.slug_path == "parent/child"
-    assert child_level2.slug_path == "parent/child/sub-child"
-    child_level2.parent = parent
-    db.session.commit()
-    assert child_level2.slug_path == "parent/sub-child"
-    another_child = MPS(title="another")
-    parent.children.append(another_child)
-    db.session.add(another_child)
-    db.session.commit()
-    assert another_child.slug_path == "parent/another"

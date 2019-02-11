@@ -6,22 +6,22 @@
 <li class="nav-item dropdown {{active_class}}">
 <a {{ aria_current}} class="nav-link dropdown-toggle" href="#" id="{{ page_html_id }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{page.title}}</a>
 <div class="dropdown-menu bg-dark" aria-labelledby="{{ page_html_id }}">
-<a class="nav-link" href="{{page.slug_path}}" {{aria_current}}>{{page.title}}</a>
+<a class="nav-link" href="{{ page_url(page) }}" {{aria_current}}>{{page.title}}</a>
 {% for child in page.children %}
 {% set aria_current='aria-current="page"'|safe if child==active_page else "" %}
-<a class="dropdown-item bg-dark text-white {{active_class}}" href="{{child.url}}" {{ aria_current }} >{{child.title}}</a>
+<a class="dropdown-item bg-dark text-white {{active_class}}" href="{{ page_url(child) }}" {{ aria_current }} >{{child.title}}</a>
 {% endfor %}
 </div>
 </li>
 {% else %}
-<li  class="nav-item {{active_class}}"><a {{ aria_current }} class="nav-link" href="{{page.url}}">{{page.title}}</a></li>
+<li  class="nav-item {{active_class}}"><a {{ aria_current }} class="nav-link" href="{{page_url(page) }}">{{page.title}}</a></li>
 {% endif %}
 {% endwith %}
 {% endwith %}
 {% endmacro %}
 
 {% macro render_tree_branch(branch) %}
-<a href="{{branch.url}}" class="list-group-item list-group-item-action footer-tree-link text-white">{{branch.title}}</a>
+<a href="{{ page_url(branch) }}" class="list-group-item list-group-item-action footer-tree-link text-white">{{branch.title}}</a>
 {% if branch.children %}
 <div class="list-group list-group-flush submenu">
 {% for b in branch.children %}

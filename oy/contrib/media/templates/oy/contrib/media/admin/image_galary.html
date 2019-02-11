@@ -23,7 +23,7 @@
 		max-width: 45%;
 	}
   .galary-wrapper {
-    margin: auto 1.8rem auto 1.8rem;
+    margin: auto 1.2rem auto 1.2rem;
   }
   </style>
 {% endblock %}
@@ -44,10 +44,7 @@
 	<div class="col-md-55">
 	<div class="thumbnail">
 	  <div class="image view view-first">
-		<img style="width: 100%; display: block;" src="{{ url_for(".internal_serve", file_id=row.file_id, size='sm') }}" alt="{{ row.title }}" />
-		<div class="mask">
-		  <p>{{ row.title }}</p>
-		</div>
+		<img data-id="{{ row.id }}" data-title="{{ row.title }}" class="image-preview" style="width: 100%;display: block;cursor:pointer;" src="{{ url_for(".internal_serve", file_id=row.file_id, size='sm') }}" alt="{{ row.title }}" tabindex="0"/>
 	  </div>
 	  <div class="tools tools-bottom">
 	 	 <input type="checkbox" name="rowid" class="action-checkbox" value="{{ get_pk_value(row) }}" title="Select {{ row.title }}" /> <span role="presentation">{{ row.title }}</span>
@@ -75,4 +72,29 @@
   </div>
 
 
+{% endblock %}
+
+{% block tail %}
+{{ super() }}
+<script type="text/javascript">
+$(document).ready(function() {
+
+  var top_level = (window.frameElement && window.dialogArguments) || opener || parent || top;
+  var popup = top_level.current_popup;
+
+  if (!popup) {
+    return;
+  }
+
+  $(".image-preview").click(function() {
+    popup.returned_data = {
+      "src": $(this).attr("src"),
+      "id": $(this).data("id"),
+      "title": $(this).data("title"),
+    };
+    popup.close();
+  });
+
+});
+</script>
 {% endblock %}

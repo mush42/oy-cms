@@ -1,5 +1,6 @@
 import pytest
 from werkzeug.exceptions import NotFound
+from oy import url_for_page
 from oy.models.page import Page
 from oy.views import ContentView
 from oy.wrappers import OyModule
@@ -23,9 +24,9 @@ def test_view_basic(app, client, db, makemodel):
     cust = CustomPage(title="Hello", author_id=1)
     db.session.add(cust)
     db.session.commit()
-    resp = client.get(cust.url, status=404)
+    resp = client.get(url_for_page(cust), status=404)
     app.add_contenttype_handler("custom_page", CustomePageView)
-    resp = client.get(cust.url)
+    resp = client.get(url_for_page(cust))
     assert resp.status == "200 OK"
     assert "Hello" in resp.text
 
@@ -35,7 +36,7 @@ def test_view_basic(app, client, db, makemodel):
             return "Custom"
 
     app.apply_middleware("custom_page", CustomPageResponseMiddleware)
-    resp = client.get(cust.url)
+    resp = client.get(url_for_page(cust))
     assert resp.status == "200 OK"
     assert "Custom" in resp.text
 
@@ -64,14 +65,14 @@ def test_view_basic(app, client, db, makemodel):
     app.apply_middleware("custom_page", CustomPageTemplateMiddleware)
     thismw = app.contenttype_handlers["custom_page"].middlewares
     assert thismw["process_template"][0] is thismw["process_context"][0]
-    resp = client.get(cust.url)
+    resp = client.get(url_for_page(cust))
     assert "from custome page template" in resp.text
 
     @app.before_page_request
     def custom_bfpr():
         return "That's it"
 
-    resp = client.get(cust.url)
+    resp = client.get(url_for_page(cust))
     assert "That's it" in resp.text
 
 
@@ -92,7 +93,7 @@ def testmodfunctionality(app, db, client, makemodel):
         return "From custom module"
 
     app.register_module(newmod)
-    resp = client.get(cust.url)
+    resp = client.get(url_for_page(cust))
     assert "From custom module" in resp.text
 
     def nohandlerargnewcustmw(response):
@@ -100,5 +101,5 @@ def testmodfunctionality(app, db, client, makemodel):
         return "Applied first middleware"
 
     app.apply_middleware("newcustom_page", nohandlerargnewcustmw)
-    resp = client.get(cust.url)
+    resp = client.get(url_for_page(cust))
     assert "Applied first middleware" in resp.text

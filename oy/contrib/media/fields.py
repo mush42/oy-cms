@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    oy.contrib.admin.media_selector
+    oy.contrib.media.fields
     ~~~~~~~~~~
 
     Provide WTForms custom fields.
@@ -17,7 +17,7 @@ from flask import current_app, url_for
 
 class MediaSelectorWidget(HiddenInput):
 
-    template_name = "oy/contrib/admin/fields/media_selector_field.html"
+    template_name = "oy/contrib/media/admin/fields/media_selector_field.html"
     
     def __call__(self, field, **kwargs):
         kwargs.setdefault('id', field.id)
@@ -46,3 +46,8 @@ class MediaSelectorField(StringField):
                 thum_url=url_for("image_admin.internal_serve", file_id=obj.file_id, size="xs"),
                 title=obj.title
             )
+
+    def get_field_js(self):
+        return [
+            url_for("oy.contrib.media.static", filename="js/media-admin.js"),
+        ]

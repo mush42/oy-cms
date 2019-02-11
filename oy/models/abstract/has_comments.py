@@ -18,8 +18,8 @@ from .time_stampped import TimeStampped
 
 
 class CommentMixin(SelfRelated, ):
-    author_name = db.Column(db.String(255), nullable=False)
-    author_email = db.Column(db.String(255), nullable=False)
+    visitor_name = db.Column(db.String(255), nullable=False)
+    visitor_email = db.Column(db.String(255), nullable=False)
     body = db.Column(db.Text)
     remote_addr = db.Column(
         db.String(255),

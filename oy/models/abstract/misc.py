@@ -17,7 +17,9 @@ from ._sqlaevent import SQLAEvent
 
 
 class SelfRelated:
-    """A class that have one-to-many relationship with itself."""
+    """A class that have many-to-many  relationship with itself.
+    This class implements the `Adjacency List` patterns of managing hierarchical data.
+    ."""
 
     __allowed_child_types__ = ()
     __allowed_parent_types__ = ()
