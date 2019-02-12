@@ -1,1 +1,2 @@
-recursive-include oy/project_templates/default/*
+recursive-include oy/project_templates/default *
+recursive-exclude tests * 

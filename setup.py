@@ -1,9 +1,13 @@
+from pathlib import Path
 from setuptools import setup, find_packages
 import oy as package
 
 
-with open("README.md", "r") as readme:
-    long_description = readme.read()
+CWD = Path(__file__).parent
+LONG_DESCRIPTION = (CWD / "README.md").read_text()
+
+with open(CWD / "requirements.txt", "r") as reqs:
+    REQUIREMENTS = [l.strip() for l in reqs.readlines()]
 
 
 setup(
@@ -12,13 +16,14 @@ setup(
     author="Musharraf Omer",
     author_email="ibnomer2011@hotmail.com",
     description="A lightweight, modular, and extensible content management system.",
-    long_description=long_description,
+    long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
     url="https://github.com/mush42/oy-cms",
     license="MIT",
     packages=find_packages(exclude=("tests",)),
     platforms="any",
     include_package_data=True,
+    package_data={"oy": ["project_templates/default/*"]},
     zip_safe=False,
     entry_points={
         "console_scripts": [
@@ -26,23 +31,7 @@ setup(
             "oyinit=oy.cli.oyinit:init_oy_project",
         ]
     },
-    install_requires=[
-        "Flask",
-        "Flask-Admin",
-        "Flask-BabelEx",
-        "Flask-Cors",
-        "flask-marshmallow",
-        "Flask-Migrate",
-        "Flask-Security",
-        "Flask-SQLAlchemy",
-        "Flask-WTF",
-        "marshmallow",
-        "marshmallow-sqlalchemy",
-        "Pillow",
-        "speaklater",
-        "unicode-slugify",
-        "WTForms-Components",
-    ],
+    install_requires=REQUIREMENTS,
     classifiers=[
         "Development Status :: 4 - Beta",
         "Environment :: Web Environment",
