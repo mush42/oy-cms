@@ -137,7 +137,7 @@ def init_oy_project(project_name, templatedir=None):
         templatedir = os.path.join(templatedir, rv)
     else:
         templatedir = os.path.join(templatedir, templates[0])
-    click.echo(f"Creating project {project_name}...")
+    click.echo(f"Creating a new project: {project_name}...")
     click.echo(f"Using project template: {templatedir}...")
     distdir = prepare_directory(project_name)
     copier = ProjectTemplateCopier(templatedir, distdir, project_name).copy_all()
