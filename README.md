@@ -92,7 +92,9 @@ Then visit your newly created site at  [http://127.0.0.1:5000](http://127.0.0.1:
 
 ## Why is it called **oy**?
 
-I thought you already know. But in case you don't, here is a hint: _SK TDT_
+I thought you already know. But in case you don't, here is a hint:
+
+> The Midwest, a deserted village, dead child, a junky  boy, a black woman with two faces, and a serious man whom you don't want to mess with.
 
 
 ## Contributing
