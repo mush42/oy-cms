@@ -34,7 +34,7 @@ First things first, install **oy** via pip:
 $ pip install oy
 ```
 
-**Oy** supplies you with a command to scaffold your projects. To create a project with the default template, navigate to your project directory and run:
+**Oy** supplies you with a command to scaffold your projects. To create a project with the default template, navigate to your projects directory and run:
 
 ```bash
 $ oyinit mysite
