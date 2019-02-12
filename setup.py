@@ -11,7 +11,7 @@ with open(CWD / "requirements.txt", "r") as reqs:
 
 
 setup(
-    name="Oy",
+    name="oy",
     version=package.__version__,
     author="Musharraf Omer",
     author_email="ibnomer2011@hotmail.com",
