@@ -6,7 +6,6 @@
 
 **oy** provides you with a flexible, full-fledged CMS engine with the following features:
 
-* Makes use of some of the best flask extensions (Flask-Admin, Flask-SQLAlchemy...)
 * A base **Page** model containing comprehensive metadata fields
 * Pages are managed in a tree using nested sets which allows for faster querying for descendants and ancestors
 * Routing to any page type is handled transparently using the familiar decorator syntax
@@ -14,6 +13,7 @@
 * Model **Mixins**, alot of them, to easily build your custom content types
 * Editable settings that users can edit in runtime (e.g, through the admin dashboard) which the developer can use in code or templates.
 * An optional module system which augment **Flask Blueprints** with additional behavior
+* Makes use of some of the best flask extensions out there (Flask-Admin, Flask-SQLAlchemy, Flask-Security...)
 
 ## Additional Features
 
