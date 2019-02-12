@@ -27,10 +27,10 @@ class Media(OyExtBase):
         template_folder="templates",
     )
 
-    def __init__(self, app=None, serve_files=False, url_prefix="/media", **module_args):
-        super().__init__(app, **module_args)
+    def __init__(self, app=None, serve_files=False, media_url_prefix="/media", **module_args):
         self.serve_files = serve_files
-        self.url_prefix = url_prefix
+        self.media_url_prefix = media_url_prefix
+        super().__init__(app, **module_args)
 
     def init_app(self, app):
         storage_conf = app.config.get("DEPOT_MEDIA_STORAGES", None)
@@ -51,7 +51,7 @@ class Media(OyExtBase):
             self._add_serving_routes(app)
 
     def _add_serving_routes(self, app):
-        media_bp = Blueprint("media", __name__, url_prefix=self.url_prefix)
+        media_bp = Blueprint("media", __name__, url_prefix=self.media_url_prefix)
         media_bp.add_url_rule(
             "/images/<string:file_id>",
             endpoint="images",

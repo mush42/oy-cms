@@ -10,9 +10,6 @@ THIS = Path(__file__).parent
 
 def test_basic_media(app, client, db):
     media = Media(serve_files=True)
-    # Should fail without `DEPOT_STORAGES` config
-    with pytest.raises(LookupError):
-        media.init_app(app)
 
     app.config["DEPOT_MEDIA_STORAGES"] = dict(
         media_storage={"depot.storage_path": str(THIS/"media")}

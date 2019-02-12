@@ -84,7 +84,7 @@ def register_settings_admin(app, admin):
                     update_settings_from_form(form.data)
                     flash("Settings were successfully saved")
                     return redirect(request.url)
-                return self.render("oy_admin/settings.html", form=form)
+                return self.render("oy/contrib/admin/settings.html", form=form)
 
         admin.add_view(
             SettingsAdmin(

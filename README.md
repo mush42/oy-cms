@@ -2,7 +2,7 @@
 
 ## Oy content management system
 
-**Oy** is a lighweight, modular, and extensible content management system (CMS) based on the **Flask** micro-framework.
+**Oy** is a lightweight, modular, and extensible content management system (CMS) based on the **Flask** micro-framework.
 
 **oy** provides you with a flexible, full-fledged CMS engine with the following features:
 
@@ -10,7 +10,7 @@
 * Pages are managed in a tree using nested sets which allows for faster querying for descendants and ancestors
 * Routing to any page type is handled transparently using the familiar decorator syntax
 * The ability to apply middlewares to modify page responses
-* Model **Mixins**, alot of them, to easily build your custom content types
+* Model **Mixins**, a lot of them, to easily build your custom content types
 * Editable settings that users can edit in runtime (e.g, through the admin dashboard) which the developer can use in code or templates.
 * An optional module system which augment **Flask Blueprints** with additional behavior
 * Makes use of some of the best flask extensions out there (Flask-Admin, Flask-SQLAlchemy, Flask-Security...)
@@ -21,7 +21,7 @@ In addition to the core, **oy** provides extra functionality through several pac
 
 - * *oy.contrib.admin* providing the administration dashboard (based on Flask-Admin).
 - **oy.contrib.media** manage user uploads (images, and documents) through an intuitive interface, and attach them to models  (uses the excellent file depot package).
-- **oy.contrib.form** easily design forms and publilsh them as pages, and view and download  submissions through the admin
+- **oy.contrib.form** easily design forms and publish them as pages, and view and download  submissions through the admin
 - **oy.contrib.redirects** setup custom redirects
 - **oy.contrib.users** provides user management with an extensible user profiles.
 
