@@ -94,7 +94,7 @@ Then visit your newly created site at  [http://127.0.0.1:5000](http://127.0.0.1:
 
 I thought you already know. But in case you don't, here is a hint:
 
-> The Midwest, a deserted village, an already dead child, a junky  boy, a black woman with two faces, and a serious man whom you don't want to mess with.
+> The Midwest, a deserted village, an already dead boy, another junky boy, a black woman with two faces, and a serious man whom you don't want to mess with.
 
 
 ## Contributing

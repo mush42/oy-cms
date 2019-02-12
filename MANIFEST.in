@@ -13,4 +13,4 @@ recursive-include oy/contrib/form/templates *
 recursive-include oy/contrib/media/static *
 recursive-include oy/contrib/media/templates *
 recursive-include oy/contrib/richtext_page/templates *
-recursive-exclude tests * 
+recursive-exclude tests *
