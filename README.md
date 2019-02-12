@@ -11,13 +11,13 @@
 * Pages are managed in a tree using nested sets which allows for faster querying for descendants and ancestors
 * Routing to any page type is handled transparently using the familiar decorator syntax
 * The ability to apply middlewares to modify page responses
-* ** Model Mixins**, alot of them, to easily build your custom content types
+* Model **Mixins**, alot of them, to easily build your custom content types
 * Editable settings that users can edit in runtime (e.g, through the admin dashboard) which the developer can use in code or templates.
 * An optional module system which augment **Flask Blueprints** with additional behavior
 
 ## Additional Features
 
-In addition to the core, **oy** provides extra functionality through several packages under the **oy.contrib ** package, including:
+In addition to the core, **oy** provides extra functionality through several packages under the **oy.contrib** package, including:
 
 - * *oy.contrib.admin* providing the administration dashboard (based on Flask-Admin).
 - **oy.contrib.media** manage user uploads (images, and documents) through an intuitive interface, and attach them to models  (uses the excellent file depot package).
@@ -56,7 +56,7 @@ cd mysite
 oy createall
 ```
 
-``bash
+```bash
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Creating database tables...
 Database tables created.
@@ -97,4 +97,4 @@ I thought you already know. But in case you don't, here is a hint: _SK TDT_
 
 ## Contributing
 
-**oy cms** is still in alpha status, contributions are more than wellcome. Help needed in perfecting existing features as well as adding new ones.
+**oy** content management system is still in alpha status, contributions are more than wellcome. Help needed in perfecting existing features as well as adding new ones.
