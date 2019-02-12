@@ -1,13 +1,1 @@
 {% extends "admin/model/list.html" %}
-
-{% block tail %}
-<script type="text/javascript">
-  var top_level = (window.frameElement && window.dialogArguments) || opener || parent || top;
-
-  if (top_level) {
-    $("#sidebar-menu").hide();
-    $("#menu-links").hide();
-  }
-  
-</script>
-{% endblock %}

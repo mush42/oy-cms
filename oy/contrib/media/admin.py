@@ -39,6 +39,10 @@ class GenericMediaAdmin(OyModelView):
         )
     ]
 
+    @property
+    def extra_js(self):
+        return [url_for("oy.contrib.media.static", filename="js/media-view.js"),]
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.file_storage = DepotManager.get(self.model.get_upload_storage())
@@ -67,7 +71,9 @@ class GenericMediaAdmin(OyModelView):
     def validate_form(self, form):
         if "uploaded_file" in form:
             file = form["uploaded_file"].data
-            if request.endpoint == f"{self.endpoint}.edit_view" and not file:
+            if request.endpoint == f"{self.endpoint}.create_view":
+                return super().validate_form(form)
+            elif request.endpoint == f"{self.endpoint}.edit_view" and not file:
                 form["uploaded_file"].data = self.get_one(
                     request.args["id"]
                 ).uploaded_file

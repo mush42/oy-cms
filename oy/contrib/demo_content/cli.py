@@ -112,5 +112,6 @@ def create_all(ctx):
     click.secho("~" * 50, fg="green")
     ctx.invoke(create_db)
     ctx.invoke(createuser, noinput=True, superuser=True)
+    click.echo("-----Superuser account details: (username=admin) (password=adminpass) please change the default password------")
     ctx.invoke(install_fixtures)
     click.secho("~" * 50, fg="green", bold=True)

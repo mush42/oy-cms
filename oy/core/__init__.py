@@ -35,8 +35,8 @@ def provide_core_settings(app):
         dict(
             name="title",
             label=lazy_gettext("Site Title"),
-            description=u"The site Title",
+            description=lazy_gettext("The site Title"),
             type="text",
-            default=u"Oy CMS",
+            default=app.name.title(),
         )
     ]

@@ -1,2 +1,16 @@
 recursive-include oy/project_templates/default *
+recursive-include oy/translations *
+recursive-include oy/translations *
+recursive-include oy/contrib/admin/static *
+recursive-include oy/contrib/admin/templates *
+recursive-include oy/contrib/bootstrap4/static *
+recursive-include oy/contrib/bootstrap4/templates *
+recursive-include oy/contrib/demo_content/fixtures *
+recursive-include oy/contrib/flask_security_templates/static *
+recursive-include oy/contrib/flask_security_templates/templates *
+recursive-include oy/contrib/form/fixtures *
+recursive-include oy/contrib/form/templates *
+recursive-include oy/contrib/media/static *
+recursive-include oy/contrib/media/templates *
+recursive-include oy/contrib/richtext_page/templates *
 recursive-exclude tests * 
