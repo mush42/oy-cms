@@ -27,7 +27,7 @@ class BadlyFormattedFixture(OyException):
     """Raised when a fixture could not be decoded"""
 
 
-class FixtureInstaller(object):
+class FixtureInstaller:
     """A utility class to install fixtures from modules."""
 
     def __init__(self, module):

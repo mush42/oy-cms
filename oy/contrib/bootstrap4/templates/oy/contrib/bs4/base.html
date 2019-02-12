@@ -17,17 +17,19 @@
 <body class="{% block body_class %}bs4{% endblock %}">
 
   {% block page_header %}{% endblock %}
+  {% block messages %}
+    {% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+    <div class="container" style="margin: 1.3rem;">
+    {{ macros.messages() }}
+    </div>
+    {% endif %}
+    {%- endwith %}
+  {% endblock %}
 
   {% block body_wrapper %}
 
-    {% block messages %}
-    {% if messages %}
-	<div class="container">
-      {{ macros.messages() }}
-    </div>
-	{% endif %}
-    {% endblock %}
-  
+
       {% block page_body %}{% endblock %}
 
   {% endblock %}

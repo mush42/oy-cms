@@ -28,19 +28,17 @@ class Media(OyExtBase):
     )
 
     def __init__(self, app=None, serve_files=False, url_prefix="/media", **module_args):
+        super().__init__(app, **module_args)
         self.serve_files = serve_files
         self.url_prefix = url_prefix
-        super().__init__(app, **module_args)
 
     def init_app(self, app):
-        if self.serve_files:
-            self._add_serving_routes(app)
         storage_conf = app.config.get("DEPOT_MEDIA_STORAGES", None)
         if storage_conf is None:
             raise LookupError(
                 "Couldn't find depot storages configuration in app config."
             )
-        elif "media_storage" not in storage_conf:
+        if "media_storage" not in storage_conf:
             raise ValueError(
                 "A storage named *media_storage* is required when configuring `DEPOT_STORAGES`."
             )
@@ -49,6 +47,8 @@ class Media(OyExtBase):
         for storage in ("image_storage", "document_storage"):
             if storage not in DepotManager._depots:
                 DepotManager.alias(storage, "media_storage")
+        if self.serve_files:
+            self._add_serving_routes(app)
 
     def _add_serving_routes(self, app):
         media_bp = Blueprint("media", __name__, url_prefix=self.url_prefix)

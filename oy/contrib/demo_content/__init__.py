@@ -10,7 +10,7 @@
 """
 
 from oy.contrib.extbase import OyExtBase
-from .cli import install_fixtures, create_all
+from .cli import FixtureInstaller, install_fixtures, create_all
 
 
 class DemoContent(OyExtBase):

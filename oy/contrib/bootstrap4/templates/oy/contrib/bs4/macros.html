@@ -81,21 +81,21 @@
 </form>
 {% endmacro %}
 
-{% macro messages() %}
-  {% with messages = get_flashed_messages(with_categories=True) -%}
-    {% if messages %}
-      {% for category, m in messages %}
-        {% if category %}
-        {% set mapping={'message': 'info', 'error': 'danger', 'success':'success'} %}
-        {% set cat=mapping.get(category, category) %}
-        {% endif %}
-        <div class="alert alert-{{ cat }} alert-dismissible fade show" role="alert">
-          {{ m|safe if 'markup' in raw_cat else m }}
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-      {% endfor %}
+{% macro messages(messages) %}
+  {% with messages = get_flashed_messages(with_categories=True) %}
+  {% if messages %}
+  {% for category, msg in messages %}
+    {% if category %}
+    {% set mapping={'message': 'info', 'error': 'danger', 'success':'success'} %}
+    {% set cat=mapping.get(category, category) %}
     {% endif %}
-  {%- endwith %}
+    <div class="alert alert-{{ cat }} alert-dismissible fade show" role="alert">
+      {{ msg }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% endif %}
+  {% endwith %}
 {% endmacro %}

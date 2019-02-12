@@ -52,8 +52,8 @@ New project created at /home/projects/mysite
 Then cd to the project directory and create the database with some demo content:
 
 ```bash
-cd mysite
-oy createall
+$ cd mysite
+$ oy createall
 ```
 
 ```bash
@@ -67,7 +67,7 @@ super User created successfully.
 
 ^^^^^^^^^^^^^^^^^^^^^^^^
 Superuser account details: (username=admin) (password=adminpass)
-please change the default password
+Please change the default password
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 Installing fixtures in the database

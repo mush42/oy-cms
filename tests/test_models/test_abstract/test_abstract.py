@@ -8,7 +8,7 @@ def test_timestammped(app, db, makemodel):
     db.session.add(t)
     db.session.commit()
     assert t.created
-    assert not t.updated
+    assert t.updated == t.created
     with app.test_request_context():
         t.title = u"That"
         db.session.commit()

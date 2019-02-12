@@ -45,7 +45,7 @@ class FormView(ContentView):
             )
             if field is None:
                 continue
-            field_entry = FieldEntry(field_id=field.id)
+            field_entry = FieldEntry(key=f.name, field_id=field.id)
             data = f.data
             if field.type == "file_input":
                 file_data = request.files[field.name]
@@ -63,12 +63,13 @@ class FormView(ContentView):
             db.session.add(field_entry)
             entry.fields.append(field_entry)
         db.session.add(entry)
-        db.session.commit()
 
     def serve(self):
         form = DynamicForm(self.page.fields).form
         if form.validate_on_submit():
-            self.store_form(form)
+            with db.session.no_autoflush:
+                self.store_form(form)
+            db.session.commit()
             flash(Markup(self.page.submit_message), "success")
             return redirect(request.path)
         return dict(form=form)

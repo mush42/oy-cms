@@ -54,7 +54,7 @@ class UploadableMediaMixin(Titled, TimeStampped, UserRelated, Tagged):
         tbl = mapper.mapped_table
         sel = db.select([tbl.c.id])
         token = token_urlsafe(14)
-        while connection.scalar(sel.where(tbl.c.file_id == token).count()):
+        while connection.scalar(db.func.count(sel.where(tbl.c.file_id == token))):
             token = token_urlsafe(NUMBYTES)
         self.file_id = token
 
@@ -90,7 +90,7 @@ class Image(db.Model, UploadableMediaMixin):
     def get_thumbnail_id(self, size):
         """ Returns the thumbnail id with the given size (e.g. 'sm').
         """
-        name = "thumbnail_" + size
+        name = f"thumbnail_{size}"
         if name not in self.uploaded_file:
             return
         return self.uploaded_file[name]["id"]

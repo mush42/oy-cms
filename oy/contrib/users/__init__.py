@@ -5,7 +5,7 @@ from .models import *
 
 
 class UserManager(OyExtBase):
-    """Extenssion point to the user profile feature"""
+    """Extenssion point to the users management feature"""
 
     module_args = dict(name="oy.contrib.users", import_name="oy.contrib.users")
 

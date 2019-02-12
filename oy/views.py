@@ -18,7 +18,7 @@ from flask import _app_ctx_stack, current_app, render_template, request
 from oy.babel import lazy_gettext
 from oy.models.page import Page
 from oy.globals import current_page
-from oy.helpers import url_for_page
+from oy.helpers import page_url
 
 
 class ContentViewType(type):
@@ -224,4 +224,4 @@ class ContentViewProcessorMixin:
 
     def page_context(self):
         pages = Page.query.menu_pages.all()
-        return {"pages": pages, "current_page": current_page, "page": current_page, "page_url": url_for_page}
+        return {"pages": pages, "current_page": current_page, "page": current_page, "page_url": page_url}

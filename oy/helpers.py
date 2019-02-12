@@ -12,7 +12,7 @@ _email_re = re.compile(
 )
 
 
-def url_for_page(page):
+def page_url(page):
     """TBD"""
     return f"/{page.url}/"
 

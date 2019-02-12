@@ -24,8 +24,8 @@ class TimeStampped(SQLAEvent):
         nullable=False,
         info=dict(label="Creation Date"),
     )
-    updated = db.Column(db.DateTime, nullable=True, info=dict(label="Last Updated"))
+    updated = db.Column(db.DateTime, nullable=True, default=datetime.utcnow)
 
-    def before_flush(self, session, is_modified):
-        if is_modified and _request_ctx_stack.top is not None:
+    def before_update(self, mapper, connection):
+        if _request_ctx_stack.top is not None:
             self.updated = datetime.utcnow()

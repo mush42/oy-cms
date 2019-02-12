@@ -16,10 +16,11 @@ class OyExtBase(OyModule):
             self._inner_init_app(app)
 
     def _inner_init_app(self, app):
-        if self.name not in app.modules:
-            if self.reg_as_module:
-                app.register_module(self)
-            self.init_app(app)
+        if self.name in app.modules:
+            raise RuntimeError(f"The extension {self.name} is already registered with the application {app}.")
+        if self.reg_as_module:
+            app.register_module(self)
+        self.init_app(app)
 
     def init_app(self, app):
         """Do the work here"""
