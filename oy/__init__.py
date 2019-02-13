@@ -20,4 +20,4 @@ from ._prepare_app import prepare_app
 
 
 __author__ = "Musharraf Omer"
-__version__ = "0.1.2"
+__version__ = "0.1.3"
