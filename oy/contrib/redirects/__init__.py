@@ -18,7 +18,7 @@ from .admin import register_admin
 class Redirects(OyExtBase):
     """Extenssion entry point for oy redirects."""
 
-    module_args = dict(name="oy.contrib.redirects", import_name="oy.contrib.redirects")
+    name = "oy.contrib.redirects"
 
     def init_app(self, app):
         app.before_request_funcs.setdefault(None, []).insert(

@@ -39,10 +39,6 @@ class GenericMediaAdmin(OyModelView):
         )
     ]
 
-    @property
-    def extra_js(self):
-        return [url_for("oy.contrib.media.static", filename="js/media-view.js"),]
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.file_storage = DepotManager.get(self.model.get_upload_storage())
