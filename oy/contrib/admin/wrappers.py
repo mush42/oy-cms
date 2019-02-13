@@ -1,3 +1,4 @@
+from functools import wraps
 from flask import request, redirect, url_for, abort
 from flask_admin import Admin, expose, BaseView
 from flask_admin.base import BaseView, AdminIndexView
@@ -60,3 +61,13 @@ class OyIndexView(AuthenticationViewMixin, AdminIndexView):
 
 class OyBaseView(BaseView, AuthenticationViewMixin):
     pass
+
+
+def admin_required(f):
+    @wraps(f)
+    def _decorated(*args, **kw):
+        if not AuthenticationViewMixin().is_accessible():
+            abort(404)
+        return f(*args, **kw)
+
+    return _decorated

@@ -7,7 +7,7 @@ from .models import *
 class UserManager(OyExtBase):
     """Extenssion point to the users management feature"""
 
-    name = "oy.contrib.users"
+    module_args = {"name": "oy.contrib.users", "import_name": "oy.contrib.users"}
 
     def __init__(self, app=None, profile_fields=None, **kwargs):
         self.profile_fields = profile_fields

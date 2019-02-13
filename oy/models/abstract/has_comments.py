@@ -17,19 +17,15 @@ from .misc import SelfRelated
 from .time_stampped import TimeStampped
 
 
-class CommentMixin(SelfRelated, ):
+class CommentMixin(SelfRelated):
     visitor_name = db.Column(db.String(255), nullable=False)
     visitor_email = db.Column(db.String(255), nullable=False)
     body = db.Column(db.Text)
     remote_addr = db.Column(
-        db.String(255),
-        nullable=False,
-        default=lambda: request.remote_addr
+        db.String(255), nullable=False, default=lambda: request.remote_addr
     )
     user_agent = db.Column(
-        db.String(255),
-        nullable=False,
-        default=lambda: request.user_agent
+        db.String(255), nullable=False, default=lambda: request.user_agent
     )
 
     def __init__(self, author_name, author_email, body):
@@ -50,10 +46,10 @@ class HasComments:
     @declared_attr
     def comments(cls):
         if not hasattr(cls, "Comment"):
-            comment_attrs = {
-                "id": db.Column(db.Integer, primary_key=True),
-            }
-            cls.Comment = type(f"{cls.__name__}Comment", (CommentMixin, db.Model), comment_attrs)
+            comment_attrs = {"id": db.Column(db.Integer, primary_key=True)}
+            cls.Comment = type(
+                f"{cls.__name__}Comment", (CommentMixin, db.Model), comment_attrs
+            )
             # The many-to-many association table
             cls.__comments_association_table__ = _prepare_association_table(
                 table_name=f"{cls.__tablename__}s_comments",
@@ -61,7 +57,5 @@ class HasComments:
                 remote2=cls.Comment.__tablename__,
             )
         return db.relationship(
-            cls.Comment,
-            secondary=cls.__comments_association_table__,
-            backref="objects"
+            cls.Comment, secondary=cls.__comments_association_table__, backref="objects"
         )

@@ -20,7 +20,7 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/mush42/oy-cms",
     license="MIT",
-    packages=find_packages(exclude=["tests",]),
+    packages=find_packages(exclude=["tests"]),
     platforms="any",
     include_package_data=True,
     package_data={"oy": ["project_templates/default/*"]},

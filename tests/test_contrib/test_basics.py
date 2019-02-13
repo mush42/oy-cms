@@ -1,6 +1,6 @@
 import pytest
+from oy.contrib.extbase import OyExtBase
 from oy.contrib.bootstrap4 import Bootstrap4
-from oy.contrib.redirects import Redirects 
 
 
 def test_contrib_exts(app):
@@ -12,7 +12,10 @@ def test_contrib_exts(app):
     assert bs4.name in app.modules
     assert bs4.name in app.data["_oy_contrib_extensions"]
 
-    # registering an extention without module_args should succeed
-    red = Redirects(app)
-    assert red.name in app.data["_oy_contrib_extensions"]
-    assert red.name not in app.modules
+    # Registering exts without module_args should work
+    class TestExt(OyExtBase):
+        name = "test-ext"
+
+    tes = TestExt(app)
+    assert tes.name in app.data["_oy_contrib_extensions"]
+    assert tes.name not in app.modules

@@ -2,14 +2,15 @@ import pytest
 from oy.models.abstract import AbstractPage
 
 
-
 def test_page_imp(db, makemodel):
-    BasePage = makemodel("BasePage", (AbstractPage,), dict(
-        __mapper_args__={"polymorphic_identity": "base-page"}
-    ))
+    BasePage = makemodel(
+        "BasePage",
+        (AbstractPage,),
+        dict(__mapper_args__={"polymorphic_identity": "base-page"}),
+    )
     parent = BasePage(title="Parent")
     child1 = BasePage(title="Child 1", parent=parent)
-    child2= BasePage(title="Child 2", parent=parent)
+    child2 = BasePage(title="Child 2", parent=parent)
     subchild1 = BasePage(title="SubChild 1", parent=child1)
     subsubchild1 = BasePage(title="SubSubChild 1", parent=subchild1)
     pages = [parent, child1, child2, subchild1, subsubchild1]

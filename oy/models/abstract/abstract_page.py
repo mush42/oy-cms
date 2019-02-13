@@ -53,5 +53,3 @@ class AbstractPage(Displayable, BaseNestedSets, ScopedUniquelySlugged):
 
     def __repr__(self):
         return f'<{self.__class__.__name__}(title="{self.title}")>'
-
-

@@ -76,7 +76,9 @@ def process_init_cls(target, *args, **kwargs):
 def _call_dml_events(evt, instance, mapper, connection):
     if isinstance(instance, SQLAEvent):
         methods = get_event_handlers(instance.__class__, evt)
-        call_all_methods_on_this_instance(methods, instance, mapper=mapper, connection=connection)
+        call_all_methods_on_this_instance(
+            methods, instance, mapper=mapper, connection=connection
+        )
 
 
 @db.event.listens_for(db.Mapper, "before_insert")

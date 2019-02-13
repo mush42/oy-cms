@@ -45,5 +45,3 @@ def test_scoped_slugged(db, makemodel):
     db.session.add(toplevel)
     db.session.commit()
     assert toplevel.slug == "child"
-
-

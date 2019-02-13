@@ -48,5 +48,5 @@ class Displayable(db.Model, Titled, Metadata, Published, UserRelated):
     @declared_attr
     def __mapper_args__(cls):
         return dict(
-            polymorphic_identity=cls.__contenttype__, polymorphic_on=cls.contenttype,
+            polymorphic_identity=cls.__contenttype__, polymorphic_on=cls.contenttype
         )

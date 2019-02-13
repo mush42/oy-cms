@@ -15,19 +15,20 @@ from flask import current_app, url_for
 
 
 class BootstrapFileInputWidget(FileInput):
-
     def __call__(self, field, **kwargs):
-        kwargs.setdefault('id', field.id)
-        kwargs.setdefault('name', field.name)
-        kwargs.setdefault('type', self.input_type)
-        kwargs['value'] = False
-        if 'required' not in kwargs and 'required' in getattr(field, 'flags', []):
-            kwargs['required'] = True
-        return current_app.jinja_env.get_template("oy/contrib/admin/fields/bs4_file_input.html").render(kwargs=kwargs)
+        kwargs.setdefault("id", field.id)
+        kwargs.setdefault("name", field.name)
+        kwargs.setdefault("type", self.input_type)
+        kwargs["value"] = False
+        if "required" not in kwargs and "required" in getattr(field, "flags", []):
+            kwargs["required"] = True
+        return current_app.jinja_env.get_template(
+            "oy/contrib/admin/fields/bs4_file_input.html"
+        ).render(kwargs=kwargs)
 
 
 class BootstrapFileInputField(FileField):
     widget = BootstrapFileInputWidget()
 
     def get_field_js(self):
-        return [url_for("oy-admin-resource-module.static", filename="js/file_input.js"),]
+        return [url_for("oy-admin-resource-module.static", filename="js/file_input.js")]

@@ -12,12 +12,12 @@ def test_basic_media(app, client, db):
     media = Media(serve_files=True)
 
     app.config["DEPOT_MEDIA_STORAGES"] = dict(
-        media_storage={"depot.storage_path": str(THIS/"media")}
+        media_storage={"depot.storage_path": str(THIS / "media")}
     )
     media.init_app(app)
 
-    imgfile = THIS/"assets"/"image.jpg"
-    docfile = THIS/"assets"/"document.pdf"
+    imgfile = THIS / "assets" / "image.jpg"
+    docfile = THIS / "assets" / "document.pdf"
     image = Image(title="Image", uploaded_file=open(imgfile, "rb"))
     document = Document(title="Document", uploaded_file=open(docfile, "rb"))
     db.session.add_all([image, document])

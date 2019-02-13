@@ -26,6 +26,8 @@ def active_formatter(view, context, model, name):
 
 
 class SettingsProfileAdmin(OyModelView):
+    """TODO: a potential for multi site installation of oy?"""
+
     can_view_details = True
     # Edit in a dialog not in a new page.
     edit_modal = True
@@ -58,17 +60,6 @@ def update_settings_from_form(data):
 def register_settings_admin(app, admin):
     settings_category = gettext("Settings")
     admin.category_menu_orders[settings_category] = 200
-    admin.add_view(
-        SettingsProfileAdmin(
-            SettingsProfile,
-            db.session,
-            name=lazy_gettext("Settings Profiles"),
-            category=settings_category,
-            menu_icon_type="fa",
-            menu_icon_value="fa-flag",
-            menu_order=math.inf,
-        )
-    )
     categories = set()
     for order, (category, settings) in enumerate(app.provided_settings):
 
@@ -89,8 +80,6 @@ def register_settings_admin(app, admin):
         admin.add_view(
             SettingsAdmin(
                 name=category.args["viewable_name"],
-                menu_icon_type="fa",
-                menu_icon_value="fa-gear",
                 category=settings_category,
                 endpoint="admin-settings-{}".format(category),
                 url="settings/{}".format(category),

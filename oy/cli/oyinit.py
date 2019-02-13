@@ -14,6 +14,7 @@ import os
 import re
 import shutil
 import click
+from contextlib import suppress
 from jinja2 import Template, Environment, FileSystemLoader
 from flask.helpers import get_root_path
 from oy.helpers import exec_module
@@ -69,6 +70,8 @@ class ProjectTemplateCopier:
             raise e
         else:
             os.unlink(os.path.join(self.distdir, "build_context.py"))
+            with suppress(IOError):
+                os.rmdir(os.path.join(self.distdir, "__pycache__"))
 
     def render_name(self, name, basedir):
         if self.jinja_env.variable_start_string in name:
@@ -137,9 +140,9 @@ def init_oy_project(project_name, templatedir=None):
         templatedir = os.path.join(templatedir, rv)
     else:
         templatedir = os.path.join(templatedir, templates[0])
-    click.echo(f"Creating a new project: {project_name}...")
-    click.echo(f"Using project template: {templatedir}...")
+    click.echo(f"\r\nCreating a new project called `{project_name}`")
+    click.echo(f"Using project template: {os.path.split(templatedir)[-1]}.")
     distdir = prepare_directory(project_name)
     copier = ProjectTemplateCopier(templatedir, distdir, project_name).copy_all()
-    click.echo(f"\r\n.........................\r\n")
-    click.echo(f"New project created at {distdir}")
+    click.echo("~" * 12)
+    click.secho(f"New project created at {distdir}\r\n", fg="green", bold=True)

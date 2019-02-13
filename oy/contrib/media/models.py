@@ -29,7 +29,7 @@ class UploadableMediaMixin(Titled, TimeStampped, UserRelated, Tagged):
         unique=True,
         nullable=False,
         index=True,
-        default=lambda: token_urlsafe(NUMBYTES)
+        default=lambda: token_urlsafe(NUMBYTES),
     )
     description = db.Column(
         db.Text, nullable=True, info=dict(lable=lazy_gettext("Description"))
@@ -60,7 +60,12 @@ class UploadableMediaMixin(Titled, TimeStampped, UserRelated, Tagged):
 
     @classmethod
     def get_upload_storage(cls):
-        return db.inspect(cls).get_property("uploaded_file").columns[0].type._upload_storage
+        return (
+            db.inspect(cls)
+            .get_property("uploaded_file")
+            .columns[0]
+            .type._upload_storage
+        )
 
 
 class Image(db.Model, UploadableMediaMixin):

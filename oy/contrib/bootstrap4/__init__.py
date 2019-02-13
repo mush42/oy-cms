@@ -27,7 +27,7 @@ class Bootstrap4(OyExtBase):
         import_name="oy.contrib.bootstrap4",
         static_folder="static",
         template_folder="templates",
-        viewable_name=lazy_gettext("Bootstrap 4"),
+        viewable_name=lazy_gettext("Bootstrap4"),
     )
 
     res_urls = dict(

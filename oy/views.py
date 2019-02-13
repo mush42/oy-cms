@@ -224,4 +224,9 @@ class ContentViewProcessorMixin:
 
     def page_context(self):
         pages = Page.query.menu_pages.all()
-        return {"pages": pages, "current_page": current_page, "page": current_page, "page_url": page_url}
+        return {
+            "pages": pages,
+            "current_page": current_page,
+            "page": current_page,
+            "page_url": page_url,
+        }

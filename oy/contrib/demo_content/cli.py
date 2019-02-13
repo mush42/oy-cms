@@ -80,27 +80,28 @@ class FixtureInstaller:
 
 
 @click.command("install-fixtures")
+@click.pass_context
 @with_appcontext
-def install_fixtures():
-    """Install dummy content."""
+def install_fixtures(ctx):
+    """Add some dummy content to the database."""
     if not User.query.filter(User.active == True).count():
         click.secho(user_not_created_msg, fg="yellow")
         if click.prompt("Would you like to create one now? (y/n):", default="y") == "y":
-            createsuperuser(noinput=False)
+            ctx.invoke(createsuperuser, noinput=False, superuser=True)
         else:
             raise click.Abort()
-    click.echo("Installing fixtures in the database")
-    click.echo("~~~~~~~~~~~~~~~~~")
+    click.echo("Adding some demo data to the database")
+    click.echo("~" * 12)
     click.echo()
     for module in current_app.modules.values():
         fixtured = FixtureInstaller(module)
         if not fixtured.fixtures:
             continue
-        click.secho("Installing fixtures for module: " + module.import_name, fg="blue")
+        click.secho(f"Adding demo data from module: {module.import_name}", fg="yellow")
         fixtured.install()
     click.echo()
-    click.secho("===============", fg="green")
-    click.secho("Finished installing all available fixtures.", fg="green", bold=True)
+    click.secho("=" * 12, fg="green")
+    click.secho("Finished adding all available demo data.", fg="green", bold=True)
 
 
 @click.command(name="createall")
@@ -109,12 +110,17 @@ def install_fixtures():
 def create_all(ctx):
     """Automatically Install all demo data."""
     click.echo()
-    click.secho("~" * 50, fg="green")
+    click.secho("~" * 12, fg="green")
     ctx.invoke(create_db)
     ctx.invoke(createuser, noinput=True, superuser=True)
-    click.echo("^" * 14)
-    click.echo("Superuser account details: (username=admin) (password=adminpass)")
-    click.echo("Please change the default password.")
-    click.echo("^" * 14)
+    click.secho("^" * 12, fg="red")
+    click.secho(
+        "Superuser account details: username=admin, password=adminpass",
+        fg="red",
+        bold=True,
+    )
+    click.secho("Please change the default password.", fg="red", bold=True)
+    click.secho("^" * 12, fg="red")
+    click.echo()
     ctx.invoke(install_fixtures)
-    click.secho("~" * 50, fg="green", bold=True)
+    click.secho("~" * 12, fg="green", bold=True)

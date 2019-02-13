@@ -24,4 +24,3 @@ class PageAdmin(DisplayableAdmin):
 
     def get_preview_url(instance):
         return f"/{instance.url}/"
-

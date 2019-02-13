@@ -25,9 +25,7 @@ class Titled(SQLAEvent):
     title = db.Column(
         db.Unicode(512),
         nullable=False,
-        info=dict(
-            label="Title", description="The title to display for the end user."
-        ),
+        info=dict(label="Title", description="The title to display for the end user."),
     )
 
     def __str__(self):
@@ -95,4 +93,3 @@ class ScopedUniquelySlugged(Slugged):
         else:
             q = q.filter(cls.parent == None)
         return q.count()
-

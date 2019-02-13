@@ -51,7 +51,12 @@ DISPLAYABEL_DEFAULTS = dict(
         "status": SelectField(
             label=lazy_gettext("Status"), choices=Displayable.STATUS_CHOICES
         ),
-        "slug": StringField(label=lazy_gettext("Slug"), description=lazy_gettext("A user-friendly identifier used as a part of the URL."))
+        "slug": StringField(
+            label=lazy_gettext("Slug"),
+            description=lazy_gettext(
+                "A user-friendly identifier used as a part of the URL."
+            ),
+        ),
     },
 )
 

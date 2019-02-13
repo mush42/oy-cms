@@ -1,3 +1,14 @@
+# -*- coding: utf-8 -*-
+"""
+    oy.contrib.admin
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    Adds the admin dashboard via Flask Admin.
+
+    :copyright: (c) 2019 by Musharraf Omer.
+    :license: MIT, see LICENSE for more details.
+"""
+
 from functools import partial
 from wtforms.form import BaseForm
 from jinja2 import Markup, contextfunction
@@ -6,7 +17,14 @@ from flask import request, url_for, abort
 from flask_admin import Admin, expose, helpers as admin_helpers
 from oy.wrappers import OyModule
 from oy.babel import lazy_gettext, gettext, ngettext
-from .wrappers import AuthenticationViewMixin, OyModelView, OyBaseView, OyIndexView
+from oy.signals import oy_app_starting
+from .wrappers import (
+    admin_required,
+    AuthenticationViewMixin,
+    OyModelView,
+    OyBaseView,
+    OyIndexView,
+)
 from .displayable_admin import DisplayableAdmin
 from .page_admin import PageAdmin
 from .settings_admin import register_settings_admin
@@ -28,27 +46,20 @@ def security_ctp_with_admin(admin):
     return security_context_processor
 
 
-class OyAdminResourceModule(OyModule, AuthenticationViewMixin):
-    def __init__(self):
-        super().__init__(
-            "oy-admin-resource-module",
-            __name__,
-            template_folder="templates",
-            static_folder="static",
-            static_url_path="/admin/static/assets",
-        )
-        self.before_request(self.permit)
-
-    def permit(self):
-        if not self.is_accessible():
-            abort(404)
+OyAdminResourceModule = OyModule(
+    name="oy-admin-resource-module",
+    import_name=__name__,
+    template_folder="templates",
+    static_folder="static",
+    static_url_path="/admin/static/assets",
+)
 
 
 class OyAdmin(Admin):
     """Provides integration with Flask-Admin"""
 
     # Resource module that provides custom admin templates and static files
-    resource_module = OyAdminResourceModule()
+    resource_module = OyAdminResourceModule
 
     def __init__(self, app=None, auto_register_modules=False, **kwargs):
         index_view = kwargs.pop(
@@ -81,7 +92,7 @@ class OyAdmin(Admin):
         self.app.config["SECURITY_POST_LOGIN_VIEW"] = self.url
         if "oy-admin-resource-module" not in self.app.modules:
             self.app.register_module(self.resource_module)
-        self.app.before_first_request(self.before_first_request_tasks)
+        oy_app_starting.connect(self.finalization_tasks, sender=self.app)
         [
             self.app.context_processor(func)
             for func in (
@@ -94,10 +105,18 @@ class OyAdmin(Admin):
             )
         ]
 
-    def before_first_request_tasks(self):
+    def finalization_tasks(self, sender):
+        self._secure_admin_static_files()
         register_settings_admin(self.app, self)
         if self.auto_register_modules:
             self.register_module_admin()
+
+    def _secure_admin_static_files(self):
+        for rule in self.app.url_map.iter_rules():
+            endpoint = rule.endpoint
+            if "admin" in endpoint and endpoint.endswith(".static"):
+                func = self.app.view_functions[endpoint]
+                self.app.view_functions[endpoint] = admin_required(func)
 
     def _get_static_for_field(self, field, type_):
         files = getattr(field, f"get_field_{type_}", [])

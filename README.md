@@ -41,12 +41,12 @@ $ oyinit mysite
 ```
 
 ```bash
-Creating project mysite...
-Using project template: /home/.../oy/project_templates/default...
 
-.........................
-
+Creating a new project called `mysite`
+Using project template: default.
+~~~~~~~~~~~~
 New project created at /home/projects/mysite
+
 ```
 
 Then cd to the project directory and create the database with some demo content:
@@ -57,7 +57,8 @@ $ oy createall
 ```
 
 ```bash
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~
 Creating database tables...
 Database tables created.
 Creating a new super user account...
@@ -65,21 +66,22 @@ Creating a new super user account...
 super User created successfully.
 
 
-^^^^^^^^^^^^^^^^^^^^^^^^
-Superuser account details: (username=admin) (password=adminpass)
-Please change the default password
-^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^
+Superuser account details: username=admin, password=adminpass
+Please change the default password.
+^^^^^^^^^^^^
 
-Installing fixtures in the database
-~~~~~~~~~~~~~~~~~
+Adding some demo data to the database
+~~~~~~~~~~~~
 
-Installing fixtures for module: oy.contrib.form
-Installing fixtures for module: oy.contrib.demo_content
-Installing fixtures for module: my.home_page
+Adding demo data from module: oy.contrib.form
+Adding demo data from module: oy.contrib.demo_content
+Adding demo data from module: mysite.home_page
 
-===============
-Finished installing all available fixtures.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+============
+Finished adding all available demo data.
+~~~~~~~~~~~~
+
 ```
 
 Finally run the server:
@@ -94,9 +96,18 @@ Then visit your newly created site at  [http://127.0.0.1:5000](http://127.0.0.1:
 
 I thought you already know. But in case you don't, here is a hint:
 
-> The Midwest, a deserted village, an already dead boy, another junky boy, a black woman with two faces, and a serious man whom you don't want to mess with.
+> The Midwest, a deserted village, an already dead boy, a junky teenager, a black woman with two faces, and a serious man whom you don't want to mess with.
 
 
 ## Contributing
 
-**oy** content management system is still in alpha status, contributions are more than wellcome. Help needed in perfecting existing features as well as adding new ones.
+**oy** content management system is still in _alpha status_, contributions are more than wellcome. Help needed in perfecting existing features as well as adding new ones.
+
+Help is needed in the following areas:
+
+* Fixing minor css regressions in the admin frontend
+* Increasing test coverage
+* Implementing a RESTFUL API with sensible defaults
+* Migrating the **Gutenberg** block editor to be used as the default rich-text widget
+* Using a modren javascript framework to implement some admin widgets (inline fields, image and document choosers...etc)
+* Translations (i18n)

@@ -27,8 +27,8 @@ from .filters import FileTypeCheckFilter, UnsupportedFileTypeError
 
 class GenericMediaAdmin(OyModelView):
     list_template = "oy/contrib/media/admin/list.html"
-    form_columns = ["title", "tags", "uploaded_file", "description",]
-    form_extra_fields = dict(tags=TagsField(label=lazy_gettext("Tags")),)
+    form_columns = ["title", "tags", "uploaded_file", "description"]
+    form_extra_fields = dict(tags=TagsField(label=lazy_gettext("Tags")))
     form_overrides = dict(uploaded_file=BootstrapFileInputField)
     form_widget_args = dict(uploaded_file=dict(required=False))
     column_list = ["title", "created"]
