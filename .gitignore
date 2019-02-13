@@ -90,3 +90,6 @@ ENV/
 
 # Development sqlite databases
 *.sqlite
+
+# media folder created by tests
+tests/test_contrib/media/
