@@ -59,41 +59,9 @@ class SelfRelated:
 class Ordered(SQLAEvent):
     """Provide an ordering field."""
 
-    _sort_order = db.Column(db.Integer)
+    sort_order = db.Column(db.Integer)
     __children_ordering_column__ = "sort_order"
 
-    @hybrid_property
-    def sort_order(self):
-        return self._sort_order
-
-    @sort_order.setter
-    def sort_order(self, value):
-        if not self.id:
-            raise RuntimeError(
-                "Cannot change order before flushing instance to database"
-            )
-        ordtbl = get_owning_table(self, "_sort_order")
-        whr = [ordtbl.c.id != self.id]
-        if "parent" in ordtbl.columns:
-            if self.parent:
-                whr.append(ordtbl.c.parent_id == self.parent_id)
-            else:
-                whr.append(ordtbl.c.parent_id == None)
-        whrcount = list(whr) + [ordtbl.c._sort_order == value]
-        if self.query.filter(db.and_(*whrcount)).count():
-            whr.append(ordtbl.c._sort_order >= value)
-            up = (
-                db.update(ordtbl)
-                .where(db.and_(*whr))
-                .values(_sort_order=ordtbl.c._sort_order + 1)
-            )
-            db.session.execute(up)
-        self._sort_order = value
-
-    def before_flush(self, session, is_modified):
-        if not is_modified:
-            self._sort_order = None
-
     def after_flush_postexec(self, session, is_modified):
-        if self._sort_order is None:
-            self._sort_order = db.inspect(self).mapper.primary_key[0]
+        if self.sort_order is None:
+            self.sort_order = db.inspect(self).mapper.primary_key[0]

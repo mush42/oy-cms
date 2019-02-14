@@ -1,0 +1,33 @@
+{
+  "name": "sb-admin-2",
+  "title": "SB Admin 2",
+  "version": "3.3.7+1",
+  "homepage": "http://startbootstrap.com/template-overviews/sb-admin-2",
+  "author": "Start Bootstrap",
+  "license": {
+    "type": "MIT",
+    "url": "https://github.com/BlackrockDigital/startbootstrap/blob/gh-pages/LICENSE"
+  },
+  "devDependencies": {
+    "browser-sync": "^2.26.3",
+    "del": "^3.0.0",
+    "gulp": "^4.0.0",
+    "gulp-clean-css": "^4.0.0",
+    "gulp-header": "^2.0.7",
+    "gulp-less": "^4.0.1",
+    "gulp-rename": "^1.4.0",
+    "gulp-uglify": "^3.0.1"
+  },
+  "dependencies": {
+    "bootstrap": "~3.3.7",
+    "flot": "^2.1.6",
+    "font-awesome": "~4.6.3",
+    "holderjs": "~2.9.6",
+    "jquery": "^3.3.1",
+    "metismenu": "^3.0.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BlackrockDigital/startbootstrap-sb-admin-2.git"
+  }
+}

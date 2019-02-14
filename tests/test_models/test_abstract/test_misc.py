@@ -35,17 +35,11 @@ def test_self_related(db, makemodel):
 
 def test_ordered(db, makemodel):
     Ord = makemodel("Ord", (SelfRelated, Ordered))
-    top1 = Ord()
-    top2 = Ord(_sort_order=11)
-    db.session.add_all((top1, top2))
+    item1 = Ord()
+    item2 = Ord()
+    db.session.add(item1)
     db.session.commit()
-    assert top1.sort_order == top1.id
-    assert top2.sort_order == top2.id
-    with pytest.raises(RuntimeError):
-        erord = Ord()
-        erord.sort_order = 22
-    t1ord, t2ord = [t.sort_order for t in (top1, top2)]
-    top1.sort_order = t2ord
+    db.session.add(item2)
     db.session.commit()
-    assert top1.sort_order == t2ord
-    assert top2.sort_order > t2ord
+    assert item1.sort_order == item1.id
+    assert item1.sort_order < item2.sort_order

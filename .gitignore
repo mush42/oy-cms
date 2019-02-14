@@ -163,3 +163,7 @@ typings/
 
 # media folder created by tests
 tests/test_contrib/media/
+
+# Frontend generated files
+frontend/admin/dist/
+frontend/admin/vendor/
