@@ -46,7 +46,7 @@ def security_ctp_with_admin(admin):
     return security_context_processor
 
 
-OyAdminResourceModule = OyModule(
+default_resource_module = OyModule(
     name="oy-admin-resource-module",
     import_name=__name__,
     template_folder="templates",
@@ -59,7 +59,7 @@ class OyAdmin(Admin):
     """Provides integration with Flask-Admin"""
 
     # Resource module that provides custom admin templates and static files
-    resource_module = OyAdminResourceModule
+    resource_module = default_resource_module
 
     def __init__(self, app=None, auto_register_modules=False, **kwargs):
         index_view = kwargs.pop(
