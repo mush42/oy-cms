@@ -1,118 +1,102 @@
-var gulp = require('gulp');
-var del = require('del');
-var browserSync = require('browser-sync').create();
-var header = require('gulp-header');
-var cleanCSS = require('gulp-clean-css');
-var rename = require("gulp-rename");
-var uglify = require('gulp-uglify');
-var pkg = require('./package.json');
+const autoprefixer = require("autoprefixer");
+const cssnano = require("cssnano");
+const gulp = require("gulp");
+const del = require("del");
+const browsersync = require("browser-sync").create();
+const header = require("gulp-header");
+const cleanCSS = require("gulp-clean-css");
+const postcss = require("gulp-postcss");
+const rename = require("gulp-rename");
+const sass = require("gulp-sass");
+const uglify = require("gulp-uglify");
+const config = require("./config");
 
+const oy = config.oyAdminStatic;
 
-// Set the banner content
-var banner = ['/*!\n',
-  '* oy cms frontend assets\n',
-  '* (c) 2019 Musharraf and oy contributers\n',
-  ' */\n'
-].join('');
+const banner = ["/*!\n",
+  "* oy cms frontend assets\n",
+  "* (c) 2019 Musharraf and oy contributers\n",
+  " */\n"
+].join("");
 
-// Compile LESS files from /less into /css
-gulp.task('less', function() {
-    return gulp.src('less/sb-admin-2.less')
-        .pipe(less())
-        .pipe(header(banner, { pkg: pkg }))
-        .pipe(gulp.dest('dist/css'))
-        .pipe(browserSync.reload({
-            stream: true
-        }))
-});
+function browserSync(done) {
+  browsersync.init({
+    proxy: "localhost:5000"
+  });
+  done();
+}
 
-// Minify compiled CSS
-gulp.task('minify-css', gulp.series('less'), function() {
-    return gulp.src('dist/css/sb-admin-2.css')
-        .pipe(cleanCSS({ compatibility: 'ie8' }))
-        .pipe(rename({ suffix: '.min' }))
-        .pipe(gulp.dest('dist/css'))
-        .pipe(browserSync.reload({
-            stream: true
-        }))
-});
+function browserSyncReload(done) {
+  browsersync.reload();
+  done();
+}
 
-// Copy JS to dist
-gulp.task('js', function() {
-    return gulp.src(['js/sb-admin-2.js'])
-        .pipe(header(banner, { pkg: pkg }))
-        .pipe(gulp.dest('dist/js'))
-        .pipe(browserSync.reload({
-            stream: true
-        }))
-})
-
-// Minify JS
-gulp.task('minify-js', gulp.series('js'), function() {
-    return gulp.src('js/sb-admin-2.js')
-        .pipe(uglify())
-        .pipe(header(banner, { pkg: pkg }))
-        .pipe(rename({ suffix: '.min' }))
-        .pipe(gulp.dest('dist/js'))
-        .pipe(browserSync.reload({
-            stream: true
-        }))
-});
-
-// Copy vendor libraries from /node_modules into /vendor
-gulp.task('copy', async function() {
-    gulp.src(['node_modules/bootstrap/dist/**/*', '!**/npm.js', '!**/bootstrap-theme.*', '!**/*.map'])
-        .pipe(gulp.dest('vendor/bootstrap'))
-
-    gulp.src(['node_modules/datatables/media/**/*'])
-        .pipe(gulp.dest('vendor/datatables'))
-
-    gulp.src(['node_modules/datatables-plugins/integration/bootstrap/3/*'])
-        .pipe(gulp.dest('vendor/datatables-plugins'))
-
-    gulp.src(['node_modules/datatables-responsive/css/*', 'node_modules/datatables-responsive/js/*'])
-        .pipe(gulp.dest('vendor/datatables-responsive'))
-
-    gulp.src(['node_modules/font-awesome/**/*', '!node_modules/font-awesome/*.json', '!node_modules/font-awesome/.*'])
-        .pipe(gulp.dest('vendor/font-awesome'))
-
-    gulp.src(['node_modules/jquery/dist/jquery.js', 'node_modules/jquery/dist/jquery.min.js'])
-        .pipe(gulp.dest('vendor/jquery'))
-
-    gulp.src(['node_modules/metismenu/dist/*'])
-        .pipe(gulp.dest('vendor/metisMenu'))
-
-    gulp.src(['node_modules/morrisjs/*.js', 'node_modules/morrisjs/*.css', '!node_modules/morrisjs/Gruntfile.js'])
-        .pipe(gulp.dest('vendor/morrisjs'))
-
-})
-
-// Run everything
-gulp.task('default', gulp.series('minify-css', 'minify-js', 'copy'));
-
-// Configure the browserSync task
-gulp.task('browserSync', function() {
-    browserSync.init({
-        server: {
-            baseDir: ''
-        },
-    })
-})
-
-// Dev task with browserSync
-gulp.task('dev', gulp.series('browserSync', 'less', 'minify-css', 'js', 'minify-js'), function() {
-    gulp.watch('less/*.less', ['less']);
-    gulp.watch('dist/css/*.css', ['minify-css']);
-    gulp.watch('js/*.js', ['minify-js']);
-    // Reloads the browser whenever HTML or JS files change
-    gulp.watch('pages/*.html', browserSync.reload);
-    gulp.watch('dist/js/*.js', browserSync.reload);
-});
-
-// Clean all target folders
-gulp.task('clean:all', function () {
-  return del([
-    'dist/*',
-    'vendor/*',
+function clean() {
+  del([
+    "dist/*",
+    "vendor/*",
   ]);
-});
+  return del(oy + "/*", {force: true});
+}
+
+function css() {
+  return gulp.src("scss/*.scss")
+    .pipe(sass())
+    .pipe(header(banner))
+    .pipe(gulp.dest("dist/css"))
+    .pipe(rename({ suffix: ".min" }))
+    .pipe(postcss([autoprefixer(), cssnano()]))
+    .pipe(cleanCSS({ compatibility: "ie8" }))
+    .pipe(gulp.dest("dist/css"))
+    .pipe(browsersync.stream());
+}
+
+function js() {
+  return gulp.src(["js/**/*.js"])
+    .pipe(uglify())
+    .pipe(header(banner))
+    .pipe(gulp.dest("dist/js"))
+    .pipe(rename({ suffix: ".min" }))
+    .pipe(gulp.dest("dist/js"))
+    .pipe(browsersync.stream());
+}
+
+function vendor(done) {
+  Object.entries(config.vendorMap).forEach((entry) => {
+      gulp.src(entry[1])
+      .pipe(gulp.dest("vendor/" + entry[0]))
+  })
+  done();
+}
+
+function copyToOy(done) {
+  const fileMap = {
+    "vendor/**": oy + "/vendor",
+    "dist/css/**": oy + "/css",
+    "dist/js/**": oy + "/js"
+  }
+  Object.entries(fileMap).forEach((entry) => {
+      gulp.src(entry[0])
+      .pipe(gulp.dest(entry[1]))
+  });
+  done();
+}
+
+function watchFiles() {
+  gulp.watch("scss/", css);
+  gulp.watch("js", gulp.series(js));
+}
+
+
+const build = gulp.series(clean, gulp.parallel(css, js, vendor));
+const copy = gulp.series(build, copyToOy);
+const watch = gulp.parallel(watchFiles, browserSync);
+
+// export all tasks
+exports.css = css;
+exports.js = js;
+exports.vendor = vendor;
+exports.clean = clean;
+exports.watch = watch;
+exports.copy = copy;
+exports.default = build;
