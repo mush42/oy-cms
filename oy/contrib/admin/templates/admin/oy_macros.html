@@ -1,0 +1,49 @@
+{% from "admin/layout.html" import menu_icon with context %}
+
+{% macro menu(menu_root=None) %}
+  {% if menu_root is none %}{% set menu_root = admin_view.admin.menu() %}{% endif %}
+  {%- for item in menu_root %}
+  {% set class_name = item.class_name or "" %}
+  {%- if item.is_category() -%}
+  {% set children = item.get_children() %}
+  {% else %}
+  {% set children = None %} 
+  {% endif %}
+  <li class="{% if children %}treeview{%endif%} {% if item.is_active(admin_view) %}active{%endif%} {{class_name}}">
+  <a href="{{ item.get_url() or "#" }}">
+  {{ menu_icon(item) }}{{ item.name }}
+  </a>
+  {% if children %}
+  <ul class="treeview-menu">
+  {{ menu(children) }}
+  </ul>
+  {% endif %}
+  </li>
+  {% endfor %}
+{% endmacro %}
+
+
+{% macro messages() %}
+<script type="text/javascript">
+  $(function () {
+  toastr.options = {
+    closeButton: true,
+    positionClass: "toast-bottom-center",
+    timeOut: 0,
+    extendedTimeOut: 0,
+    showEasing: "swing",
+    hideEasing: "swing",
+    tapToDismiss: true,
+    onclick: null
+  };
+  {% with messages = get_flashed_messages(with_categories=True) %}
+  {% if messages %}
+  {% for category, msg in messages %}
+  {% set category="info" if category=="message" else category %}
+  toastr.{{ category }}("{{ msg }}");
+  {% endfor %}
+  {% endif %}
+  {% endwith %}
+  });
+</script>
+{% endmacro %}

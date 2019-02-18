@@ -17,6 +17,7 @@
 
 {% block head %}
   {{ super() }}
+  <link rel="stylesheet" href="{{ url_for("oy.contrib.media.admin.static", filename="vendor/magnific-popup/magnific-popup.css") }}">
   <style>
 	.select-all-wrapper {
 		margin-bottom: 1.5rem;
@@ -76,6 +77,7 @@
 
 {% block tail %}
 {{ super() }}
+<script type="text/javascript" src="{{ url_for("oy.contrib.media.admin.static", filename="vendor/magnific-popup/magnific-popup.css") }}">
 <script type="text/javascript">
 $(document).ready(function() {
 

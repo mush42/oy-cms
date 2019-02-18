@@ -29,7 +29,7 @@ class CkeditorTextAreaField(TextAreaField):
         return [
             url_for(
                 "oy-admin-resource-module.static",
-                filename="vendor/ckeditor/ckeditor.js",
+                filename="vendor/fields/ckeditor/ckeditor.js",
             ),
-            url_for("oy-admin-resource-module.static", filename="js/ckeditor-setup.js"),
+            url_for("oy-admin-resource-module.static", filename="js/fields/ckeditor-setup.min.js"),
         ]

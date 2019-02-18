@@ -1,6 +1,6 @@
+const { src, dest, series, parallel, watch } = require("gulp");
 const autoprefixer = require("autoprefixer");
 const cssnano = require("cssnano");
-const gulp = require("gulp");
 const del = require("del");
 const browsersync = require("browser-sync").create();
 const header = require("gulp-header");
@@ -11,7 +11,6 @@ const sass = require("gulp-sass");
 const uglify = require("gulp-uglify");
 const config = require("./config");
 
-const oy = config.oyAdminStatic;
 
 const banner = ["/*!\n",
   "* oy cms frontend assets\n",
@@ -19,84 +18,80 @@ const banner = ["/*!\n",
   " */\n"
 ].join("");
 
-function browserSync(done) {
-  browsersync.init({
-    proxy: "localhost:5000"
+async function browserSync() {
+  await browsersync.init({
+    proxy: "localhost:5000/admin/"
   });
-  done();
 }
 
-function browserSyncReload(done) {
-  browsersync.reload();
-  done();
+async function browserSyncReload() {
+  await browsersync.reload();
 }
 
-function clean() {
+function clean(done) {
   del([
     "dist/*",
     "vendor/*",
   ]);
-  return del(oy + "/*", {force: true});
+  config.contribModules.forEach((mod) => {
+    del(mod.staticDir + "/*", {force: true});
+  });
+  done();
 }
 
 function css() {
-  return gulp.src("scss/*.scss")
+  return src("scss/**/*.scss")
     .pipe(sass())
     .pipe(header(banner))
-    .pipe(gulp.dest("dist/css"))
+    .pipe(dest("dist/css"))
     .pipe(rename({ suffix: ".min" }))
     .pipe(postcss([autoprefixer(), cssnano()]))
     .pipe(cleanCSS({ compatibility: "ie8" }))
-    .pipe(gulp.dest("dist/css"))
+    .pipe(dest("dist/css"))
     .pipe(browsersync.stream());
 }
 
 function js() {
-  return gulp.src(["js/**/*.js"])
+  return src(["js/**/*.js"])
     .pipe(uglify())
     .pipe(header(banner))
-    .pipe(gulp.dest("dist/js"))
+    .pipe(dest("dist/js"))
     .pipe(rename({ suffix: ".min" }))
-    .pipe(gulp.dest("dist/js"))
+    .pipe(dest("dist/js"))
     .pipe(browsersync.stream());
 }
 
 function vendor(done) {
   Object.entries(config.vendorMap).forEach((entry) => {
-      gulp.src(entry[1])
-      .pipe(gulp.dest("vendor/" + entry[0]))
-  })
+      src(entry[1])
+      .pipe(dest("vendor/" + entry[0]))
+  });
   done();
 }
 
 function copyToOy(done) {
-  const fileMap = {
-    "vendor/**": oy + "/vendor",
-    "dist/css/**": oy + "/css",
-    "dist/js/**": oy + "/js"
-  }
-  Object.entries(fileMap).forEach((entry) => {
-      gulp.src(entry[0])
-      .pipe(gulp.dest(entry[1]))
+  Object.entries(config.oyDeps).forEach((entry) => {
+      src(entry[0])
+      .pipe(dest(entry[1]))
   });
   done();
 }
 
 function watchFiles() {
-  gulp.watch("scss/", css);
-  gulp.watch("js", gulp.series(js));
+  watch("scss/", series(css));
+  watch("js", series(js));
 }
 
 
-const build = gulp.series(clean, gulp.parallel(css, js, vendor));
-const copy = gulp.series(build, copyToOy);
-const watch = gulp.parallel(watchFiles, browserSync);
+const build = series(clean, parallel(css, js, vendor));
+const watchTask = parallel(series(watchFiles, css, js, copyToOy), browserSync);
 
 // export all tasks
+exports.clean = clean;
 exports.css = css;
 exports.js = js;
 exports.vendor = vendor;
-exports.clean = clean;
-exports.watch = watch;
-exports.copy = copy;
-exports.default = build;
+exports.build = build;
+exports.copy = copyToOy;
+exports.watch = watchTask;
+exports.default = series(build, copyToOy);

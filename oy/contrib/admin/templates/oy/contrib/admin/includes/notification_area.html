@@ -1,0 +1,50 @@
+<!-- Notifications -->
+<li class="dropdown notifications-menu">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false" role="button">
+    <i class="fa fa-bell-o"></i>
+    <span class="sr-only">Notifications</span>
+    <span class="label label-warning">10</span>
+  </a>
+  <ul class="dropdown-menu">
+    {% if not notifications %}
+    <li class="header">{{ gettext("No notifications") }}</li>
+    {% else %}
+    <li class="header">You have new notifications</li>
+    {% endif %}
+    <li>
+      {% if notifications %}
+      <!-- inner menu: contains the actual data -->
+      <ul class="menu">
+        <li>
+          <a href="#">
+            <i class="fa fa-users text-aqua"></i> 5 new members joined today
+          </a>
+        </li>
+      </ul>
+      {% endif %}
+    </li>
+    <li class="footer"><a href="#">View all</a></li>
+  </ul>
+</li>
+<!-- User Account. -->
+<li class="dropdown user user-menu">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false" role="button">
+    <span class="sr-only">User account</span>
+    <i class="fa fa-user"></i>
+  </a>
+  <ul class="dropdown-menu">
+    <!-- User image -->
+    <li class="user-header">
+      <p>{{ current_user.username }}</p>
+    </li>
+    <!-- Menu Footer-->
+    <li class="user-footer">
+      <div class="pull-left">
+        <a href="#" class="btn btn-default btn-flat">Edit Profile</a>
+      </div>
+      <div class="pull-right">
+        <a href="{{ url_for("security.logout") }}" class="btn btn-default btn-flat">Sign out</a>
+      </div>
+    </li>
+  </ul>
+</li>

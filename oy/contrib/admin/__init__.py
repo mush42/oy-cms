@@ -67,8 +67,8 @@ class OyAdmin(Admin):
             OyIndexView(
                 name=lazy_gettext("Dashboard Home"),
                 menu_icon_type="fa",
-                menu_icon_value="fa-home",
-                # template="oy_admin/index.html",
+                menu_icon_value="fa-dashboard",
+                template="oy/contrib/admin/index.html",
             ),
         )
         self.auto_register_modules = auto_register_modules
@@ -98,7 +98,7 @@ class OyAdmin(Admin):
             for func in (
                 security_ctp_with_admin(self),
                 lambda: dict(
-                    admin_plugin_static=self.admin_plugin_static,
+                    oy_admin_static=self.admin_plugin_static,
                     get_form_css=self.get_form_static("css"),
                     get_form_js=self.get_form_static("js"),
                 ),

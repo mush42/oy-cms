@@ -9,7 +9,6 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from .tinymce import TinymceTextAreaField
 from .ckeditor import CkeditorTextAreaField
 from .tags import TagsField
 from .bs3 import BootstrapFileInputField

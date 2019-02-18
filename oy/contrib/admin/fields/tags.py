@@ -43,7 +43,7 @@ class TagsField(StringField):
         return [
             url_for(
                 "oy-admin-resource-module.static",
-                filename="vendor/tags_input/jquery.tagsinput.min.css",
+                filename="vendor/fields/tagsinput/jquery.tagsinput-revisited.min.css",
             )
         ]
 
@@ -51,7 +51,7 @@ class TagsField(StringField):
         return [
             url_for(
                 "oy-admin-resource-module.static",
-                filename="vendor/tags_input/jquery.tagsinput.min.js",
+                filename="vendor/fields/tagsinput/jquery.tagsinput-revisited.min.js",
             ),
             Markup(
                 '<script type="text/javascript">$(".tags_input").tagsInput()</script>'

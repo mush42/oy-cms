@@ -1,6 +1,6 @@
 {
   "name": "oy-frontend",
-  "title": "Oy CMS Frontend",
+  "title": "Oy CMS Frontend Components",
   "version": "0.1.5",
   "homepage": "http://github.com/mush42/oy-cms",
   "author": "Musharraf Omer",
@@ -9,11 +9,14 @@
     "url": "https://github.com/mush42/oy-cms/blob/LICENSE"
   },
   "devDependencies": {
+    "autoprefixer": "^9.4.7",
     "browser-sync": "^2.26.3",
+    "cssnano": "^4.1.10",
     "del": "^3.0.0",
     "gulp": "^4.0.0",
     "gulp-clean-css": "^4.0.0",
     "gulp-header": "^2.0.7",
+    "gulp-postcss": "^8.0.0",
     "gulp-rename": "^1.4.0",
     "gulp-sass": "^4.0.2",
     "gulp-uglify": "^3.0.1"
@@ -21,20 +24,18 @@
   "dependencies": {
     "@ckeditor/ckeditor5-build-classic": "^11.2.0",
     "admin-lte": "~2.4.8",
-    "autoprefixer": "^9.4.7",
-    "bootstrap": "~3.3.7",
-    "bootstrap-datepicker": "^1.8.0",
-    "bootstrap-daterangepicker": "^3.0.3",
-    "cssnano": "^4.1.10",
+    "bootstrap": "3.4.0",
+    "bootstrap4": "npm:bootstrap",
+    "bootswatch": "^4.3.1",
     "flot": "^2.1.6",
     "font-awesome": "^4.7.0",
-    "gulp-postcss": "^8.0.0",
     "holderjs": "~2.9.6",
     "jquery": "^3.3.1",
     "jquery.tagsinput-revisited": "^2.0.0",
     "lity": "^2.3.1",
+    "magnific-popup": "^1.1.0",
     "metismenu": "^3.0.3",
-    "select2": "^4.0.6-rc.1"
+    "toastr": "^2.1.4"
   },
   "repository": {
     "type": "git",

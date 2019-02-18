@@ -1,153 +1,190 @@
-<!DOCTYPE html>
+<!doctype html>
 {% import 'admin/layout.html' as layout with context -%}
+{% import 'admin/oy_macros.html' as oy with context -%}
 {% import 'admin/static.html' as admin_static with context %}
 {% import "oy/contrib/admin/form_fields_macros.html" as form_field_macros with context %}
-
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
-  <title>{% block title %}{% if admin_view.category %}{{ admin_view.category }} - {% endif %}{{ admin_view.name }} - {{ admin_view.admin.name }}{% endblock %}</title>
-  {% block head_meta %}
-  {% endblock %}
-  {% block head_css %}
-  <!-- Bootstrap -->
-    <link href="{{ admin_static.url(filename='bootstrap/bootstrap3/swatch/{swatch}/bootstrap.min.css'.format(swatch=config.get('FLASK_ADMIN_SWATCH', 'default')), v='3.3.5') }}" rel="stylesheet">
-    <link href="{{ admin_static.url(filename='bootstrap/bootstrap3/css/bootstrap-theme.min.css', v='3.3.5') }}" rel="stylesheet">
-  <!-- Font Awesome -->
-  <link href="{{ admin_plugin_static('vendor/css/font-awesome.min.css') }}" rel="stylesheet">
-  <link href="{{ admin_plugin_static('vendor/css/lity.min.css') }}" rel="stylesheet">
-  <link href="{{ admin_plugin_static('vendor/css/animate.min.css') }}" rel="stylesheet">
-  <link href="{{ admin_plugin_static('css/custom.min.css') }}" rel="stylesheet">
-  <!-- Custom Admin Style -->
-  <link href="{{ admin_static.url(filename='admin/css/bootstrap3/admin.css', v='1.1.1') }}" rel="stylesheet">
-
-    {% if admin_view.extra_css %}
-      {% for css_url in admin_view.extra_css %}
-      <link href="{{ css_url }}" rel="stylesheet">
-      {% endfor %}
-    {% endif %}
-	{{ form_field_macros.render_form_css() }}
-  {% endblock %}
+<head>
   {% block head %}
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <title>
+  {% block title %}
+  {% if admin_view.category %}
+  {{ admin_view.category ~ " - " }}
+  {% endif %}
+  {{ admin_view.name ~ " - " }}{{ admin_view.admin.name }}
   {% endblock %}
-  {% block head_tail %}
+  </title>
+
+  {% block head_meta %}{% endblock %}
+
+  {% block head_css %}
+  <!-- Bootstrap 3.3.7 -->
+  <link rel="stylesheet" href="{{ oy_admin_static("vendor/bootstrap/css/bootstrap.min.css") }}">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="{{ oy_admin_static("vendor/font-awesome/css/font-awesome.min.css") }}">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{{ oy_admin_static("vendor/admin-lte/AdminLTE-without-plugins.min.css") }}">
+  <!-- AdminLTE Skin. -->
+  <link rel="stylesheet" href="{{ oy_admin_static("vendor/admin-lte/skin-black.min.css") }}">
+  <!-- Metesmenu. -->
+  <link rel="stylesheet" href="{{ oy_admin_static("vendor/metisMenu/metisMenu.min.css") }}">
+  <!-- Lity lightbox. -->
+  <link rel="stylesheet" href="{{ oy_admin_static("vendor/lity/lity.min.css") }}">
+  <!-- toastr notifications. -->
+  <link rel="stylesheet" href="{{ oy_admin_static("vendor/toastr/toastr.min.css") }}">
+  <!-- Custom css -->
+  <link rel="stylesheet" href="{{ oy_admin_static("css/oyadmin.min.css") }}">
+  {% endblock head_css %}
+
+  {% block admin_view_extra_css %}
+  {% if admin_view.extra_css %}
+  {% for css_url in admin_view.extra_css %}
+  <link href="{{ css_url }}" rel="stylesheet">
+  {% endfor %}
+  {% endif %}
   {% endblock %}
-  </head>
-  <body class="nav-md">
 
-  <!-- Page Content Starts Here -->
-  {% block page_body %}
-  <div class="container body">
-    <div class="main_container">
+  {% block form_fields_css %}
+  {{ form_field_macros.render_form_css() }}
+  {% endblock %}
 
-    <div class="col-md-3 left_col" id="side-navigation">
-      <div class="left_col scroll-view">
-      <div class="navbar nav_title" style="border: 0;">
-        {% block brand %}
-        <a class="site_title" href="{{ admin_view.admin.url }}">{{ admin_view.admin.name }}</a>
-        {% endblock %}
-      </div>
+  {% block head_tail %}{% endblock %}
+  {% endblock %}
+</head>
+<body class="hold-transition skin-black sidebar-mini">
+<!-- Site wrapper -->
+<div class="wrapper">
 
-      <div class="clearfix"></div>
+  <header class="main-header">
+    {% block brand %}
+    {% endblock brand %}
 
-      <br />
+    <!-- Header Navbar. -->
+    <nav class="navbar navbar-static-top">
+      <!-- Sidebar toggle button-->
+      <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
 
-      <!-- sidebar menu -->
-      {% block main_menu %}
-      <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
-        <div class="menu_section">
-        <h3>Main Menu</h3>
-        <ul class="nav side-menu">
-        {{ layout.menu() }}
+      <div class="navbar-custom-menu">
+        <ul class="nav navbar-nav">
+        {% include "oy/contrib/admin/includes/notification_area.html" %}
+        <!-- Control Sidebar Toggle Button -->
+        <li>
+          <a href="#" data-toggle="control-sidebar" role="button" aria-expanded="false">
+            <span class="sr-only">Toggle Right side menu</span>
+            <i class="fa fa-gears"></i>
+          </a>
+        </li>
         </ul>
-        </div>
       </div>
-      {% endblock %}
-      <!-- /sidebar menu -->
+    </nav>
+  </header>
 
-      </div>
-    </div>
-
-    <!-- top navigation -->
-    {% block menu_links %}
-    <div class="top_nav pull-right" id="menu-links">
-      <div class="nav_menu">
-      <nav>
-        <div class="nav toggle" id="side-menu-toggler">
-        <a role="button" id="menu_toggle" title="{{ gettext("Expand menu") }}"><i class="fa fa-expand"></i></a>
-        </div>
-        <ul class="nav navbar-nav navbar-right">
+  <!-- Left side column. contains the sidebar -->
+  {% block side_menu %}
+  <aside class="main-sidebar">
+    <!-- sidebar. -->
+    <section class="sidebar">
+      <!-- sidebar menu. -->
+      <ul class="sidebar-menu" data-widget="tree">
+        <li class="header" role="heading">{{ gettext("Main Menu") }}</li>
+        {{ oy.menu() }}
+        {% block menu_links %}
+        <li class="header" role="heading">{{ gettext("Other Links") }}</li>
         {{ layout.menu_links() }}
-        </ul>
-      </nav>
-      {% block access_control %}
-      {% endblock %}
-      </div>
-    </div>
-    {% endblock %}
-    <!-- /top navigation -->
+        {% endblock menu_links %}
+      </ul>
+    </section>
+    <!-- /.sidebar -->
+  </aside>
+  {% endblock side_menu %}
 
-    <!-- page content -->
-    <div class="right_col" role="main">
-    {% block messages %}
-    {{ layout.messages() }}
-    {% endblock %}
+  {% block access_control %}{% endblock %}
 
-    {# store the jinja2 context for form_rules rendering logic #}
-    {% set render_ctx = h.resolve_ctx() %}
-    {% block page_header %}
-    <div class="page-title">
-      <div class="title_left">
-      <h1 class="page-title">{{admin_view.name|capitalize}}</h1>
-      </div>
-    </div>
-    {% endblock %}
+  {# store the jinja2 context for form_rules rendering logic #}
+  {% set render_ctx = h.resolve_ctx() %}
 
-    <div class="clearfix"></div>
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      {% block page_header %}
+      <h1>{{admin_view.name|capitalize}}</h1>
+      {% endblock page_header %}
+    </section>
 
+    <!-- Main content -->
+    <section class="content">
+    <div class="row">
+    <div class="page_body_wrapper col-md-offset-1">
     {% block body %}{% endblock %}
     </div>
-    <!-- /page content -->
-
-    <!-- footer content -->
-    <footer>
-      <div class="pull-right">
-      Oy Content Management System
-      </div>
-      <div class="clearfix"></div>
-    </footer>
-    <!-- /footer content -->
-
     </div>
+    </section>
+    <!-- /.content -->
   </div>
+  <!-- /.content-wrapper -->
 
-  {% endblock %}
-  <!-- Page Content Ends Here -->
+  <footer class="main-footer">
+    <div class="pull-right hidden-xs">
+      <b>Oy Content Management System</b>
+    </div>
+  </footer>
 
-  {% block tail_js %}
-  <script src="{{ admin_plugin_static('vendor/js/jquery.min.js') }} " type="text/javascript"></script>
-  <script src="{{ admin_plugin_static('vendor/js/lity.min.js') }} " type="text/javascript"></script>
-      <script src="{{ admin_static.url(filename='bootstrap/bootstrap3/js/bootstrap.min.js', v='3.3.5') }}" type="text/javascript"></script>
-  <script src="{{ admin_plugin_static('js/custom.min.js') }}" type="text/javascript"></script>
-  <script src="{{ admin_plugin_static('js/admin-extra.js') }}" type="text/javascript"></script>
-  <script src="{{ admin_static.url(filename='vendor/moment.min.js', v='2.9.0') }}" type="text/javascript"></script>
-  <script src="{{ admin_static.url(filename='vendor/select2/select2.min.js', v='3.5.2') }}" type="text/javascript"></script>
+  <!-- Control Sidebar -->
+  <aside class="control-sidebar control-sidebar-dark" aria-hidden="true">
+  {% include "oy/contrib/admin/includes/secondary_sidebar.html" %}
+  </aside>
+  <!-- /.control-sidebar -->
+  <!-- Add the sidebar's background. This div must be placed
+       immediately after the control sidebar -->
+  <div class="control-sidebar-bg"></div>
+</div>
+<!-- ./wrapper -->
 
-  {% if admin_view.extra_js %}
-    {% for js_url in admin_view.extra_js %}
-    <script src="{{ js_url }}" type="text/javascript"></script>
-    {% endfor %}
-  {% endif %}
+{% block tail_js %}
+<!-- jQuery 3 -->
+<script src="{{ oy_admin_static("vendor/jquery/jquery.min.js") }}"></script>
+<!-- Bootstrap 3.3.7 -->
+<script src="{{ oy_admin_static("vendor/bootstrap/js/bootstrap.min.js") }}"></script>
+<!-- AdminLTE App -->
+<script src="{{ oy_admin_static("vendor/admin-lte/adminlte.min.js") }}"></script>
+<!-- metestmenu -->
+<script src="{{ oy_admin_static("vendor/metisMenu/metisMenu.min.js") }}"></script>
+<!-- Lity lightbox -->
+<script src="{{ oy_admin_static("vendor/lity/lity.min.js") }}"></script>
+<!-- toastr notifications. -->
+<script src="{{ oy_admin_static("vendor/toastr/toastr.min.js") }}"></script>
 
-  {{ form_field_macros.render_form_js() }}
+<script>
+  $(document).ready(function () {
+    $('.sidebar-menu').tree()
+  });
+</script>
+{% endblock %}
 
-  {% endblock %}
+{% block messages %}
+{{ oy.messages() }}
+{% endblock %}
 
-  {% block tail %}
-  {% endblock %}
-  </body>
+{% block admin_view_extra_js %}
+{% if admin_view.extra_js %}
+{% for js_url in admin_view.extra_js %}
+<script src="{{ js_url }}" type="text/javascript"></script>
+{% endfor %}
+{% endif %}
+{% endblock %}
+
+{% block form_fields_js %}
+{{ form_field_macros.render_form_js() }}
+{% endblock %}
+{% block tail %}{% endblock %}
+</body>
 </html>

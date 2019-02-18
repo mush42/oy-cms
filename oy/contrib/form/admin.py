@@ -25,7 +25,7 @@ from oy.models import db
 from oy.babel import lazy_gettext
 from oy.helpers import paginate_with_args
 from oy.contrib.admin.wrappers import AuthenticationViewMixin
-from oy.contrib.admin.fields import TinymceTextAreaField
+from oy.contrib.admin.fields import CkeditorTextAreaField
 from oy.contrib.admin import PageAdmin
 from .models import Form, Field, FormEntry
 
@@ -80,7 +80,7 @@ class FormAdmin(PageAdmin):
     form_columns.insert(6, "fields")
     form_columns.insert(7, "submit_text")
     form_columns.insert(8, "submit_message")
-    form_overrides = {"submit_message": TinymceTextAreaField}
+    form_overrides = {"submit_message": CkeditorTextAreaField}
     inline_models = [
         (
             Field,
