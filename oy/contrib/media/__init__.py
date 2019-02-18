@@ -51,6 +51,7 @@ class Media(OyExtBase):
                 import_name="oy.contrib.media",
                 static_folder="static",
                 template_folder="templates",
+                static_url_path="/admin/static/assets/media"
             )
         )
         if self.serve_files:
