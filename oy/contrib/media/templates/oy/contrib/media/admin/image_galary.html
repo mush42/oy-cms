@@ -19,15 +19,6 @@
   {{ super() }}
   <link rel="stylesheet" href="{{ url_for("oy.contrib.media.admin.static", filename="css/galary.min.css") }}">
   <link rel="stylesheet" href="{{ url_for("oy.contrib.media.admin.static", filename="vendor/magnific-popup/magnific-popup.css") }}">
-  <style>
-	.select-all-wrapper {
-		margin-bottom: 1.5rem;
-		max-width: 45%;
-	}
-  .galary-wrapper {
-    margin: auto 1.2rem auto 1.2rem;
-  }
-  </style>
 {% endblock %}
 
 {% block body %}
@@ -43,10 +34,12 @@
 	{% endif %}
 	<div class="row">
     {% for row in data %}
-	<div class="col-md-2">
+	<div class="col-lg-2 col-md-4 col-sm-6 col-xs-12">
 	<div class="thumbnail">
 	  <div class="image view view-first">
-		<img data-id="{{ row.id }}" data-title="{{ row.title }}" class="image-preview" style="width: 100%;display: block;cursor:pointer;" src="{{ url_for(".internal_serve", file_id=row.file_id, size='sm') }}" alt="{{ row.title }}" tabindex="0"/>
+		<a href="{{ url_for(".internal_serve", file_id=row.file_id) }}" class="img-link">
+      <img data-id="{{ row.id }}" data-title="{{ row.title }}" class="image-preview" style="width: 100%;display: block;cursor:pointer;" src="{{ url_for(".internal_serve", file_id=row.file_id, size='sm') }}" alt="{{ row.title }}"/>
+    </a>
 	  </div>
 	  <div class="tools tools-bottom">
 	 	 <input type="checkbox" name="rowid" class="action-checkbox" value="{{ get_pk_value(row) }}" title="Select {{ row.title }}" /> <span role="presentation">{{ row.title }}</span>
@@ -78,9 +71,15 @@
 
 {% block tail %}
 {{ super() }}
-<script type="text/javascript" src="{{ url_for("oy.contrib.media.admin.static", filename="vendor/magnific-popup/magnific-popup.css") }}">
+<script type="text/javascript" src="{{ url_for("oy.contrib.media.admin.static", filename="vendor/magnific-popup/jquery.magnific-popup.min.js") }}"></script>
+
 <script type="text/javascript">
 $(document).ready(function() {
+
+  $(".galary-wrapper").magnificPopup({
+    delegate: ".img-link",
+    type: "image"
+  });
 
   var top_level = (window.frameElement && window.dialogArguments) || opener || parent || top;
   var popup = top_level.current_popup;

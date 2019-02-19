@@ -20,7 +20,7 @@ const banner = ["/*!\n",
 
 async function browserSync() {
   await browsersync.init({
-    proxy: "localhost:5000/admin/"
+    proxy: "localhost:5000/"
   });
 }
 
@@ -28,15 +28,15 @@ async function browserSyncReload() {
   await browsersync.reload();
 }
 
-function clean(done) {
-  del([
+function clean() {
+  let toDelete = [
     "dist/*",
     "vendor/*",
-  ]);
+  ];
   config.contribModules.forEach((mod) => {
-    del(mod.staticDir + "/*", {force: true});
+	toDelete.push(mod.staticDir + "/*");
   });
-  done();
+  return del(toDelete, {force: true});
 }
 
 function css() {
@@ -78,13 +78,15 @@ function copyToOy(done) {
 }
 
 function watchFiles() {
-  watch("scss/", series(css));
-  watch("js", series(js));
+  watch("scss/", series(css, copyToOy));
+  watch("js", series(js, copyToOy));
+  watch("../oy/contrib/**/templates/**/*.html", async function watchTemplates() {
+	  await browsersync.reload();
+  });
 }
 
 
 const build = series(clean, parallel(css, js, vendor));
-const watchTask = parallel(series(watchFiles, css, js, copyToOy), browserSync);
 
 // export all tasks
 exports.clean = clean;
@@ -93,5 +95,5 @@ exports.js = js;
 exports.vendor = vendor;
 exports.build = build;
 exports.copy = copyToOy;
-exports.watch = watchTask;
+exports.watch = parallel(series(watchFiles, css, js), browserSync);
 exports.default = series(build, copyToOy);
