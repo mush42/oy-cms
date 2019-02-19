@@ -99,3 +99,7 @@ ENV/
 
 # media folder created by tests
 tests/test_contrib/media/
+
+# static files as they are auto generated
+oy/contrib/**/static/
+
