@@ -16,7 +16,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.ext.associationproxy import association_proxy
 from flask import current_app
 from oy.boot.sqla import db
-from oy.models.abstract import SQLAEvent, ProxiedDictMixin, DynamicProp
+from oy.models.abstract import SQLAEvent, ReadOnlyProxiedDictMixin, DynamicProp
 from oy.dynamicform import Field
 from oy.helpers import get_owning_table
 
@@ -86,7 +86,7 @@ class Setting(DynamicProp, db.Model):
         return "<Setting key={}><category:{}>".format(self.key, self.category)
 
 
-class Settings(ProxiedDictMixin, db.Model, SQLAEvent):
+class Settings(ReadOnlyProxiedDictMixin, db.Model, SQLAEvent):
     id = db.Column(db.Integer, primary_key=True)
     store = db.relationship(
         "Setting", collection_class=attribute_mapped_collection("key")

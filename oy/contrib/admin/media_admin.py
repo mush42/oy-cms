@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    oy.contrib.media.admin
+    oy.contrib.admin.media
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     Provides the admin interface for adding and removing images and documents.
@@ -20,13 +20,13 @@ from oy.contrib.admin import OyModelView
 from oy.contrib.admin.fields import BootstrapFileInputField, TagsField
 from oy.models import db
 from oy.babel import gettext, lazy_gettext
-from .models import Image, Document
-from .serving import ModelFileServer
-from .filters import FileTypeCheckFilter, UnsupportedFileTypeError
+from oy.models.media import Image, Document
+from oy.media.serving import ModelFileServer
+from oy.media.filters import FileTypeCheckFilter, UnsupportedFileTypeError
 
 
 class GenericMediaAdmin(OyModelView):
-    list_template = "oy/contrib/media/admin/list.html"
+    list_template = "admin/oy/media/list.html"
     form_columns = ["title", "tags", "uploaded_file", "description"]
     form_extra_fields = dict(tags=TagsField(label=lazy_gettext("Tags")))
     form_overrides = dict(uploaded_file=BootstrapFileInputField)
@@ -83,7 +83,7 @@ class GenericMediaAdmin(OyModelView):
 
 
 class ImageAdmin(GenericMediaAdmin):
-    list_template = "oy/contrib/media/admin/image_galary.html"
+    list_template = "admin/oy/media/image_galary.html"
 
     @expose("/files/<string:file_id>")
     @expose("/thumbnails/<string:size>/<string:file_id>")
@@ -98,7 +98,7 @@ class ImageAdmin(GenericMediaAdmin):
         return FileServeApp(storedfile=file, cache_max_age=0)
 
 
-def register_admin(app, admin):
+def register_media_admin(app, admin):
     admin.add_view(
         ImageAdmin(
             Image,

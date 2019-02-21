@@ -17,7 +17,7 @@ from flask import current_app, url_for
 from oy.models import db
 from oy.models.abstract import Titled, TimeStampped, UserRelated, Tagged
 from oy.babel import lazy_gettext
-from .filters import FileTypeCheckFilter, WithThumbnailFilter
+from oy.media.filters import FileTypeCheckFilter, WithThumbnailFilter
 
 
 NUMBYTES = 16

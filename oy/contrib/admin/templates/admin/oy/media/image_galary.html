@@ -1,4 +1,4 @@
-{% extends "oy/contrib/media/admin/list.html" %}
+{% extends "admin/oy/media/list.html" %}
 
 {% macro delete_row(row_id, row) %}
 <form style="display: inline-block;" method="POST" action="{{ get_url('.delete_view') }}">
@@ -17,8 +17,8 @@
 
 {% block head %}
   {{ super() }}
-  <link rel="stylesheet" href="{{ url_for("oy.contrib.media.admin.static", filename="css/galary.min.css") }}">
-  <link rel="stylesheet" href="{{ url_for("oy.contrib.media.admin.static", filename="vendor/magnific-popup/magnific-popup.css") }}">
+  <link rel="stylesheet" href="{{ oy_admin_static("css/galary.min.css") }}">
+  <link rel="stylesheet" href="{{ oy_admin_static("vendor/magnific-popup/magnific-popup.css") }}">
 {% endblock %}
 
 {% block body %}
@@ -71,7 +71,7 @@
 
 {% block tail %}
 {{ super() }}
-<script type="text/javascript" src="{{ url_for("oy.contrib.media.admin.static", filename="vendor/magnific-popup/jquery.magnific-popup.min.js") }}"></script>
+<script type="text/javascript" src="{{ oy_admin_static("vendor/magnific-popup/jquery.magnific-popup.min.js") }}"></script>
 
 <script type="text/javascript">
 $(document).ready(function() {

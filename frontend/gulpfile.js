@@ -78,8 +78,8 @@ function copyToOy(done) {
 }
 
 function watchFiles() {
-  watch("scss/", series(css, copyToOy));
-  watch("js", series(js, copyToOy));
+  watch("scss/**/*.scss", series(css, copyToOy, browserSyncReload));
+  watch("js/**/*.js", series(js, copyToOy, browserSyncReload));
   watch("../oy/contrib/**/templates/**/*.html", async function watchTemplates() {
 	  await browsersync.reload();
   });

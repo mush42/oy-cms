@@ -5,7 +5,7 @@ from flask import current_app
 from oy.boot.sqla import db
 from oy.wrappers import OyModule
 from oy.exceptions import SettingDoesNotExist
-from oy.models.settings import SettingsProfile
+from oy.models.settings import Setting, SettingsProfile
 
 
 class Settings(object):
@@ -26,7 +26,7 @@ class Settings(object):
         raise AttributeError("Can't set attribute")
 
     def edit(self, key, value):
-        self.storage[key] = value
+        self.storage.store[key] = Setting(key=key, value=value)
         db.session.commit()
 
 

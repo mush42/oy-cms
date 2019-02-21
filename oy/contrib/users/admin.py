@@ -1,67 +1,127 @@
+# -*- coding: utf-8 -*-
+"""
+    oy.contrib.users.admin
+    ~~~~~~~~~~~~~~~~~~~~~~~~
+
+    Provides the users management admin interface.
+
+    :copyright: (c) 2018 by Musharraf Omer.
+    :license: MIT, see LICENSE for more details.
+"""
+
 from collections import OrderedDict
-from flask import current_app, request, url_for, flash, redirect
+from wtforms.fields import StringField, PasswordField
+from flask import current_app, request, url_for, flash, redirect, abort
+from flask_admin.form import rules
 from flask_security import current_user
+from flask_security.changeable import change_user_password
+from flask_security.utils import logout_user, verify_password
 from flask_admin import expose
 from flask_admin import form
 from flask_admin.model.form import InlineFormAdmin
 from flask_admin.model.template import EndpointLinkRowAction
 from flask_admin.contrib.sqla import ModelView
-
 from oy.boot.sqla import db
 from oy.boot.security import user_datastore
-from oy.babel import gettext, lazy_gettext
+from oy.babel import lazy_gettext
 from oy.models.user import User
 from oy.dynamicform import DynamicForm
 from oy.contrib.admin.wrappers import OyModelView
-from .models import Profile
+from .models import Profile, ProfileExtras
 
 
-class ProfileAdmin(OyModelView):
-    can_create = False
-    can_delete = False
-    column_exclude_list = ["user", "created", "extras"]
-    column_list = ["first_name", "last_name", "updated"]
-    form_excluded_columns = ["user", "extras", "updated", "created"]
+# Used to make the form fields of user profile unique
+_prefix = "profile_extra__"
+_wrap_field = lambda name: _prefix + name
+_unwrap_field = lambda name: name[len(_prefix):]
+
+
+class UserAdmin(OyModelView):
+    column_list = ["username", "email", "active",]
 
     def is_accessible(self):
         if super().is_accessible():
-            if (
-                "admin" in current_user.roles
-                or current_user.profile.id == request.args.get("id")
-            ):
+            if current_user.has_role("admin"):
                 return True
         return False
 
-    def on_form_prefill(self, form, id):
-        model = self.get_one(id)
-        for field in form:
-            if field.name.startswith("profile_extra__"):
-                field.data = model.get(field.name[15:])
+    def validate_form(self, form):
+        if not form["old_password"].data:
+            return super().validate_form(form)
+        user = self.get_one(request.args["id"])
+        if not user:
+            flash(lazy_gettext("User does not exist."), category="error")
+            return False
+        o, n, c = [form[f].data for f in ("old_password", "new_password", "new_password_confirm")]
+        if not verify_password(o, user.password):
+            flash(lazy_gettext("The password you have entered is incorrect."), category="error")
+            return False
+        elif o and not any([n, c]):
+            flash(lazy_gettext("A new password was not provided."), category="warning")
+            return False
+        elif n != c:
+            flash(lazy_gettext("Passwords do not match."), category="error")
+            return False
+        return True
 
     def after_model_change(self, form, model, is_created):
-        for field in form:
-            if field.name.startswith("profile_extra__"):
-                model[field.name[15:]] = field.data
+        if form["new_password"].data:
+            change_user_password(model, form["new_password"].data)
+            flash(lazy_gettext("The password has been changed successfully."))
+        for field in (f for f in form if f.name.startswith(_prefix)):
+            fname = _unwrap_field(field.name)
+            if fname not in model.profile:
+                model.profile.extras[fname] = ProfileExtras(key=fname)
+            model.profile[fname] = field.data
         db.session.commit()
 
     @property
     def form_extra_fields(self):
-        """Contribute the fields of profile extras"""
-        rv = {}
-        profile_fields = current_app.data["profile_fields"]
-        for name, ufield in DynamicForm(profile_fields).fields:
-            rv.setdefault(f"profile_extra__{name}", ufield)
+        rv = dict(
+          old_password=PasswordField(label=lazy_gettext("Old Password")),
+          new_password=PasswordField(label=lazy_gettext("New Password")),
+          new_password_confirm=PasswordField(label=lazy_gettext("Confirm New Password"))
+        )
+        pk = request.args.get("id")
+        user = None if not pk else self.get_one(pk)
+        for fn, cf, kw in self.get_profile_fields():
+            if user is not None:
+                kw["default"] = user.profile.get(fn)
+            rv[_wrap_field(fn)] = cf(**kw)
         return rv
+
+    @property
+    def form_rules(self):
+        rv = [
+            "user_name",
+            "email",
+            rules.NestedRule([
+                rules.HTML("<h4>" + lazy_gettext("Change Password") + "</h4>"),
+                "old_password",
+                "new_password",
+                "new_password_confirm"
+            ]),
+            rules.HTML("<h4>" + lazy_gettext("Profile Details") + "</h4>"),
+        ]
+        for fn, _, __ in self.get_profile_fields():
+            rv.append(_wrap_field(fn))
+        rv.append(            "roles")
+        return rv
+
+    def get_profile_fields(self):
+        """Contribute the fields of profile extras"""
+        profile_fields = current_app.data["profile_fields"]
+        yield from DynamicForm(profile_fields).fields
 
 
 def register_admin(app, admin):
     admin.add_view(
-        ProfileAdmin(
-            Profile,
+        UserAdmin(
+            User,
             db.session,
-            name=lazy_gettext("Profiles"),
+            name=lazy_gettext("User Accounts"),
             menu_icon_type="fa",
-            menu_icon_value="fa-user",
+            menu_icon_value="fa-users",
             menu_order=100,
         )
     )

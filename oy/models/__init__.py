@@ -18,3 +18,4 @@ from . import _events
 from .user import User, Role
 from .settings import SettingsProfile, SettingCategory, Settings
 from .page import Page, PageQuery
+from .media import Image, Document

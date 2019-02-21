@@ -2,6 +2,11 @@
 {% import 'admin/lib.html' as lib with context %}
 {% from 'admin/lib.html' import extra with context %} {# backward compatible #}
 
+{% block title %}
+  {% set title = (admin_view.category or "") ~ " " ~ admin_view.name %}
+  {{ gettext("New ") ~  title }}
+{% endblock %}
+
 {% block head %}
   {{ super() }}
   {{ lib.form_css() }}

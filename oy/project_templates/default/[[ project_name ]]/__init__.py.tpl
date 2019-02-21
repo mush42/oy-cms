@@ -13,7 +13,6 @@ from oy.contrib.bootstrap4 import Bootstrap4
 from oy.contrib.users import UserManager
 from oy.contrib.redirects import Redirects
 from oy.contrib.form import Form
-from oy.contrib.media import Media
 from oy.contrib.demo_content import DemoContent
 from .home_page import home_page
 
@@ -38,9 +37,6 @@ def create_app():
 
     # Enable you to create forms for visiters to fill-in
     form = Form(app)
-
-    # User uploaded images and documents
-    Media(app, serve_files=True)
 
     # Adds shell commands to install demo data
     DemoContent(app)

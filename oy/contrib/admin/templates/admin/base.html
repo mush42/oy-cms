@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 {% import 'admin/layout.html' as layout with context -%}
-{% import 'admin/oy_macros.html' as oy with context -%}
 {% import 'admin/static.html' as admin_static with context %}
-{% import "oy/contrib/admin/form_fields_macros.html" as form_field_macros with context %}
+{% import "admin/oy/form_fields_macros.html" as form_field_macros with context %}
 <html>
 <head>
   {% block head %}
@@ -74,7 +73,7 @@
 
       <div class="navbar-custom-menu">
         <ul class="nav navbar-nav">
-        {% include "oy/contrib/admin/includes/notification_area.html" %}
+        {% include "admin/oy/includes/notification_area.html" %}
         <!-- Control Sidebar Toggle Button -->
         <li>
           <a href="#" data-toggle="control-sidebar" role="button" aria-expanded="false">
@@ -95,7 +94,7 @@
       <!-- sidebar menu. -->
       <ul class="sidebar-menu" data-widget="tree">
         <li class="header" role="heading">{{ gettext("Main Menu") }}</li>
-        {{ oy.menu() }}
+        {{ layout.menu() }}
         {% block menu_links %}
         <li class="header" role="heading">{{ gettext("Other Links") }}</li>
         {{ layout.menu_links() }}
@@ -140,7 +139,7 @@
 
   <!-- Control Sidebar -->
   <aside class="control-sidebar control-sidebar-dark" aria-hidden="true">
-  {% include "oy/contrib/admin/includes/secondary_sidebar.html" %}
+  {% include "admin/oy/includes/secondary_sidebar.html" %}
   </aside>
   <!-- /.control-sidebar -->
   <!-- Add the sidebar's background. This div must be placed
@@ -171,7 +170,7 @@
 {% endblock %}
 
 {% block messages %}
-{{ oy.messages() }}
+{{ layout.messages() }}
 {% endblock %}
 
 {% block admin_view_extra_js %}

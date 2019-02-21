@@ -28,6 +28,7 @@ from .wrappers import (
 from .displayable_admin import DisplayableAdmin
 from .page_admin import PageAdmin
 from .settings_admin import register_settings_admin
+from .media_admin import register_media_admin
 
 
 def security_ctp_with_admin(admin):
@@ -68,7 +69,7 @@ class OyAdmin(Admin):
                 name=lazy_gettext("Dashboard Home"),
                 menu_icon_type="fa",
                 menu_icon_value="fa-dashboard",
-                template="oy/contrib/admin/index.html",
+                template="admin/oy/index.html",
             ),
         )
         self.auto_register_modules = auto_register_modules
@@ -108,6 +109,7 @@ class OyAdmin(Admin):
     def finalization_tasks(self, sender):
         self._secure_admin_static_files()
         register_settings_admin(self.app, self)
+        register_media_admin(self.app, self)
         if self.auto_register_modules:
             self.register_module_admin()
 

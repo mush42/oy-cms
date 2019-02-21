@@ -10,7 +10,7 @@
 """
 
 from ._sqlaevent import SQLAEvent
-from .polymorphic_prop import ProxiedDictMixin, DynamicProp
+from .polymorphic_prop import ProxiedDictMixin, ReadOnlyProxiedDictMixin, DynamicProp, DynamicPropWithFile
 from .slugged import Titled, Slugged, ScopedUniquelySlugged
 from .metadata import Metadata
 from .time_stampped import TimeStampped

@@ -23,7 +23,7 @@ class BootstrapFileInputWidget(FileInput):
         if "required" not in kwargs and "required" in getattr(field, "flags", []):
             kwargs["required"] = True
         return current_app.jinja_env.get_template(
-            "oy/contrib/admin/fields/bs4_file_input.html"
+            "admin/oy/fields/bs4_file_input.html"
         ).render(kwargs=kwargs)
 
 

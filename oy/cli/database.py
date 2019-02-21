@@ -61,7 +61,7 @@ def clean_settings():
         return
     for k in to_remove:
         click.secho("\t> Removing unused setting::: %s" % k, fg="red")
-        del active_settings[k]
+        del active_settings.store[k]
     db.session.commit()
     click.secho("Database cleaned.", fg="green", bold=True)
     click.secho("~" * 50, fg="green")

@@ -191,7 +191,7 @@ class DynamicForm(object):
         for field in self.fieldset:
             fieldname, concrete_field, kwargs = field.to_wtf()
             if fields_only:
-                self.unbound_fields.append((fieldname, concrete_field(**kwargs)))
+                self.unbound_fields.append((fieldname, concrete_field, kwargs))
             else:
                 setattr(self.raw_form, fieldname, concrete_field(**kwargs))
         self._generated = True

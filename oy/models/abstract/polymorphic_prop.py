@@ -13,6 +13,10 @@ import sqlalchemy.types as types
 from sqlalchemy import literal_column, event
 from sqlalchemy.orm.interfaces import PropComparator
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.ext.declarative import declared_attr
+from werkzeug.datastructures import FileStorage
+from depot.fields.sqlalchemy import UploadedFileField
+from depot.io.utils import FileIntent
 from oy.boot.sqla import db
 
 
@@ -134,7 +138,11 @@ def on_new_class(mapper, cls_):
         col = mapper.c[k]
         if "type" in col.info:
             python_type, discriminator = col.info["type"]
-            info_dict[python_type] = (k, discriminator)
+            if type(python_type) in (list, tuple):
+                for pty in python_type:
+                    info_dict[pty] = (k, discriminator)
+            else:
+                info_dict[python_type] = (k, discriminator)
             info_dict[discriminator] = (k, discriminator)
     cls_.type_map = info_dict
 
@@ -145,3 +153,18 @@ class DynamicProp(PolymorphicVerticalProperty):
     int_value = db.Column(db.Integer, info={"type": (int, "integer")})
     str_value = db.Column(db.Unicode(5120), info={"type": (str, "string")})
     bool_value = db.Column(db.Boolean, info={"type": (bool, "boolean")})
+
+
+class DynamicPropWithFile(DynamicProp):
+
+    @declared_attr
+    def file_value(cls):
+        kwargs = getattr(cls, "__file_field_args__", {})
+        nullable = kwargs.pop("nullable", True)
+        info = kwargs.pop("info", {})
+        info["type"] = ((FileIntent, FileStorage), "file")
+        return db.Column(
+            UploadedFileField(**kwargs),
+            nullable=nullable,
+            info=info
+        )

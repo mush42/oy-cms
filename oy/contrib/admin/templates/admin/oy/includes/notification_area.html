@@ -3,7 +3,9 @@
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false" role="button">
     <i class="fa fa-bell-o"></i>
     <span class="sr-only">Notifications</span>
-    <span class="label label-warning">10</span>
+    {% if notifications %}
+    <span class="label label-warning">{{ notifications.count }}</span>
+    {% endif %}
   </a>
   <ul class="dropdown-menu">
     {% if not notifications %}
