@@ -2,7 +2,6 @@ import pytest
 import oy
 from werkzeug.utils import import_string
 from webtest import TestApp
-from flask import _app_ctx_stack
 from oy.boot.sqla import db as sqla_db
 from oy.boot.security import user_datastore
 
@@ -48,10 +47,7 @@ def create_user():
 
 @pytest.fixture(scope="function")
 def db(request, app):
-    ctx = _app_ctx_stack.top
-    if ctx is None:
-        ctx = app.app_context()
-    with ctx:
+    with app.app_context():
         sqla_db.create_all()
         user = create_user()
         sqla_db.session.commit()

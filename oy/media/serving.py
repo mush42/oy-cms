@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    oy.contrib.media.serving
+    oy.media.serving
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     Provides the media serve view.
