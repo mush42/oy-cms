@@ -10,7 +10,7 @@
 """
 
 from ._sqlaevent import SQLAEvent
-from .polymorphic_prop import ProxiedDictMixin, ReadOnlyProxiedDictMixin, DynamicProp, DynamicPropWithFile
+from .polymorphic_prop import ProxiedDictMixin, ReadOnlyProxiedDictMixin, DynamicProp
 from .slugged import Titled, Slugged, ScopedUniquelySlugged
 from .metadata import Metadata
 from .time_stampped import TimeStampped
@@ -21,3 +21,4 @@ from .displayable import Displayable
 from .abstract_page import AbstractPage
 from .classifiable import Tagged, Categorized
 from .has_comments import HasComments
+from .generic_media import GenericMedia, DynamicPropWithFile

@@ -14,9 +14,6 @@ from sqlalchemy import literal_column, event
 from sqlalchemy.orm.interfaces import PropComparator
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.ext.declarative import declared_attr
-from werkzeug.datastructures import FileStorage
-from depot.fields.sqlalchemy import UploadedFileField
-from depot.io.utils import FileIntent
 from oy.boot.sqla import db
 
 
@@ -155,16 +152,3 @@ class DynamicProp(PolymorphicVerticalProperty):
     bool_value = db.Column(db.Boolean, info={"type": (bool, "boolean")})
 
 
-class DynamicPropWithFile(DynamicProp):
-
-    @declared_attr
-    def file_value(cls):
-        kwargs = getattr(cls, "__file_field_args__", {})
-        nullable = kwargs.pop("nullable", True)
-        info = kwargs.pop("info", {})
-        info["type"] = ((FileIntent, FileStorage), "file")
-        return db.Column(
-            UploadedFileField(**kwargs),
-            nullable=nullable,
-            info=info
-        )

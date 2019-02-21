@@ -11,64 +11,16 @@
 
 from secrets import token_urlsafe
 from sqlalchemy.orm import synonym
-from sqlalchemy.ext.declarative import declared_attr
 from depot.fields.sqlalchemy import UploadedFileField
 from flask import current_app, url_for
+from oy.babel import lazy_gettext
 from oy.models import db
 from oy.models.abstract import Titled, TimeStampped, UserRelated, Tagged
-from oy.babel import lazy_gettext
-from oy.media.filters import FileTypeCheckFilter, WithThumbnailFilter
+from oy.models.abstract import GenericMedia
+from oy.media.filters import WithThumbnailFilter
 
 
-NUMBYTES = 16
-
-
-class UploadableMediaMixin(Titled, TimeStampped, UserRelated, Tagged):
-    file_id = db.Column(
-        db.String(64),
-        unique=True,
-        nullable=False,
-        index=True,
-        default=lambda: token_urlsafe(NUMBYTES),
-    )
-    description = db.Column(
-        db.Text, nullable=True, info=dict(lable=lazy_gettext("Description"))
-    )
-
-    __depot_args__ = {"upload_storage": "media_storage"}
-
-    @declared_attr
-    def uploaded_file(cls):
-        depot_args = dict(cls.__depot_args__)
-        filters = depot_args.pop("filters", [])
-        allowed_files = getattr(cls, "__allowed_file_types__", [])
-        if allowed_files:
-            filters.insert(0, FileTypeCheckFilter(filetypes=allowed_files))
-        return db.Column(
-            UploadedFileField(filters=filters, **depot_args),
-            nullable=False,
-            info=dict(label=lazy_gettext("Select a file")),
-        )
-
-    def before_insert(self, mapper, connection):
-        tbl = mapper.mapped_table
-        sel = db.select([tbl.c.id])
-        token = token_urlsafe(14)
-        while connection.scalar(db.func.count(sel.where(tbl.c.file_id == token))):
-            token = token_urlsafe(NUMBYTES)
-        self.file_id = token
-
-    @classmethod
-    def get_upload_storage(cls):
-        return (
-            db.inspect(cls)
-            .get_property("uploaded_file")
-            .columns[0]
-            .type._upload_storage
-        )
-
-
-class Image(db.Model, UploadableMediaMixin):
+class Image(db.Model, GenericMedia):
     id = db.Column(db.Integer, primary_key=True)
 
     # Nicer aliases for template designers
@@ -101,7 +53,7 @@ class Image(db.Model, UploadableMediaMixin):
         return self.uploaded_file[name]["id"]
 
 
-class Document(db.Model, UploadableMediaMixin):
+class Document(db.Model, GenericMedia):
     id = db.Column(db.Integer, primary_key=True)
     file = synonym("uploaded_file")
 

@@ -9,6 +9,7 @@
     :license: MIT, see LICENSE for more details.
 """
 
+import os
 from depot.manager import DepotManager
 from flask import Blueprint
 from .serving import ModelFileServer
@@ -19,17 +20,17 @@ class Media:
 
     @classmethod
     def configure(cls, app):
-        storage_conf = app.config.get("DEPOT_MEDIA_STORAGES", None)
-        if storage_conf is None:
-            raise LookupError(
-                "Couldn't find depot storages configuration in app config."
-            )
-        if "media_storage" not in storage_conf:
+        if app.config.get("DEPOT_MEDIA_STORAGES") is None:
+            app.config["DEPOT_MEDIA_STORAGES"] = {
+                "media_storage": {"depot.storage_path": os.path.join(os.getcwd(), "media")}
+            }
+        if "media_storage" not in app.config.get("DEPOT_MEDIA_STORAGES"):
             raise ValueError(
                 "A storage named *media_storage* is required when configuring `DEPOT_STORAGES`."
             )
-        for name, opts in storage_conf.items():
-            DepotManager.configure(name, opts)
+        for name, opts in app.config.get("DEPOT_MEDIA_STORAGES").items():
+            if name not in DepotManager._depots:
+                DepotManager.configure(name, opts)
         for storage in ("image_storage", "document_storage"):
             if storage not in DepotManager._depots:
                 DepotManager.alias(storage, "media_storage")

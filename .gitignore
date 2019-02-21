@@ -98,7 +98,7 @@ ENV/
 *.logs
 
 # media folder created by tests
-tests/test_contrib/media/
+tests/test_media/media/
 
 # static files as they are auto generated
 oy/contrib/**/static/

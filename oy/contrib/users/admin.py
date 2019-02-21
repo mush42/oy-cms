@@ -10,23 +10,19 @@
 """
 
 from collections import OrderedDict
-from wtforms.fields import StringField, PasswordField
+from wtforms.fields import StringField, PasswordField, FileField
 from flask import current_app, request, url_for, flash, redirect, abort
-from flask_admin.form import rules
 from flask_security import current_user
 from flask_security.changeable import change_user_password
 from flask_security.utils import logout_user, verify_password
+from flask_admin.form import rules
 from flask_admin import expose
-from flask_admin import form
-from flask_admin.model.form import InlineFormAdmin
-from flask_admin.model.template import EndpointLinkRowAction
-from flask_admin.contrib.sqla import ModelView
 from oy.boot.sqla import db
-from oy.boot.security import user_datastore
 from oy.babel import lazy_gettext
 from oy.models.user import User
 from oy.dynamicform import DynamicForm
-from oy.contrib.admin.wrappers import OyModelView
+from oy.contrib.admin import OyModelView
+from oy.contrib.admin.fields import BootstrapFileInputField
 from .models import Profile, ProfileExtras
 
 
@@ -38,6 +34,7 @@ _unwrap_field = lambda name: name[len(_prefix):]
 
 class UserAdmin(OyModelView):
     column_list = ["username", "email", "active",]
+
 
     def is_accessible(self):
         if super().is_accessible():
@@ -85,6 +82,8 @@ class UserAdmin(OyModelView):
         pk = request.args.get("id")
         user = None if not pk else self.get_one(pk)
         for fn, cf, kw in self.get_profile_fields():
+            if hasattr(cf.widget, "input_type") and cf.widget.input_type == "file":
+                cf = BootstrapFileInputField
             if user is not None:
                 kw["default"] = user.profile.get(fn)
             rv[_wrap_field(fn)] = cf(**kw)

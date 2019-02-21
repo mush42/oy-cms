@@ -1,21 +1,15 @@
 import pytest
 from io import BytesIO
 from pathlib import Path
-from oy.contrib.media import Media, Image, Document
-from oy.contrib.media.filters import UnsupportedFileTypeError
+from flask import _app_ctx_stack
+from oy.models import Image, Document
+from oy.media.filters import UnsupportedFileTypeError
 
 
 THIS = Path(__file__).parent
 
 
-def test_basic_media(app, client, db):
-    media = Media(serve_files=True)
-
-    app.config["DEPOT_MEDIA_STORAGES"] = dict(
-        media_storage={"depot.storage_path": str(THIS / "media")}
-    )
-    media.init_app(app)
-
+def test_media(client, db):
     imgfile = THIS / "assets" / "image.jpg"
     docfile = THIS / "assets" / "document.pdf"
     image = Image(title="Image", uploaded_file=open(imgfile, "rb"))
@@ -41,3 +35,12 @@ def test_basic_media(app, client, db):
     arbitrary_file.write(b"arbitrary data")
     with pytest.raises(UnsupportedFileTypeError):
         not_accepted_image = Image(title="Nope", uploaded_file=arbitrary_file)
+
+
+def test_media_runner(create_app, client, db):
+    config  = {"SERVE_MEDIA_FILES": True}
+    config["DEPOT_MEDIA_STORAGES"] = dict(
+        media_storage={"depot.storage_path": str(THIS / "media")}
+    )
+    app = create_app(config)
+    _app_ctx_stack.push(app)
