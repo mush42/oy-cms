@@ -87,10 +87,10 @@
   </header>
 
   <!-- Left side column. contains the sidebar -->
-  {% block side_menu %}
   <aside class="main-sidebar">
     <!-- sidebar. -->
     <section class="sidebar">
+      {% block side_menu %}
       <!-- sidebar menu. -->
       <ul class="sidebar-menu" data-widget="tree">
         <li class="header" role="heading">{{ gettext("Main Menu") }}</li>
@@ -100,10 +100,10 @@
         {{ layout.menu_links() }}
         {% endblock menu_links %}
       </ul>
+      {% endblock side_menu %}
     </section>
     <!-- /.sidebar -->
   </aside>
-  {% endblock side_menu %}
 
   {% block access_control %}{% endblock %}
 

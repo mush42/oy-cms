@@ -19,7 +19,6 @@ from oy.boot import boot_config
 from oy.wrappers import Oy
 from oy.exceptions import OyException
 from oy.core import core
-from oy.media import Media
 from oy.models import *
 
 
@@ -96,5 +95,4 @@ def prepare_app(name, config=None, app_class=Oy, envar="STARLIT_CONFIG", **kwarg
         initialize_builtin_extensions()
     app.shell_context_processor(make_shell_context)
     app.register_module(core)
-    Media.configure(app)
     return app

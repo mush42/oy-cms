@@ -21,32 +21,18 @@ from flask_security.utils import (
 from wtforms.fields import StringField, SelectField, PasswordField, BooleanField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import data_required, ValidationError
-from ... import app, db
-from ...main import user_datastore
-from ...babel import lazy_gettext, gettext
-from ...user.models import Role
+from flask import current_app
+from oy.babel import lazy_gettext
+from oy.models import db, Role
 
 
 def unique_username(form, field):
+    from oy.boot.security import user_datastore
     if user_datastore.get_user(field.data) is not None:
         raise ValidationError(lazy_gettext("User name already exists"))
 
 
-class NewPasswordConfirmMixin(object):
-    password = PasswordField(
-        label=lazy_gettext("Password"),
-        description=lazy_gettext("Not less than 6 characters"),
-        validators=[password_required, password_length],
-        render_kw=dict(required=True),
-    )
-    password_confirm = PasswordField(
-        label=lazy_gettext("Re-Type Password"),
-        validators=[EqualTo("password", message="RETYPE_PASSWORD_MISMATCH")],
-        render_kw=dict(required=True),
-    )
-
-
-class UsernameEmailMixin(object):
+class OyRegisterForm(RegisterForm):
     user_name = StringField(
         label=lazy_gettext("User Name"),
         description=lazy_gettext("Should be UNIQUE"),
@@ -61,10 +47,17 @@ class UsernameEmailMixin(object):
         validators=[email_required, email_validator, unique_user_email],
         render_kw=dict(required=True),
     )
-
-
-class CanellaRegisterForm(UsernameEmailMixin, NewPasswordConfirmMixin, RegisterForm):
-    submit = None
+    password = PasswordField(
+        label=lazy_gettext("Password"),
+        description=lazy_gettext("Not less than 6 characters"),
+        validators=[password_required, password_length],
+        render_kw=dict(required=True),
+    )
+    password_confirm = PasswordField(
+        label=lazy_gettext("Re-Type Password"),
+        validators=[EqualTo("password", message="RETYPE_PASSWORD_MISMATCH")],
+        render_kw=dict(required=True),
+    )
     roles = QuerySelectMultipleField(
         label=lazy_gettext("User Roles"),
         allow_blank=True,
@@ -79,21 +72,3 @@ class CanellaRegisterForm(UsernameEmailMixin, NewPasswordConfirmMixin, RegisterF
         default=True,
     )
 
-
-def register_user(should_confirm, **kwargs):
-    confirmation_link, token = None, None
-    kwargs["password"] = encrypt_password(kwargs["password"])
-    user = user_datastore.create_user(**kwargs)
-    user_datastore.commit()
-    flash(gettext("User created successfully"))
-    if should_confirm:
-        confirmation_link, token = generate_confirmation_link(user)
-        do_flash(*get_message("CONFIRM_REGISTRATION", email=user.email))
-        send_mail(
-            config_value("EMAIL_SUBJECT_REGISTER"),
-            user.email,
-            "welcome",
-            user=user,
-            confirmation_link=confirmation_link,
-        )
-    user_registered.send(app, user=user, confirm_token=token)

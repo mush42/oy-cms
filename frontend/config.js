@@ -14,6 +14,7 @@ const modules = [
   new ContribModule("admin"),
   new ContribModule("bootstrap4"),
   new ContribModule("flask_security_templates"),
+  new ContribModule("media"),
 ];
 
 exports.vendorMap = {
@@ -31,7 +32,7 @@ exports.vendorMap = {
     "node_modules/bootswatch/dist/**",
     "!**/*.scss"
   ],
-  "admin/magnific-popup": ["node_modules/magnific-popup/dist/**"],
+  "media/magnific-popup": ["node_modules/magnific-popup/dist/**"],
   "admin/bootstrap": [
 	"node_modules/bootstrap/dist/**/*",
     "!**/npm.js", 

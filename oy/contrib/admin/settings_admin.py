@@ -44,7 +44,8 @@ class SettingsProfileAdmin(OyModelView):
 
 def make_settings_form_for_category(app, category):
     fields = []
-    for setting in app.provided_settings_dict[category]:
+    for field in app.provided_settings_dict[category]:
+        setting = field.asdict()
         setting["default"] = getattr(current_settings, setting["name"])
         fields.append(setting)
     return DynamicForm(fields).form

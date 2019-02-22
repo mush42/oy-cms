@@ -1,20 +1,29 @@
 import pytest
 from io import BytesIO
 from pathlib import Path
-from flask import _app_ctx_stack
+from tempfile import TemporaryDirectory
 from oy.boot.sqla import db
-from oy.models import Image, Document
-from oy.media import Media
-from oy.media.filters import UnsupportedFileTypeError
+from oy.contrib.media.models import Image, Document
+from oy.contrib.media import Media
+from oy.contrib.media.utils import UnsupportedFileTypeError
 
 
-THIS = Path(__file__).parent
+ASSETS_DIR = Path(__file__).parent / "assets"
+TEMP_DIR = TemporaryDirectory()
 
 
 def test_media(app, client, db):
-    Media._add_serving_routes(app)
-    imgfile = THIS / "assets" / "image.jpg"
-    docfile = THIS / "assets" / "document.pdf"
+    config = {
+        "SERVE_MEDIA_FILES": True,
+        "DEPOT_MEDIA_STORAGES": dict(
+            media_storage={"depot.storage_path": TEMP_DIR.name}
+        )
+    }
+    
+    app.config.update(config)
+    Media(app)
+    imgfile =  ASSETS_DIR/ "image.jpg"
+    docfile = ASSETS_DIR/"document.pdf"
     image = Image(title="Image", uploaded_file=open(imgfile, "rb"))
     document = Document(title="Document", uploaded_file=open(docfile, "rb"))
     db.session.add_all([image, document])
@@ -38,3 +47,6 @@ def test_media(app, client, db):
     arbitrary_file.write(b"arbitrary data")
     with pytest.raises(UnsupportedFileTypeError):
         not_accepted_image = Image(title="Nope", uploaded_file=arbitrary_file)
+
+    # Some housekeeping
+    TEMP_DIR.cleanup()

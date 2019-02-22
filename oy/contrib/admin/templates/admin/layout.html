@@ -11,6 +11,8 @@
   {% elif icon_type == 'image-url' %}
     <img src="{{ icon_value }}" alt="menu image">
   {% endif %}
+  {% else %}
+  <i class="fa fa-circle-o"></i>
 {% endif %}
 {%- endmacro %}
 
@@ -23,7 +25,7 @@
   {% set children = None %} 
   {% endif %}
   <li class="{% if children %}treeview{%endif%} {% if item.is_active(admin_view) %}active{%endif%}">
-  <a href="{{ item.get_url() or "#" }}">
+  <a href="{{ item.get_url() or "#" }}" {% if children %}aria-haspopup="true"{% endif %}>
   {% if item.class_name %}
   <i class="{{ item.class_name }}"></i>
   {% else %}

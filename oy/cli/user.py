@@ -1,6 +1,7 @@
 import click
 from flask import current_app
 from flask.cli import with_appcontext
+from flask_security.utils import hash_password
 from oy.boot.sqla import db
 from oy.helpers import is_valid_email
 from oy.models.user import User, Role
@@ -71,7 +72,10 @@ def createuser(noinput, superuser):
     else:
         role = user_datastore.find_or_create_role("staff")
     user_datastore.create_user(
-        user_name=user_name, email=email, password=password, roles=[role]
+        user_name=user_name,
+        email=email,
+        password=hash_password(password),
+        roles=[role]
     )
     db.session.commit()
     click.echo()

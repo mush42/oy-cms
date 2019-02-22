@@ -1,14 +1,25 @@
 from flask_wtf import Form
+from flask_security.forms import password_required, password_length, EqualTo
 from flask_security.utils import verify_and_update_password, encrypt_password
 from wtforms import PasswordField
-from .register import NewPasswordConfirmMixin, password_required
 from oy.babel import lazy_gettext, gettext
 
 
-class OyChangePasswordForm(NewPasswordConfirmMixin, Form):
+class OyChangePasswordForm(Form):
     old_password = PasswordField(
         label=lazy_gettext("Old Password"),
         validators=[password_required],
+        render_kw=dict(required=True),
+    )
+    password = PasswordField(
+        label=lazy_gettext("Password"),
+        description=lazy_gettext("Not less than 6 characters"),
+        validators=[password_required, password_length],
+        render_kw=dict(required=True),
+    )
+    password_confirm = PasswordField(
+        label=lazy_gettext("Re-Type Password"),
+        validators=[EqualTo("password", message="RETYPE_PASSWORD_MISMATCH")],
         render_kw=dict(required=True),
     )
 

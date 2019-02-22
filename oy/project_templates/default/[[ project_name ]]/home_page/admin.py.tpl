@@ -8,10 +8,11 @@
 """
 
 from flask_admin.model.form import InlineFormAdmin
-from oy.models import Page, Image, db
+from oy.models import Page, db
 from oy.contrib.admin import PageAdmin
 from oy.contrib.admin.fields import CkeditorTextAreaField
-from oy.contrib.admin.fields import MediaSelectorField
+from oy.contrib.media.fields import MediaSelectorField
+from oy.contrib.media import Image
 from oy.babel import lazy_gettext
 from .models import HomePage, FeaturedContent
 

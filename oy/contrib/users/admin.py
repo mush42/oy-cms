@@ -9,31 +9,31 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from collections import OrderedDict
 from wtforms.fields import StringField, PasswordField, FileField
 from flask import current_app, request, url_for, flash, redirect, abort
 from flask_security import current_user
 from flask_security.changeable import change_user_password
-from flask_security.utils import logout_user, verify_password
+from flask_security.registerable import register_user
+from flask_security.utils import hash_password, verify_password
 from flask_admin.form import rules
 from flask_admin import expose
 from oy.boot.sqla import db
-from oy.babel import lazy_gettext
+from oy.boot.flask_security_forms import OyRegisterForm
+from oy.babel import gettext, lazy_gettext
 from oy.models.user import User
 from oy.dynamicform import DynamicForm
 from oy.contrib.admin import OyModelView
-from oy.contrib.admin.fields import BootstrapFileInputField
-from .models import Profile, ProfileExtras
+from .models import ProfileExtras
 
 
-# Used to make the form fields of user profile unique
+# Used to make the field names of user profile unique
 _prefix = "profile_extra__"
 _wrap_field = lambda name: _prefix + name
 _unwrap_field = lambda name: name[len(_prefix):]
 
 
 class UserAdmin(OyModelView):
-    column_list = ["username", "email", "active",]
+    column_list = ["user_name", "email", "active",]
 
 
     def is_accessible(self):
@@ -47,24 +47,28 @@ class UserAdmin(OyModelView):
             return super().validate_form(form)
         user = self.get_one(request.args["id"])
         if not user:
-            flash(lazy_gettext("User does not exist."), category="error")
+            flash(gettext("User does not exist."), category="error")
             return False
         o, n, c = [form[f].data for f in ("old_password", "new_password", "new_password_confirm")]
         if not verify_password(o, user.password):
-            flash(lazy_gettext("The password you have entered is incorrect."), category="error")
+            flash(gettext("The password you have entered is incorrect."), category="error")
             return False
         elif o and not any([n, c]):
-            flash(lazy_gettext("A new password was not provided."), category="warning")
+            flash(gettext("A new password was not provided."), category="warning")
             return False
         elif n != c:
-            flash(lazy_gettext("Passwords do not match."), category="error")
+            flash(gettext("Passwords do not match."), category="error")
             return False
         return True
 
     def after_model_change(self, form, model, is_created):
         if form["new_password"].data:
-            change_user_password(model, form["new_password"].data)
-            flash(lazy_gettext("The password has been changed successfully."))
+            if not current_app.debug:
+                change_user_password(model, form["new_password"].data)
+            else:
+                model.password = hash_password(form["new_password"].data)
+                db.session.commit()
+            flash(gettext("The password has been changed successfully."))
         for field in (f for f in form if f.name.startswith(_prefix)):
             fname = _unwrap_field(field.name)
             if fname not in model.profile:
@@ -82,8 +86,6 @@ class UserAdmin(OyModelView):
         pk = request.args.get("id")
         user = None if not pk else self.get_one(pk)
         for fn, cf, kw in self.get_profile_fields():
-            if hasattr(cf.widget, "input_type") and cf.widget.input_type == "file":
-                cf = BootstrapFileInputField
             if user is not None:
                 kw["default"] = user.profile.get(fn)
             rv[_wrap_field(fn)] = cf(**kw)
@@ -112,6 +114,22 @@ class UserAdmin(OyModelView):
         profile_fields = current_app.data["profile_fields"]
         yield from DynamicForm(profile_fields).fields
 
+    @expose("/register", methods=("GET", "POST",))
+    def create_view(self):
+        template = self.create_template
+        form = OyRegisterForm()
+        if form.validate():
+            if not current_app.debug:
+                register_user(**form.to_dict())
+            else:
+                user_data = form.to_dict()
+                user_data["password"] = hash_password(user_data["password"])
+                db.session.add(User(**user_data))
+                db.session.commit()
+            flash(gettext("User created successfully."))
+            return redirect(url_for(".index_view"))
+        return self.render(template, form=form)
+
 
 def register_admin(app, admin):
     admin.add_view(
@@ -119,6 +137,7 @@ def register_admin(app, admin):
             User,
             db.session,
             name=lazy_gettext("User Accounts"),
+            endpoint="users",
             menu_icon_type="fa",
             menu_icon_value="fa-users",
             menu_order=100,

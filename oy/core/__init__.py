@@ -4,6 +4,7 @@ from flask import current_app, request, _request_ctx_stack
 from flask_babelex import get_locale
 from oy.wrappers import OyModule
 from oy.babel import gettext, ngettext, lazy_gettext
+from oy.dynamicform import Field
 from .settings import current_settings_profile, current_settings
 
 
@@ -32,11 +33,11 @@ def qs_args(url, qs):
 @core.settings_provider()
 def provide_core_settings(app):
     return [
-        dict(
+        Field(
             name="title",
+            type="text",
             label=lazy_gettext("Site Title"),
             description=lazy_gettext("The site Title"),
-            type="text",
             default=app.name.title(),
         )
     ]

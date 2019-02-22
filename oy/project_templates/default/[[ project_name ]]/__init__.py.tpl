@@ -10,6 +10,7 @@ from oy import prepare_app
 from oy.contrib.admin import OyAdmin
 from oy.contrib.flask_security_templates import FlaskSecurityTemplates
 from oy.contrib.bootstrap4 import Bootstrap4
+from oy.contrib.media import Media
 from oy.contrib.users import UserManager
 from oy.contrib.redirects import Redirects
 from oy.contrib.form import Form
@@ -25,6 +26,9 @@ def create_app():
 
     # Flask-admin
     admin = OyAdmin(app, auto_register_modules=True)
+
+    # Manage user uploaded files
+    Media(app)
 
     # User management with flexible user profiles
     UserManager(app)

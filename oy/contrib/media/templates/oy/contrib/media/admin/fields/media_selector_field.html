@@ -1,0 +1,40 @@
+<div class="form-group" style="padding: 1.2rem;">
+
+  <label class="col-md-2 control-label">{{ field.label }}</label>
+  <div id="selected-media-preview-{{ kwargs.id }}" {% if not kwargs.value %}class="visually-hidden" aria-hidden="true"{% endif %}>
+    {{ html_hidden_input }}
+    <div class="col-md-10">
+      {% set img = field.get_image(kwargs.value) %}
+      <div class="row">
+        <div class="col-md-3">
+          <img id="{{ kwargs.id }}_preview" class="img-responsive" src="{{ img.thum_url }}" alt="{{ img.title }}"/>
+        </div>
+        <div class="col-md-4">
+          <a href="#" data-popup-target="{{ url_for("image_admin.index_view", embedded=True) }}" data-input-id="{{ kwargs.id }}" class="media-popup-openner btn btn-default" style="margin-bottom:0;" role="button">
+            {{ gettext("Change Image") }}
+          </a>
+        </div>
+      </div>
+        {% if not kwargs.required %}
+        <a href="#" class="btn btn-default media-clear-btn" data-input-id="{{ kwargs.id }}" role="button">
+        <i class="fa fa-times"></i> {{ gettext("Remove image") }}
+        </a>
+        {% endif %}
+    </div>
+  </div>
+
+  <div id="nothing-selected-{{ kwargs.id }}" {% if kwargs.value %}class="visually-hidden" aria-hidden="true"{%endif%}>
+    <div class="row">
+      <div class="col-md-3">
+      <p class="fa fa-image fa-5x"></p>
+      </div>
+      <div class="col-md-3">
+        <p class="h3">{{ gettext("Nothing selected") }}</p>
+          <a href="#" data-popup-target="{{ url_for("image_admin.index_view", embedded=True) }}" data-input-id="{{ kwargs.id }}" class="media-popup-openner btn btn-default" style="margin-bottom:0;" role="button">
+            {{ gettext("Select an image") }}
+          </a>
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -4,20 +4,22 @@
 
 **Oy** is a lightweight, modular, and extensible content management system (CMS) based on the **Flask** micro-framework.
 
-**oy** provides you with a flexible, full-fledged CMS engine with the following features:
+**Oy** provides you with a flexible, full-fledged CMS engine with the following features:
 
 * A base **Page** model containing comprehensive metadata fields
-* Pages are managed in a tree using nested sets which allows for faster querying for descendants and ancestors
+* Pages are managed in a tree using nested sets which allows for faster traversal of the page tree
 * Routing to any page type is handled transparently using the familiar decorator syntax
 * The ability to apply middlewares to modify page responses
-* Model **Mixins**, a lot of them, to easily build your custom content types
+* A wide range of **Model Mixins** to easily build custom content types
 * Editable settings that users can edit in runtime (e.g, through the admin dashboard) which the developer can use in code or templates.
 * An optional module system which augment **Flask Blueprints** with additional behavior
-* Makes use of some of the best flask extensions out there (Flask-Admin, Flask-SQLAlchemy, Flask-Security...)
+* Makes perfect use of some of the best flask extensions (Flask-Admin, Flask-SQLAlchemy, Flask-Security..etc.)
 
-## Additional Features
+## Contrib Extensions
 
-In addition to the core, **oy** provides extra functionality through several packages under the **oy.contrib** package, including:
+Building on the top of this powerful core, **oy** provides most of it's functionality via **contrib packages** which use the familiar  flask extension API.
+
+Extensions under the **oy.contrib** package supplies you with the following additional features:
 
 - * *oy.contrib.admin* providing the administration dashboard (based on Flask-Admin).
 - **oy.contrib.media** manage user uploads (images, and documents) through an intuitive interface, and attach them to models  (uses the excellent file depot package).
@@ -34,7 +36,7 @@ First things first, install **oy** via pip:
 $ pip install oy
 ```
 
-**Oy** supplies you with a command to scaffold your projects. To create a project with the default template, navigate to your projects directory and run:
+**Oy** provides the **oyinit** command to help you scaffold your new projects. To create a project with the default template, navigate to your projects directory and run:
 
 ```bash
 $ oyinit mysite
@@ -92,22 +94,72 @@ $ flask run
 
 Then visit your newly created site at  [http://127.0.0.1:5000](http://127.0.0.1:5000) you will be greeted with the default home page. To edit the site content visit the administration dashboard at [http://127.0.0.1:5000/admin/](http://127.0.0.1:5000/admin/) and use the default account details: username=admin, password=adminpass.
 
-## Why is it called **oy**?
+## Development
 
-I thought you already know. But in case you don't, here is a hint:
+To develop oy locally, first clone the repo:
 
-> The Midwest, a deserted village, an already dead boy, a junky teenager, a black woman with two faces, and a serious man whom you don't want to mess with.
+```bash
+$ git clone https://github.com/mush42/oy-cms.git
+$ cd oy-cms
+```
 
+Create a virtual environment and install the required packages from PYPI:
+
+```bash
+$ virtualenv .venv
+$ source .venv/bin/activate
+$ pip install -r requirements-dev.txt
+```
+ 
+Then cd to the frontend directory and install the frontend components:
+
+```bash
+$ cd frontend
+$ yarn install
+# or if you don't have yarn installed
+$ npm install
+```
+
+Static assets are not committed to the repository because they are generated automatically using **gulp**
+
+Install gulp-cli locally, and then use gulp to build and copy the static files:
+
+```bash
+# install the gulp command line interface globally
+$ yarn global add gulp-cli
+# or if you don't have yarn installed
+$ npm -g -i gulp-cli
+
+# Then build and copy the static assets
+$ gulp build
+$ gulp copy
+```
+ 
+Finally install **oy** in editable mode:
+
+```bash
+$ cd ..
+$ pip install -e .
+```
 
 ## Contributing
 
-**oy** content management system is still in _alpha status_, contributions are more than wellcome. Help needed in perfecting existing features as well as adding new ones.
+**oy** content management system is still in _alpha status_, contributions are more than wellcome. Help is needed in perfecting existing features as well as adding new ones.
 
-Help is needed in the following areas:
+Currently we are workon on the following areas:
 
-* Fixing minor css regressions in the admin frontend
 * Increasing test coverage
 * Implementing a RESTFUL API with sensible defaults
-* Migrating the **Gutenberg** block editor to be used as the default rich-text widget
-* Using a modren javascript framework to implement some admin widgets (inline fields, image and document choosers...etc)
+* Migrating the **Gutenberg** block editor to oy in order for it to be used  as the default rich-text widget
+* Using **React.js** to implement some admin widgets (inline fields, image and document choosers...etc)
 * Translations (i18n)
+
+## Why is it called **oy**?
+
+We thought you already know. But in case you don't, here is a hint:
+
+> The Midwest, a deserted village, an already dead boy, a junky teenager, a black woman with two faces, and a serious man whom you don't want to mess with.
+
+## Licence
+
+**Oy CMS** is copyright (c) 2019 Musharraf Omer and oy contributers. It is licenced under the [MIT License](https://github.com/mush42/oy-cms/blob/master/LICENSE).

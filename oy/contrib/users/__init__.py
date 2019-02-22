@@ -33,11 +33,6 @@ DEFAULT_PROFILE_FIELDS = (
         name="bio",
         type="textarea",
         label=lazy_gettext("Biography"),
-    ),
-    Field(
-        name="picture",
-        type="file",
-        label=lazy_gettext("Profile Picture"),
     )
 )
 

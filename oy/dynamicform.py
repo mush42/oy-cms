@@ -4,7 +4,7 @@
     ~~~~~~~~~~
 
     A form that can construct its fields from
-    a list of dicts containing fields data
+    a list of Field objects containing field data
 
     :copyright: (c) 2018 by Musharraf Omer.
     :license: MIT, see LICENSE for more details.
@@ -69,7 +69,7 @@ default_field_types = (
 )
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class Field:
     name: str
     type: str
@@ -84,21 +84,24 @@ class Field:
 
     def __post_init__(self):
         if not self.description:
-            self.description = ""
+            object.__setattr__(self, "description", "")
         if self.default and callable(self.default):
-            self.default = self.default(self)
+            object.__setattr__(self, "default", self.default(self))
         if self.choices is not None:
             if callable(self.choices):
-                self.choices = self.choices(self)
+                object.__setattr__(self, "choices", self.choices(self))
             if type(self.choices) is dict:
-                self.choices = self.choices.items()
-                return
-            elif type(self.choices) is not str:
+                object.__setattr__(self, "choices", self.choices.items())
+            elif type(self.choices) is str:
+                rv = []
+                for choice in self.choices.split(";"):
+                    rv.append(choice.split(":"))
+                object.__setattr__(self, "choices", rv)
+            else:
                 raise TypeError("{} Invalid value for field choices.".format(choices))
-            rv = []
-            for choice in self.choices.split(";"):
-                rv.append(choice.split(":"))
-            self.choices = rv
+
+    def asdict(self):
+        return dataclasses.asdict(self)
 
     def to_wtf(self):
         field_types = current_app.data["available_field_types"]
@@ -133,8 +136,8 @@ class DynamicForm(object):
     """
     A Dynamic form generator:
 
-    The simplest use is to pass an iterable of dicts
-    containing some metadata about the fields you want
+    The simplest use is to pass an iterable of Field
+    objects containing some metadata about the fields you want
     to create.
     
     Metadata should contain at least name and type and

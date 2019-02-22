@@ -24,7 +24,7 @@ def security_processer():
 
 
 def initialize_security(app):
-    security.init_app(
+    secstate = security.init_app(
         app,
         login_form=OyLoginForm,
         forgot_password_form=OyRecoverPasswordForm,

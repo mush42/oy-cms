@@ -3,7 +3,6 @@ from sqlalchemy.orm import validates
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.ext.associationproxy import association_proxy
 from flask_security import UserMixin, RoleMixin
-from flask_security.utils import hash_password
 from oy.boot.sqla import db
 from oy.babel import lazy_gettext
 from oy.helpers import is_valid_email
@@ -98,13 +97,3 @@ class User(db.Model, UserMixin, SQLAEvent):
 
     def __repr__(self):
         return "User(user_name={})".format(self.user_name)
-
-    def before_commit(self, session, is_modified):
-        needs_hash = any(
-            (
-                not is_modified,
-                is_modified and "password" not in inspect(self).unmodified,
-            )
-        )
-        if needs_hash:
-            self.password = hash_password(self.password)

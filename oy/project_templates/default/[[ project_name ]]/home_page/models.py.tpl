@@ -8,8 +8,9 @@
 """
 
 from sqlalchemy.ext.associationproxy import association_proxy
-from oy.models import Page, Image, db
+from oy.models import Page, db
 from oy.models.abstract import Ordered
+from oy.contrib.media import Image 
 
 
 class FeaturedContent(db.Model, Ordered):

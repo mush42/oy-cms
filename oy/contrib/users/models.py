@@ -9,18 +9,16 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from sqlalchemy import event, inspect
 from sqlalchemy.orm import backref, mapper
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.ext.associationproxy import association_proxy
-from flask_security import UserMixin, RoleMixin
 from oy.boot.sqla import db
 from oy.babel import lazy_gettext
-from oy.models.abstract import TimeStampped, ReadOnlyProxiedDictMixin, DynamicPropWithFile, SQLAEvent
+from oy.models.abstract import TimeStampped, ImmutableProxiedDictMixin, DynamicProp
 from oy.models import User
 
 
-class Profile(ReadOnlyProxiedDictMixin, db.Model, TimeStampped):
+class Profile(ImmutableProxiedDictMixin, db.Model, TimeStampped):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(
         db.Integer,
@@ -45,12 +43,12 @@ class Profile(ReadOnlyProxiedDictMixin, db.Model, TimeStampped):
         return f"<{self.user.user_name}: Profile()>"
 
 
-class ProfileExtras(DynamicPropWithFile, db.Model):
+class ProfileExtras(DynamicProp, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     profile_id = db.Column(db.Integer, db.ForeignKey("profile.id"))
 
 
-@event.listens_for(mapper, "init")
+@db.event.listens_for(mapper, "init")
 def add_user_profile(target, *args, **kwargs):
     if isinstance(target, User) and not getattr(target, "profile", None):
         target.profile = Profile()

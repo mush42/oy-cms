@@ -18,6 +18,7 @@ from flask_admin import Admin, expose, helpers as admin_helpers
 from oy.wrappers import OyModule
 from oy.babel import lazy_gettext, gettext, ngettext
 from oy.signals import oy_app_starting
+from oy.dynamicform import Field
 from .wrappers import (
     admin_required,
     AuthenticationViewMixin,
@@ -28,7 +29,6 @@ from .wrappers import (
 from .displayable_admin import DisplayableAdmin
 from .page_admin import PageAdmin
 from .settings_admin import register_settings_admin
-from .media_admin import register_media_admin
 
 
 def security_ctp_with_admin(admin):
@@ -53,7 +53,20 @@ default_resource_module = OyModule(
     template_folder="templates",
     static_folder="static",
     static_url_path="/admin/static/assets",
+    viewable_name=lazy_gettext("Admin Dashboard")
 )
+
+@default_resource_module.settings_provider()
+def provide_admin_dashboard_settings(app):
+    return [
+        Field(
+            name="show_user_panel",
+            type="checkbox",
+            label=lazy_gettext("Show User Panel"),
+            description=lazy_gettext("Show the user panel in the left side bar."),
+            default=True
+        ),
+    ]
 
 
 class OyAdmin(Admin):
@@ -102,6 +115,7 @@ class OyAdmin(Admin):
                     oy_admin_static=self.admin_plugin_static,
                     get_form_css=self.get_form_static("css"),
                     get_form_js=self.get_form_static("js"),
+                    module_enabled=lambda m: m in self.app.data.get("_oy_contrib_extensions", [])
                 ),
             )
         ]
@@ -109,7 +123,6 @@ class OyAdmin(Admin):
     def finalization_tasks(self, sender):
         self._secure_admin_static_files()
         register_settings_admin(self.app, self)
-        register_media_admin(self.app, self)
         if self.auto_register_modules:
             self.register_module_admin()
 

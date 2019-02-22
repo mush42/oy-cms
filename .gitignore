@@ -97,9 +97,6 @@ ENV/
 # Log files (if you are creating logs in debug mode, uncomment this)
 *.logs
 
-# media folder created by tests
-tests/media/
-
 # static files as they are auto generated
 oy/contrib/**/static/
 

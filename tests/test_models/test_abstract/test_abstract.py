@@ -1,4 +1,5 @@
 import pytest
+import time
 from oy.models.abstract import TimeStampped, Metadata, Titled
 
 
@@ -8,12 +9,13 @@ def test_timestammped(app, db, makemodel):
     db.session.add(t)
     db.session.commit()
     assert t.created
-    assert t.updated == t.created
+    assert t.updated
+    first_updated = t.updated
+    time.sleep(.1)
     with app.test_request_context():
         t.title = u"That"
         db.session.commit()
-    assert t.updated
-
+    assert t.updated > first_updated
 
 def test_metadata(app, db, makemodel):
     class Content(Titled):

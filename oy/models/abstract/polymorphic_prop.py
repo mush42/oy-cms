@@ -47,7 +47,7 @@ class ProxiedDictMixin(object):
         del self._proxied[key]
 
 
-class ReadOnlyProxiedDictMixin(ProxiedDictMixin):
+class ImmutableProxiedDictMixin(ProxiedDictMixin):
     """Like :class:`ProxiedDictMixin` but disables the addition of
     new keys and deletion of existing ones
     """
