@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/mush42/oy-cms.svg?branch=master)](https://travis-ci.org/mush42/Oy-cms)
+[![Build Status](https://travis-ci.org/mush42/oy-cms.svg?branch=master)](https://travis-ci.org/mush42/oy-cms)
 
 ## Oy content management system
 
