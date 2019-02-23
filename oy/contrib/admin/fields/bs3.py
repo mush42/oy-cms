@@ -31,4 +31,9 @@ class BootstrapFileInputField(FileField):
     widget = BootstrapFileInputWidget()
 
     def get_field_js(self):
-        return [url_for("oy-admin-resource-module.static", filename="js/fields/file_input.min.js")]
+        return [
+            url_for(
+                "oy-admin-resource-module.static",
+                filename="js/fields/file_input.min.js",
+            )
+        ]

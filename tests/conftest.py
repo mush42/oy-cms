@@ -27,6 +27,7 @@ def create_app(app):
         base_config = dict(app.config)
         base_config.update(config)
         return oy.prepare_app(__name__, config=base_config)
+
     return app_creator
 
 

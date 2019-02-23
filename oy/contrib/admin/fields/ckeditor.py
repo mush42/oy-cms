@@ -31,5 +31,8 @@ class CkeditorTextAreaField(TextAreaField):
                 "oy-admin-resource-module.static",
                 filename="vendor/fields/ckeditor/ckeditor.js",
             ),
-            url_for("oy-admin-resource-module.static", filename="js/fields/ckeditor-setup.min.js"),
+            url_for(
+                "oy-admin-resource-module.static",
+                filename="js/fields/ckeditor-setup.min.js",
+            ),
         ]

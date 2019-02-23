@@ -29,12 +29,11 @@ from .models import ProfileExtras
 # Used to make the field names of user profile unique
 _prefix = "profile_extra__"
 _wrap_field = lambda name: _prefix + name
-_unwrap_field = lambda name: name[len(_prefix):]
+_unwrap_field = lambda name: name[len(_prefix) :]
 
 
 class UserAdmin(OyModelView):
-    column_list = ["user_name", "email", "active",]
-
+    column_list = ["user_name", "email", "active"]
 
     def is_accessible(self):
         if super().is_accessible():
@@ -49,9 +48,14 @@ class UserAdmin(OyModelView):
         if not user:
             flash(gettext("User does not exist."), category="error")
             return False
-        o, n, c = [form[f].data for f in ("old_password", "new_password", "new_password_confirm")]
+        o, n, c = [
+            form[f].data
+            for f in ("old_password", "new_password", "new_password_confirm")
+        ]
         if not verify_password(o, user.password):
-            flash(gettext("The password you have entered is incorrect."), category="error")
+            flash(
+                gettext("The password you have entered is incorrect."), category="error"
+            )
             return False
         elif o and not any([n, c]):
             flash(gettext("A new password was not provided."), category="warning")
@@ -79,9 +83,11 @@ class UserAdmin(OyModelView):
     @property
     def form_extra_fields(self):
         rv = dict(
-          old_password=PasswordField(label=lazy_gettext("Old Password")),
-          new_password=PasswordField(label=lazy_gettext("New Password")),
-          new_password_confirm=PasswordField(label=lazy_gettext("Confirm New Password"))
+            old_password=PasswordField(label=lazy_gettext("Old Password")),
+            new_password=PasswordField(label=lazy_gettext("New Password")),
+            new_password_confirm=PasswordField(
+                label=lazy_gettext("Confirm New Password")
+            ),
         )
         pk = request.args.get("id")
         user = None if not pk else self.get_one(pk)
@@ -96,17 +102,19 @@ class UserAdmin(OyModelView):
         rv = [
             "user_name",
             "email",
-            rules.NestedRule([
-                rules.HTML("<h4>" + lazy_gettext("Change Password") + "</h4>"),
-                "old_password",
-                "new_password",
-                "new_password_confirm"
-            ]),
+            rules.NestedRule(
+                [
+                    rules.HTML("<h4>" + lazy_gettext("Change Password") + "</h4>"),
+                    "old_password",
+                    "new_password",
+                    "new_password_confirm",
+                ]
+            ),
             rules.HTML("<h4>" + lazy_gettext("Profile Details") + "</h4>"),
         ]
         for fn, _, __ in self.get_profile_fields():
             rv.append(_wrap_field(fn))
-        rv.append(            "roles")
+        rv.append("roles")
         return rv
 
     def get_profile_fields(self):
@@ -114,7 +122,7 @@ class UserAdmin(OyModelView):
         profile_fields = current_app.data["profile_fields"]
         yield from DynamicForm(profile_fields).fields
 
-    @expose("/register", methods=("GET", "POST",))
+    @expose("/register", methods=("GET", "POST"))
     def create_view(self):
         template = self.create_template
         form = OyRegisterForm()

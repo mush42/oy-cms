@@ -11,11 +11,12 @@ def test_timestammped(app, db, makemodel):
     assert t.created
     assert t.updated
     first_updated = t.updated
-    time.sleep(.1)
+    time.sleep(0.1)
     with app.test_request_context():
         t.title = u"That"
         db.session.commit()
     assert t.updated > first_updated
+
 
 def test_metadata(app, db, makemodel):
     class Content(Titled):

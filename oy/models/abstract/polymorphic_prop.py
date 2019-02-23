@@ -150,5 +150,3 @@ class DynamicProp(PolymorphicVerticalProperty):
     int_value = db.Column(db.Integer, info={"type": (int, "integer")})
     str_value = db.Column(db.Unicode(5120), info={"type": (str, "string")})
     bool_value = db.Column(db.Boolean, info={"type": (bool, "boolean")})
-
-

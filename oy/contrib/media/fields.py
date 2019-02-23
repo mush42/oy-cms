@@ -50,4 +50,6 @@ class MediaSelectorField(StringField):
             )
 
     def get_field_js(self):
-        return [url_for("oy.contrib.media.admin.static", filename="js/media-admin.min.js")]
+        return [
+            url_for("oy.contrib.media.admin.static", filename="js/media-admin.min.js")
+        ]

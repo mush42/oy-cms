@@ -26,10 +26,12 @@ class Media(OyExtBase):
     def init_app(self, app):
         storage_conf = app.config.get("DEPOT_MEDIA_STORAGES", {})
         if not storage_conf:
-            raise LookupError("""
+            raise LookupError(
+                """
                 Media storage config is required when using the media extension.
                 Please add `DEPOT_MEDIA_STORAGES`  to the app config,
-        """)    
+        """
+            )
         if "media_storage" not in storage_conf:
             raise ValueError(
                 "A storage named *media_storage* is required when configuring `DEPOT_STORAGES`."
@@ -45,7 +47,9 @@ class Media(OyExtBase):
 
     @staticmethod
     def _add_serving_routes(app):
-        media_bp = Blueprint("media", __name__, url_prefix=app.config.get("MEDIA_URL_PREFIX", "/media"))
+        media_bp = Blueprint(
+            "media", __name__, url_prefix=app.config.get("MEDIA_URL_PREFIX", "/media")
+        )
         media_bp.add_url_rule(
             "/images/<string:file_id>",
             endpoint="images",

@@ -70,16 +70,10 @@ class GenericMedia(Titled, TimeStampped, UserRelated, Tagged):
 
 
 class DynamicPropWithFile(DynamicProp):
-
     @declared_attr
     def file_value(cls):
         kwargs = getattr(cls, "__file_field_args__", {})
         nullable = kwargs.pop("nullable", True)
         info = kwargs.pop("info", {})
         info["type"] = ((FileIntent, FileStorage), "file")
-        return db.Column(
-            UploadedFileField(**kwargs),
-            nullable=nullable,
-            info=info
-        )
-
+        return db.Column(UploadedFileField(**kwargs), nullable=nullable, info=info)

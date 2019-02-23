@@ -28,6 +28,7 @@ from oy.models import db, Role
 
 def unique_username(form, field):
     from oy.boot.security import user_datastore
+
     if user_datastore.get_user(field.data) is not None:
         raise ValidationError(lazy_gettext("User name already exists"))
 
@@ -71,4 +72,3 @@ class OyRegisterForm(RegisterForm):
         ),
         default=True,
     )
-

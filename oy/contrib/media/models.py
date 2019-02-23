@@ -30,7 +30,7 @@ class Image(db.Model, GenericMedia):
     IMG_SIZES = dict(xs=(64, 64), sm=(128, 128), md=(320, 320), lg=(512, 512))
     __depot_args__ = {
         "upload_storage": "image_storage",
-        "upload_type": uploaded_image(thumbnail_sizes=IMG_SIZES)
+        "upload_type": uploaded_image(thumbnail_sizes=IMG_SIZES),
     }
 
     @property

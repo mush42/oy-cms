@@ -25,7 +25,7 @@ class Bootstrap4(OyExtBase):
     file_paths = dict(
         jquery="vendor/jquery/jquery.min.js",
         bs4css="vendor/bootstrap/css/bootstrap.min.css",
-        bs4js="vendor/bootstrap/js/bootstrap.min.js"
+        bs4js="vendor/bootstrap/js/bootstrap.min.js",
     )
 
     def init_app(self, app):
@@ -41,7 +41,5 @@ class Bootstrap4(OyExtBase):
                 filename = self.file_paths["bs4css"]
             else:
                 filename = "vendor/swatch/{swatch}/bootstrap.min.css"
-            return url_for(
-                self.name + ".static", filename=filename
-            )
+            return url_for(self.name + ".static", filename=filename)
         return url_for(self.name + ".static", filename=self.file_paths[restype])

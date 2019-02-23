@@ -53,8 +53,9 @@ default_resource_module = OyModule(
     template_folder="templates",
     static_folder="static",
     static_url_path="/admin/static/assets",
-    viewable_name=lazy_gettext("Admin Dashboard")
+    viewable_name=lazy_gettext("Admin Dashboard"),
 )
+
 
 @default_resource_module.settings_provider()
 def provide_admin_dashboard_settings(app):
@@ -64,8 +65,8 @@ def provide_admin_dashboard_settings(app):
             type="checkbox",
             label=lazy_gettext("Show User Panel"),
             description=lazy_gettext("Show the user panel in the left side bar."),
-            default=True
-        ),
+            default=True,
+        )
     ]
 
 
@@ -115,7 +116,8 @@ class OyAdmin(Admin):
                     oy_admin_static=self.admin_plugin_static,
                     get_form_css=self.get_form_static("css"),
                     get_form_js=self.get_form_static("js"),
-                    module_enabled=lambda m: m in self.app.data.get("_oy_contrib_extensions", [])
+                    module_enabled=lambda m: m
+                    in self.app.data.get("_oy_contrib_extensions", []),
                 ),
             )
         ]

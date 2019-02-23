@@ -18,22 +18,12 @@ from .models import *
 
 DEFAULT_PROFILE_FIELDS = (
     Field(
-        name="first_name",
-        type="text",
-        label=lazy_gettext("First Name"),
-        required=True,
+        name="first_name", type="text", label=lazy_gettext("First Name"), required=True
     ),
     Field(
-        name="last_name",
-        type="text",
-        label=lazy_gettext("Last Name"),
-        required=True,
+        name="last_name", type="text", label=lazy_gettext("Last Name"), required=True
     ),
-    Field(
-        name="bio",
-        type="textarea",
-        label=lazy_gettext("Biography"),
-    )
+    Field(name="bio", type="textarea", label=lazy_gettext("Biography")),
 )
 
 
@@ -42,7 +32,9 @@ class UserManager(OyExtBase):
 
     module_args = {"name": "oy.contrib.users", "import_name": "oy.contrib.users"}
 
-    def __init__(self, app=None, profile_fields=None, add_default_profile_fields=True, **kwargs):
+    def __init__(
+        self, app=None, profile_fields=None, add_default_profile_fields=True, **kwargs
+    ):
         self.profile_fields = profile_fields or []
         if add_default_profile_fields:
             self.profile_fields.extend(DEFAULT_PROFILE_FIELDS)

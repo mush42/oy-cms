@@ -90,7 +90,7 @@ class UploadedImage(UploadedFile):
     .. warning::
         Requires Pillow library
     """
-    
+
     # Those attributes should be overridden by the inheriting classes
     thumbnail_sizes = {}
     thumbnail_quality = 90
@@ -98,7 +98,9 @@ class UploadedImage(UploadedFile):
 
     def process_content(self, content, filename=None, content_type=None):
         file = file_from_content(content)
-        FileTypeCheckFilter(filetypes=["raster-image", "raw-image", "vector-image"]).validate_filetype(file)
+        FileTypeCheckFilter(
+            filetypes=["raster-image", "raw-image", "vector-image"]
+        ).validate_filetype(file)
         __, filename, content_type = FileStorage.fileinfo(content)
         for name, size in self.thumbnail_sizes.items():
             self.store_thumbnail(file, filename, name, size)
@@ -142,8 +144,12 @@ class UploadedImage(UploadedFile):
 
 def uploaded_image(thumbnail_sizes, thumbnail_format="png", thumbnail_quality=90):
     """A factory function which help to avoid the need to inherit the UploadedImage class."""
-    return type("UploadedImageUploadType", (UploadedImage,), dict(
-        thumbnail_sizes=thumbnail_sizes,
-        thumbnail_format=thumbnail_format,
-        thumbnail_quality=thumbnail_quality
-    ))
+    return type(
+        "UploadedImageUploadType",
+        (UploadedImage,),
+        dict(
+            thumbnail_sizes=thumbnail_sizes,
+            thumbnail_format=thumbnail_format,
+            thumbnail_quality=thumbnail_quality,
+        ),
+    )

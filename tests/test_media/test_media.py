@@ -17,13 +17,13 @@ def test_media(app, client, db):
         "SERVE_MEDIA_FILES": True,
         "DEPOT_MEDIA_STORAGES": dict(
             media_storage={"depot.storage_path": TEMP_DIR.name}
-        )
+        ),
     }
-    
+
     app.config.update(config)
     Media(app)
-    imgfile =  ASSETS_DIR/ "image.jpg"
-    docfile = ASSETS_DIR/"document.pdf"
+    imgfile = ASSETS_DIR / "image.jpg"
+    docfile = ASSETS_DIR / "document.pdf"
     image = Image(title="Image", uploaded_file=open(imgfile, "rb"))
     document = Document(title="Document", uploaded_file=open(docfile, "rb"))
     db.session.add_all([image, document])

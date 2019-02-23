@@ -42,7 +42,7 @@ class FixtureInstaller:
                 to_read = os.path.join(
                     self.module.root_path, "fixtures", "__files__", v[10:]
                 )
-                obj[k] = open(to_read, "r").read()
+                obj[k] = open(to_read, "rb").read()
             elif "date" in k:
                 obj[k] = parse(v)
         return model(**obj)

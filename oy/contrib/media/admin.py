@@ -43,13 +43,15 @@ class GenericMediaAdmin(OyModelView):
         super().__init__(*args, **kwargs)
         self.fileserver = ModelFileServer(model=self.model)
         if "oy.contrib.media.admin" not in current_app.blueprints:
-            current_app.register_blueprint(Blueprint(
-                name="oy.contrib.media.admin",
-                import_name="oy.contrib.media.admin",
-                static_folder="static",
-                template_folder="templates",
-                static_url_path="/admin/static/assets/media"
-            ))
+            current_app.register_blueprint(
+                Blueprint(
+                    name="oy.contrib.media.admin",
+                    import_name="oy.contrib.media.admin",
+                    static_folder="static",
+                    template_folder="templates",
+                    static_url_path="/admin/static/assets/media",
+                )
+            )
 
     def search_placeholder(self):
         return gettext("Search")
