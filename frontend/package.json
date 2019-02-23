@@ -24,7 +24,7 @@
   "dependencies": {
     "@ckeditor/ckeditor5-build-classic": "^11.2.0",
     "admin-lte": "~2.4.8",
-    "bootstrap": "3.4.0",
+    "bootstrap": "3.4.1",
     "bootstrap4": "npm:bootstrap@4.3.1",
     "bootswatch": "^4.3.1",
     "flot": "^2.1.6",
