@@ -77,4 +77,13 @@ def createuser(noinput, superuser):
     db.session.commit()
     click.echo()
     click.secho(f"{usertype} User created successfully.", fg="green", bold=True)
+    click.secho("^" * 12, fg="red")
+    click.secho(
+        f"User account details: username={user_name}, password={password}",
+        fg="red",
+        bold=True,
+    )
+    if noinput:
+        click.secho("Please change the default password.", fg="red", bold=True)
+    click.secho("^" * 12, fg="red")
     click.echo("\r\n")

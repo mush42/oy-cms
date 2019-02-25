@@ -103,8 +103,15 @@ class ProjectTemplateCopier:
 
 @click.command(name="oyinit")
 @click.argument("project_name")
-@click.option("--templatedir", help="The template to be used", default=None)
-def init_oy_project(project_name, templatedir=None):
+@click.option(
+    "--templatedir", help="Template directory or repository URL.", default=None
+)
+@click.option(
+    "--templatename",
+    help="The name of the template you want to use.",
+    default="default",
+)
+def init_oy_project(project_name, templatedir, templatename):
     """Start a new oy project"""
     if not is_valid_pkg_name(project_name):
         click.echo(
@@ -117,13 +124,19 @@ def init_oy_project(project_name, templatedir=None):
     else:
         rv = get_vcs_from_url(templatedir)
         if rv is not None:
-            click.echo(f"Cloning template from {rv.url}...")
+            click.secho(f"Cloning template from {rv.url}...", fg="yellow")
             templatedir = os.path.join(clone(rv.url), "project_templates")
+            click.secho("Repository cloned successfully.", fg="yellow")
     if not os.path.isdir(templatedir):
         click.echo(f"Error: Template directory {templatedir} does not exist.")
         raise click.Abort()
+    candidate_templates = os.listdir(templatedir)
     templates = []
-    for f in os.listdir(templatedir):
+    if templatename not in candidate_templates:
+        click.secho(f"Template {templatename} does not exist.")
+    elif templatename in candidate_templates:
+        templates.append(templatename)
+    for f in candidate_templates:
         if os.path.isdir(os.path.join(templatedir, f)):
             if os.path.isfile(os.path.join(templatedir, f, "build_context.py")):
                 templates.append(f)
@@ -134,12 +147,10 @@ def init_oy_project(project_name, templatedir=None):
             click.echo(f"  * {i}")
         while rv not in templates:
             rv = click.prompt(
-                "\r\nPlease choose one of the above or press ctrl+c to quit. ",
-                default="default",
+                "\r\nPlease choose one of the above or press enter to accept the default.",
+                default=templates[0],
             )
         templatedir = os.path.join(templatedir, rv)
-    else:
-        templatedir = os.path.join(templatedir, templates[0])
     click.echo(f"\r\nCreating a new project called `{project_name}`")
     click.echo(f"Using project template: {os.path.split(templatedir)[-1]}.")
     distdir = prepare_directory(project_name)

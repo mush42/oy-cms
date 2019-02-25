@@ -22,7 +22,6 @@ from flask import (
     abort,
     flash,
 )
-from werkzeug import secure_filename
 from flask_wtf import Form as HtmlForm
 from oy.globals import current_page
 from oy.boot.sqla import db
@@ -32,6 +31,7 @@ from oy.helpers import date_stamp
 from oy.contrib.extbase import OyExtBase
 from .admin import register_admin
 from .models import FormEntry, FieldEntry, Form, Field
+from .signals import before_accepting_submission, new_submission_received
 
 
 class FormView(ContentView):
@@ -47,29 +47,25 @@ class FormView(ContentView):
                 continue
             field_entry = FieldEntry(key=f.name, field_id=field.id)
             data = f.data
-            if field.type == "file_input":
-                file_data = request.files[field.name]
-                filename = "%s-%s-%s.%s" % (
-                    field.name,
-                    date_stamp(),
-                    str(time.time()).replace(".", ""),
-                    os.path.splitext(file_data.filename)[-1],
-                )
-                filename = secure_filename(filename)
-                path = os.path.join(current_app.config["FORM_UPLOADS_PATH"], filename)
-                file_data.save(path)
-                data = filename
             field_entry.value = data
             db.session.add(field_entry)
             entry.fields.append(field_entry)
         db.session.add(entry)
+        return entry
 
     def serve(self):
         form = DynamicForm(self.page.fields).form
         if form.validate_on_submit():
+            entry = None
             with db.session.no_autoflush:
-                self.store_form(form)
+                before_accepting_submission.send(
+                    sender=current_app._get_current_object(), form=form
+                )
+                entry = self.store_form(form)
             db.session.commit()
+            new_submission_received.send(
+                sender=current_app._get_current_object(), entry=entry
+            )
             flash(Markup(self.page.submit_message), "success")
             return redirect(request.path)
         return dict(form=form)

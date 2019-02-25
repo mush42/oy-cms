@@ -9,6 +9,7 @@
     :license: MIT, see LICENSE for more details.
 """
 
+import os
 from secrets import token_urlsafe
 from sqlalchemy.ext.declarative import declared_attr
 from werkzeug.datastructures import FileStorage
@@ -17,6 +18,10 @@ from depot.io.utils import FileIntent
 from oy.babel import lazy_gettext
 from oy.models import db
 from oy.models.abstract import DynamicProp, Titled, TimeStampped, UserRelated, Tagged
+from oy.helpers import slugify
+from oy.contrib.demo_content.utils import (
+    deserialize_instance as original_deserialize_instance,
+)
 from .utils import FileTypeCheckFilter
 
 
@@ -57,7 +62,8 @@ class GenericMedia(Titled, TimeStampped, UserRelated, Tagged):
         token = token_urlsafe(14)
         while connection.scalar(db.func.count(sel.where(tbl.c.file_id == token))):
             token = token_urlsafe(NUMBYTES)
-        self.file_id = token
+        filename, ext = os.path.splitext(self.uploaded_file.filename)
+        self.file_id = f"{slugify(filename)}-{token}{ext}"
 
     @classmethod
     def get_upload_storage(cls):
@@ -67,6 +73,18 @@ class GenericMedia(Titled, TimeStampped, UserRelated, Tagged):
             .columns[0]
             .type._upload_storage
         )
+
+    @staticmethod
+    def deserialize_instance(module, model, **attrs):
+        """Custom logic for constructing object from json when adding demo data."""
+        with db.session.no_autoflush:
+            file = open(
+                os.path.join(module.root_path, "fixtures", attrs["uploaded_file"]), "rb"
+            )
+            attrs["uploaded_file"] = file
+            obj = original_deserialize_instance(module, model, **attrs)
+            file.close()
+        return obj
 
 
 class DynamicPropWithFile(DynamicProp):

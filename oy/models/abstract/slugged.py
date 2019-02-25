@@ -14,8 +14,7 @@ from sqlalchemy import inspect
 from sqlalchemy.orm.exc import NoResultFound
 from flask import current_app
 from oy.boot.sqla import db
-from slugify import slugify
-from oy.helpers import increment_string, get_owning_table
+from oy.helpers import slugify, increment_string, get_owning_table
 from ._sqlaevent import SQLAEvent
 
 

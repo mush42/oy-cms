@@ -95,6 +95,11 @@ class OyModule(Blueprint):
         super(OyModule, self).__init__(name, import_name, **kwargs)
 
     def register(self, app, *args, **kwargs):
+        if self.has_static_folder and not self.static_url_path.startswith(
+            app.static_url_path
+        ):
+            url_components = [app.static_url_path, self.static_url_path]
+            self.static_url_path = "/" + "/".join(p.strip("/") for p in url_components)
         super(OyModule, self).register(app, *args, **kwargs)
         # Update the app.config with our defaults
         app.config.from_module_defaults(self.root_path)

@@ -54,11 +54,11 @@ def clean_settings():
     current_app.provided_settings_dict = {}
     current_app._collect_provided_settings()
     app_settings = chain.from_iterable(current_app.provided_settings_dict.values())
-    valid_settings = {s["name"] for s in app_settings}
+    valid_settings = {s.name for s in app_settings}
     to_remove = set(active_settings) - valid_settings
     if not to_remove:
         click.secho("------- Great: No unused settings ----------", fg="green")
-        return
+        raise click.exceptions.Exit(0)
     for k in to_remove:
         click.secho("\t> Removing unused setting::: %s" % k, fg="red")
         del active_settings.store[k]

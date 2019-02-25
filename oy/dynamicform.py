@@ -25,7 +25,6 @@ from wtforms.fields import (
     RadioField,
     BooleanField,
     TextAreaField,
-    FileField,
 )
 from wtforms.fields.html5 import (
     IntegerField,
@@ -65,7 +64,6 @@ default_field_types = (
     FieldType("datetime", lazy_gettext("Date & Time input"), DateTimeField),
     FieldType("url", lazy_gettext("URL input"), URLField, (url(),)),
     FieldType("tell", lazy_gettext("Tell input"), TelField),
-    FieldType("file", lazy_gettext("File input"), FileField),
 )
 
 

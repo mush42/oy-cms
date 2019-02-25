@@ -52,22 +52,9 @@ default_resource_module = OyModule(
     import_name=__name__,
     template_folder="templates",
     static_folder="static",
-    static_url_path="/admin/static/assets",
+    static_url_path="/static/admin",
     viewable_name=lazy_gettext("Admin Dashboard"),
 )
-
-
-@default_resource_module.settings_provider()
-def provide_admin_dashboard_settings(app):
-    return [
-        Field(
-            name="show_user_panel",
-            type="checkbox",
-            label=lazy_gettext("Show User Panel"),
-            description=lazy_gettext("Show the user panel in the left side bar."),
-            default=True,
-        )
-    ]
 
 
 class OyAdmin(Admin):

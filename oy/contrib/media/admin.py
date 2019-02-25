@@ -25,6 +25,12 @@ from .serving import ModelFileServer
 from .utils import FileTypeCheckFilter, UnsupportedFileTypeError
 
 
+class FileDownloadRowAction(EndpointLinkRowAction):
+    def render(self, context, row_id, row):
+        row_id = row.file_id
+        return super().render(context, row_id, row)
+
+
 class GenericMediaAdmin(OyModelView):
     list_template = "oy/contrib/media/admin/list.html"
     form_columns = ["title", "tags", "uploaded_file", "description"]
@@ -34,14 +40,21 @@ class GenericMediaAdmin(OyModelView):
     column_list = ["title", "created"]
     column_searchable_list = ["tags", "title", "description"]
     column_extra_row_actions = [
-        EndpointLinkRowAction(
-            "fa fa-download", ".serve_file_with_id", title=lazy_gettext("Download")
+        FileDownloadRowAction(
+            "fa fa-download",
+            ".serve_file_with_id",
+            title=lazy_gettext("Download"),
+            id_arg="file_id",
         )
     ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fileserver = ModelFileServer(model=self.model)
+
+    def create_blueprint(self, admin):
+        blueprint = super().create_blueprint(admin)
+        # A blueprint to serve files for media admin
         if "oy.contrib.media.admin" not in current_app.blueprints:
             current_app.register_blueprint(
                 Blueprint(
@@ -49,16 +62,25 @@ class GenericMediaAdmin(OyModelView):
                     import_name="oy.contrib.media.admin",
                     static_folder="static",
                     template_folder="templates",
-                    static_url_path="/admin/static/assets/media",
+                    static_url_path="/static/admin/media",
                 )
             )
+        blueprint.register_error_handler(
+            UnsupportedFileTypeError, self.handle_unsupported_file_types
+        )
+        return blueprint
 
     def search_placeholder(self):
         return gettext("Search")
 
-    @expose("/download/<id>")
-    def serve_file_with_id(self, id):
-        return self.fileserver(file_id=self.get_one(id).file_id)
+    def handle_unsupported_file_types(self, error):
+        flash(gettext(f"Error uploading file. {error}"))
+        return redirect(request.path)
+
+    @expose("/download/<file_id>")
+    def serve_file_with_id(self, file_id):
+        doc = self.model.query.filter_by(file_id=file_id).one()
+        return self.fileserver(doc.file_id)
 
     @expose("/files/<string:file_id>")
     def internal_serve(self, file_id):

@@ -1,6 +1,7 @@
 from werkzeug.local import LocalProxy
 from flask import current_app, request, url_for, session
 from flask_security import Security, SQLAlchemyUserDatastore
+from flask_wtf import CSRFProtect
 from oy.boot.sqla import db
 from oy.models.user import User, Role
 from oy.babel import gettext, lazy_gettext
@@ -24,10 +25,11 @@ def security_processer():
 
 
 def initialize_security(app):
-    secstate = security.init_app(
+    security.init_app(
         app,
         login_form=OyLoginForm,
         forgot_password_form=OyRecoverPasswordForm,
         datastore=user_datastore,
     )
     app.before_request(security_processer)
+    CSRFProtect(app)

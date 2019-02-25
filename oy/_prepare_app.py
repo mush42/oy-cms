@@ -10,7 +10,6 @@
 """
 
 from flask import current_app
-from flask_wtf import CSRFProtect
 from oy.boot.sqla import db, migrate
 from oy.boot.babel import babel
 from oy.boot.security import initialize_security
@@ -25,7 +24,6 @@ from oy.models import *
 def initialize_builtin_extensions():
     """Initialize third-party extensions."""
     app = current_app._get_current_object()
-    CSRFProtect(app)
     db.init_app(app)
     migrate.init_app(app, db=db)
     babel.init_app(app)

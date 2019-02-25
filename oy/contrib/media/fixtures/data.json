@@ -1,0 +1,10 @@
+{
+  "oy.contrib.media.models:Image": [
+    {
+      "title": "Cute kitten",
+      "tags": ["animal", "cats", "cute"],
+      "description": "A cute little kitten",
+      "uploaded_file": "__files__/cat.jpg"
+    }
+  ]
+}
