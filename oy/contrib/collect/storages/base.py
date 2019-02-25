@@ -11,14 +11,7 @@
 
 import os
 import click
-from pathlib import Path
-from dataclasses import dataclass
-
-
-@dataclass
-class CopyOpts:
-    src: str
-    dst: str
+from pathlib import PurePath as Path
 
 
 class BaseStorage:
@@ -38,23 +31,23 @@ class BaseStorage:
         to_copy = []
         to_process = []
         if self.app.has_static_folder:
-            to_process.append((self.app.static_folder, ""))
+            to_process.append((self.app.static_folder, "",))
         blueprints = [bp for bp in self.app.blueprints.values() if bp.has_static_folder]
         for blueprint in blueprints:
-            prefix = blueprint.static_url_path.lstrip(self.app.static_url_path).strip(
-                "/"
-            )
-            to_process.append((blueprint.static_folder, prefix))
+            if blueprint.url_prefix:
+                prefix = "/".join(p.strip("/") for p in (blueprint.url_prefix, blueprint.static_url_path))
+            else:
+                pathcomp = [ p for p in blueprint.static_url_path.split("/") if p][1:]
+                prefix = "/".join(pathcomp).strip("/")
+            to_process.append((blueprint.static_folder, prefix,))
         for folder, prefix in to_process:
             for dirname, _, files in os.walk(folder):
-                rel = Path(dirname).relative_to(folder)
                 for file in files:
-                    to_copy.append(
-                        CopyOpts(
-                            src=Path(dirname) / file,
-                            dst=Path(self.destdir / prefix / rel / file),
-                        )
-                    )
+                    relpath = Path(dirname, file).relative_to(folder)
+                    src = Path(dirname) / file
+                    dst = self.destdir/prefix/relpath
+                    to_copy.append((src, dst,))
+                    self.log(f"Copied {src} to {dst}.")
         yield from to_copy
         with_prefix = [
             bp
@@ -62,12 +55,14 @@ class BaseStorage:
             if bp.has_static_folder and bp.url_prefix
         ]
         if with_prefix:
+            app_static = self.app.static_url_path.strip("/")
             self.log(
-                f"Beside adding '{self.app.static_url_path}' to your static files webserver config."
+                f"\r\n\r\nBeside adding '{app_static}' to your static files webserver config."
             )
-            self.log("You need to add the following aliases too:")
+            self.log("You need to add aliases for the following as well:")
         for bp in with_prefix:
-            self.log(f"  * '{bp.url_prefix}{bp.static_url_path}'")
+            uri = bp.url_prefix + bp.static_url_path
+            self.log(f"  *  url='{uri}', folder='{(self.destdir/uri[1:]).as_posix()}'")
 
     def log(self, msg):
         if self.verbose:

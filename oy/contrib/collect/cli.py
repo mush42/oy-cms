@@ -25,6 +25,7 @@ from flask.cli import with_appcontext
 @with_appcontext
 def collect_static(ctx, destination_directory, verbose):
     """Collect static files of the application in one directory."""
+    current_app.finalize()
     import_path = current_app.config["COLLECT_STORAGE"]
     storage_class = import_string(import_path, silent=True)
     if storage_class is None:

@@ -80,8 +80,8 @@ class UserAdmin(OyModelView):
             model.profile[fname] = field.data
         db.session.commit()
 
-    @property
-    def form_extra_fields(self):
+    def get_form(self):
+        form = super().get_form()
         rv = dict(
             old_password=PasswordField(label=lazy_gettext("Old Password")),
             new_password=PasswordField(label=lazy_gettext("New Password")),
@@ -89,13 +89,14 @@ class UserAdmin(OyModelView):
                 label=lazy_gettext("Confirm New Password")
             ),
         )
-        pk = request.args.get("id")
-        user = None if not pk else self.get_one(pk)
+        user = None if not request else self.get_one(request.args.get("id"))
         for fn, cf, kw in self.get_profile_fields():
             if user is not None:
                 kw["default"] = user.profile.get(fn)
             rv[_wrap_field(fn)] = cf(**kw)
-        return rv
+        for k, v in rv.items():
+            setattr(form, k, v)
+        return form
 
     @property
     def form_rules(self):
