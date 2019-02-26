@@ -44,7 +44,8 @@ def register_admin(app, admin):
         HomePageAdmin(
             HomePage,
             db.session,
-            name="Home Pages",
+            name="home page",
+            verbose_name="home pages",
             menu_icon_type="fa",
             menu_icon_value="fa-home",
             menu_order=1000,

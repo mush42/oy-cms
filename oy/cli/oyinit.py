@@ -125,35 +125,24 @@ def init_oy_project(project_name, templatedir, templatename):
         rv = get_vcs_from_url(templatedir)
         if rv is not None:
             click.secho(f"Cloning template from {rv.url}...", fg="yellow")
-            templatedir = os.path.join(clone(rv.url), "project_templates")
+            cloned = clone(rv)
+            if not cloned:
+                click.secho(f"Error cloning repository from {rv.url}.", fg="red")
+                raise click.Abort()
+            templatedir = os.path.join(cloned, "project_templates")
             click.secho("Repository cloned successfully.", fg="yellow")
     if not os.path.isdir(templatedir):
         click.echo(f"Error: Template directory {templatedir} does not exist.")
         raise click.Abort()
-    candidate_templates = os.listdir(templatedir)
-    templates = []
-    if templatename not in candidate_templates:
-        click.secho(f"Template {templatename} does not exist.")
-    elif templatename in candidate_templates:
-        templates.append(templatename)
-    for f in candidate_templates:
-        if os.path.isdir(os.path.join(templatedir, f)):
-            if os.path.isfile(os.path.join(templatedir, f, "build_context.py")):
-                templates.append(f)
-    if templates and len(templates) > 1:
-        rv = ""
-        click.echo("Which template you would like to use?\r\n")
-        for i in templates:
-            click.echo(f"  * {i}")
-        while rv not in templates:
-            rv = click.prompt(
-                "\r\nPlease choose one of the above or press enter to accept the default.",
-                default=templates[0],
-            )
-        templatedir = os.path.join(templatedir, rv)
-    click.echo(f"\r\nCreating a new project called `{project_name}`")
-    click.echo(f"Using project template: {os.path.split(templatedir)[-1]}.")
+    templatepath = os.path.join(templatedir, templatename)
+    if not os.path.exists(templatepath):
+        click.secho(f"Template {templatename} does not exists.", fg="red")
+        raise click.Abort()
+    click.echo(
+        f"\r\nCreating a new project called `{project_name}` from `{templatedir}`"
+    )
+    click.echo(f"Using project template: {templatename}.")
     distdir = prepare_directory(project_name)
-    copier = ProjectTemplateCopier(templatedir, distdir, project_name).copy_all()
+    copier = ProjectTemplateCopier(templatepath, distdir, project_name).copy_all()
     click.echo("~" * 12)
     click.secho(f"New project created at {distdir}\r\n", fg="green", bold=True)

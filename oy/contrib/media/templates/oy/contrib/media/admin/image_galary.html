@@ -1,19 +1,5 @@
 {% extends "oy/contrib/media/admin/list.html" %}
-
-{% macro delete_row(row_id, row) %}
-<form style="display: inline-block;" method="POST" action="{{ get_url('.delete_view') }}">
-  {{ delete_form.id(value=get_pk_value(row)) }}
-  {{ delete_form.url(value=return_url) }}
-  {% if delete_form.csrf_token %}
-  {{ delete_form.csrf_token }}
-  {% elif csrf_token %}
-  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-  {% endif %}
-  <button class="btn btn-sm" onclick="return safeConfirm('{{ _gettext('Are you sure you want to delete this record?') }}');" title="{{ _gettext('Delete record') }}">
-    <i class="fa fa-trash-o"></i>
-  </button>
-</form>
-{% endmacro %}
+{% import 'admin/actions.html' as actionlib with context %}
 
 {% block head %}
   {{ super() }}
@@ -24,6 +10,10 @@
 {% block body %}
   {% block model_menu_bar %}
     {{ super() }}
+  {% endblock %}
+
+  {% block actions %}
+  {{ actionlib.form(actions, get_url('.action_view')) }}
   {% endblock %}
 
   <div class="container galary-wrapper">
@@ -47,9 +37,9 @@
 	  <div class="caption">
    <section class="btn-toolbar" role="region" aria-label="{{ gettext('Image actions') }} ">
 	 <section class="btn-group" >
-	 {{ delete_row(row.id, row) }}
 	  <a class="btn btn-sm" href="{{ get_url('.edit_view', id=row.id, url=return_url) }}" title="{{ gettext('Edit Record') }}"><i class="fa fa-pencil-square-o"></i></a>
 	  <a class="btn btn-sm preview-btn" href="{{ url_for(".internal_serve", file_id=row.file_id) }}" role="button" title="{{ gettext("Preview") }}"><i class="fa fa-eye"></i></a>
+	  <a class="btn btn-sm" href="{{ get_url(".delete_confirm", pk=row.id) }}" role="button" title="{{ gettext("Delete") }}"><i class="fa fa-trash"></i></a>
 	  </section>
 	  </section>
 	  </div>

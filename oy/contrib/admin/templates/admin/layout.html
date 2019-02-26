@@ -31,7 +31,11 @@
   {% else %}
   {{ menu_icon(item) }}
   {% endif %}
-  {{ item.name }}
+  {% if item._view and item._view.verbose_name %}
+  {{ item._view.verbose_name.title() }}
+  {% else %}
+  {{ item.name.title() }}
+  {% endif %}
   </a>
   {% if children %}
   <ul class="treeview-menu">
@@ -48,7 +52,9 @@
     {% set class_name = item.get_class_name() %}
     {% if item.is_accessible() and item.is_visible() %}
       <li{% if class_name %} class="{{ class_name }}"{% endif %}>
-        <a href="{{ item.get_url() }}">{{ menu_icon(item) }}{{ item.name }}</a>
+        <a href="{{ item.get_url() }}">
+        {{ item.name.title() }}
+        </a>
       </li>
     {% endif %}
   {% endfor %}

@@ -19,6 +19,9 @@ class BaseStorage:
     Concrete storages must implement the run() method.
     """
 
+    # A human readable name to describing this storage
+    name = None
+
     def __init__(self, app, destdir, verbose):
         self.app = app
         self.destdir = Path(destdir)
@@ -28,26 +31,28 @@ class BaseStorage:
         raise NotImplementedError
 
     def __iter__(self, src=None, dest=None):
-        to_copy = []
-        to_process = []
+        to_copy = set()
+        to_process = set()
         if self.app.has_static_folder:
-            to_process.append((self.app.static_folder, "",))
+            to_process.add((self.app.static_folder, ""))
         blueprints = [bp for bp in self.app.blueprints.values() if bp.has_static_folder]
         for blueprint in blueprints:
             if blueprint.url_prefix:
-                prefix = "/".join(p.strip("/") for p in (blueprint.url_prefix, blueprint.static_url_path))
+                prefix = "/".join(
+                    p.strip("/")
+                    for p in (blueprint.url_prefix, blueprint.static_url_path)
+                )
             else:
-                pathcomp = [ p for p in blueprint.static_url_path.split("/") if p][1:]
+                pathcomp = [p for p in blueprint.static_url_path.split("/") if p][1:]
                 prefix = "/".join(pathcomp).strip("/")
-            to_process.append((blueprint.static_folder, prefix,))
+            to_process.add((blueprint.static_folder, prefix))
         for folder, prefix in to_process:
             for dirname, _, files in os.walk(folder):
                 for file in files:
                     relpath = Path(dirname, file).relative_to(folder)
                     src = Path(dirname) / file
-                    dst = self.destdir/prefix/relpath
-                    to_copy.append((src, dst,))
-                    self.log(f"Copied {src} to {dst}.")
+                    dst = self.destdir / prefix / relpath
+                    to_copy.add((src, dst))
         yield from to_copy
         with_prefix = [
             bp

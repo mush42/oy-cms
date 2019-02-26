@@ -134,7 +134,8 @@ def register_admin(app, admin):
         ImageAdmin(
             Image,
             db.session,
-            name=lazy_gettext("Images"),
+            name=lazy_gettext("image"),
+            verbose_name=lazy_gettext("images"),
             endpoint="image_admin",
             url="media/images/",
             menu_icon_type="fa",
@@ -146,7 +147,8 @@ def register_admin(app, admin):
         GenericMediaAdmin(
             Document,
             db.session,
-            name=lazy_gettext("Documents"),
+            name=lazy_gettext("document"),
+            verbose_name=lazy_gettext("documents"),
             endpoint="document_admin",
             url="media/documents/",
             menu_icon_type="fa",

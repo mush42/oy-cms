@@ -54,9 +54,7 @@ def field_type_choices():
 
 
 class FormAdmin(PageAdmin):
-
-    column_extra_row_actions = list(PageAdmin.column_extra_row_actions)
-    column_extra_row_actions += [
+    column_extra_row_actions = [
         EndpointLinkRowAction(
             icon_class="fa fa-download",
             endpoint=".export_entries",
@@ -165,7 +163,8 @@ def register_admin(app, admin):
         FormAdmin(
             Form,
             db.session,
-            name=lazy_gettext("Forms"),
+            name=lazy_gettext("form"),
+            verbose_name=lazy_gettext("forms"),
             menu_icon_type="fa",
             menu_icon_value="fa-wpforms",
             menu_order=600,

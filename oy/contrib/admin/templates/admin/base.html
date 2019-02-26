@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 {% import 'admin/layout.html' as layout with context -%}
 {% import 'admin/static.html' as admin_static with context %}
+{% import "admin/oy/oy_macros.html" as oy with context %}
 {% import "admin/oy/form_fields_macros.html" as form_field_macros with context %}
 <html>
 <head>
@@ -10,10 +11,7 @@
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
   <title>
   {% block title %}
-  {% if admin_view.category %}
-  {{ admin_view.category ~ " - " }}
-  {% endif %}
-  {{ admin_view.name ~ " - " }}{{ admin_view.admin.name }}
+  {{ oy.get_title() }}
   {% endblock %}
   </title>
 
@@ -115,7 +113,9 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
       {% block page_header %}
-      <h1>{{admin_view.name|capitalize}}</h1>
+      <div class="page-header">
+      <h1>{{ (admin_view["verbose_name"] or admin_view.name)|capitalize }}</h1>
+      </div>
       {% endblock page_header %}
     </section>
 

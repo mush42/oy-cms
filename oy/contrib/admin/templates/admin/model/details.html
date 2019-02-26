@@ -1,5 +1,10 @@
 {% extends 'admin/master.html' %}
 {% import 'admin/lib.html' as lib with context %}
+{% import "admin/oy/oy_macros.html" as oy with context %}
+
+{% block title %}
+  {{ oy.get_title(prefix=gettext("Details for:")) }}
+{% endblock %}
 
 {% block body %}
   {% block navlinks %}

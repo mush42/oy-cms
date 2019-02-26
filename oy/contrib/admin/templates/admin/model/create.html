@@ -1,10 +1,10 @@
 {% extends 'admin/master.html' %}
 {% import 'admin/lib.html' as lib with context %}
+{% import "admin/oy/oy_macros.html" as oy with context %}
 {% from 'admin/lib.html' import extra with context %} {# backward compatible #}
 
 {% block title %}
-  {% set title = (admin_view.category or "") ~ " " ~ admin_view.name %}
-  {{ gettext("New ") ~  title }}
+  {{ oy.get_title(prefix=gettext("New")) }}
 {% endblock %}
 
 {% block head %}

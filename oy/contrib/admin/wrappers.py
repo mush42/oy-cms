@@ -1,8 +1,14 @@
 from functools import wraps
-from flask import request, redirect, url_for, abort
+from flask import flash, request, redirect, url_for, abort
 from flask_admin import Admin, expose, BaseView
 from flask_admin.base import BaseView, AdminIndexView
 from flask_admin.form import SecureForm
+from flask_admin.helpers import get_redirect_target
+from flask_admin.model.template import (
+    DeleteRowAction,
+    LinkRowAction,
+    EndpointLinkRowAction,
+)
 from flask_admin.contrib.sqla import ModelView, form
 from flask_security import current_user
 from oy.boot.sqla import db
@@ -44,6 +50,10 @@ class OyModelView(AuthenticationViewMixin, ModelView):
 
     model_form_converter = OyModelFormConverter
 
+    def __init__(self, *args, **kwargs):
+        self.verbose_name = kwargs.pop("verbose_name", kwargs.get("name"))
+        super().__init__(*args, **kwargs)
+
     def get_column_name(self, field):
         if self.column_labels and field in self.column_labels:
             return self.column_labels[field]
@@ -51,6 +61,50 @@ class OyModelView(AuthenticationViewMixin, ModelView):
         if column is not None and column.info.get("label"):
             return column.info["label"]
         return super(OyModelView, self).get_column_name(field)
+
+    def get_list_row_actions(self):
+        actions = super().get_list_row_actions()
+        if self.can_delete:
+            actions = [a for a in actions if not isinstance(a, DeleteRowAction)]
+            actions.append(
+                EndpointLinkRowAction(
+                    "fa fa-trash",
+                    ".delete_confirm",
+                    title=gettext("Delete"),
+                    id_arg="pk",
+                )
+            )
+        if hasattr(self, "get_preview_url"):
+            actions.append(
+                LinkRowAction(
+                    icon_class="fa fa-eye",
+                    url=lambda v, i, r: self.get_preview_url(r),
+                    title=lazy_gettext("Preview in site"),
+                )
+            )
+        return actions
+
+    @expose("/delete-confirm/<string:pk>")
+    def delete_confirm(self, pk):
+        obj = self.get_one(pk)
+        if obj is not None:
+            return_url = get_redirect_target() or url_for(".index_view")
+            return self.render(
+                "admin/oy/delete_confirm.html", pk=pk, return_url=return_url
+            )
+        else:
+            abort(404)
+
+    @expose("/do-delete/<string:pk>")
+    def delete_executor(self, pk):
+        obj = self.get_one(pk)
+        if obj is not None:
+            db.session.delete(obj)
+            db.session.commit()
+            flash("Record deleted successfully.")
+            return redirect(get_redirect_target() or url_for(".index_view"))
+        else:
+            abort(404)
 
 
 class OyIndexView(AuthenticationViewMixin, AdminIndexView):

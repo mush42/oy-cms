@@ -34,6 +34,7 @@ _unwrap_field = lambda name: name[len(_prefix) :]
 
 class UserAdmin(OyModelView):
     column_list = ["user_name", "email", "active"]
+    form_excluded_columns = ("password", "confirmed_at", "profile")
 
     def is_accessible(self):
         if super().is_accessible():
@@ -89,7 +90,8 @@ class UserAdmin(OyModelView):
                 label=lazy_gettext("Confirm New Password")
             ),
         )
-        user = None if not request else self.get_one(request.args.get("id"))
+        idarg = None if not request else request.args.get("id")
+        user = None if not idarg else self.get_one(idarg)
         for fn, cf, kw in self.get_profile_fields():
             if user is not None:
                 kw["default"] = user.profile.get(fn)
@@ -103,6 +105,7 @@ class UserAdmin(OyModelView):
         rv = [
             "user_name",
             "email",
+            "active",
             rules.NestedRule(
                 [
                     rules.HTML("<h4>" + lazy_gettext("Change Password") + "</h4>"),
@@ -145,7 +148,8 @@ def register_admin(app, admin):
         UserAdmin(
             User,
             db.session,
-            name=lazy_gettext("User Accounts"),
+            name=lazy_gettext("user account"),
+            verbose_name=lazy_gettext("user accounts"),
             endpoint="users",
             menu_icon_type="fa",
             menu_icon_value="fa-users",

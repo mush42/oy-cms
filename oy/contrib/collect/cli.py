@@ -3,7 +3,7 @@
     oy.contrib.collect.cli
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
-    The click command for this extension.
+    The click command for the collect extension.
 
     :copyright: (c) 2019 by Musharraf Omer.
     :license: MIT, see LICENSE for more details.
@@ -19,7 +19,11 @@ from flask.cli import with_appcontext
 @click.command("collectstatic")
 @click.argument("destination-directory", default="static", required=False)
 @click.option(
-    "--verbose", help="Show detailed info about copied files and folders.", default=True
+    "-v",
+    "--verbose",
+    help="Show detailed info about copied files and folders.",
+    default=False,
+    is_flag=True,
 )
 @click.pass_context
 @with_appcontext
@@ -38,7 +42,7 @@ def collect_static(ctx, destination_directory, verbose):
     )
     click.secho("\r\n" + ("~" * 12), fg="yellow")
     click.echo(f"Collecting static files for app: {current_app.name}")
-    click.echo(f"Using storage: {import_path}")
+    click.echo(f"Using storage: {storage.name}")
     storage.run()
     click.echo(f"Done copying files to {os.path.abspath(destination_directory)}")
     click.secho("\r\n" + ("~" * 12), fg="yellow")

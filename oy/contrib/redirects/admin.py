@@ -26,7 +26,8 @@ def register_admin(app, admin):
         RedirectsAdmin(
             Redirect,
             db.session,
-            name=lazy_gettext("Redirects"),
+            name=lazy_gettext("redirect"),
+            verbose_name=lazy_gettext("redirects"),
             menu_icon_type="fa",
             menu_icon_value="fa-refresh",
             menu_order=300,

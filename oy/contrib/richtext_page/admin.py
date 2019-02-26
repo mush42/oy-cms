@@ -28,7 +28,8 @@ def register_admin(app, admin):
         RichTextPageAdmin(
             RichTextPage,
             db.session,
-            name=lazy_gettext("Rich Text Pages"),
+            name=lazy_gettext("Rich Text page"),
+            verbose_name=lazy_gettext("Rich Text pages"),
             menu_icon_type="fa",
             menu_icon_value="fa-newspaper-o",
             menu_order=700,

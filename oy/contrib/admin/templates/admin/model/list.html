@@ -1,9 +1,14 @@
 {% extends 'admin/master.html' %}
 {% import 'admin/lib.html' as lib with context %}
+{% import "admin/oy/oy_macros.html" as oy with context %}
 {% import 'admin/static.html' as admin_static with context%}
 {% import 'admin/model/layout.html' as model_layout with context %}
 {% import 'admin/actions.html' as actionlib with context %}
 {% import 'admin/model/row_actions.html' as row_actions with context %}
+
+{% block title %}
+  {{ oy.get_title(name=admin_view.verbose_name) }}
+{% endblock %}
 
 {% block head %}
     {{ super() }}
