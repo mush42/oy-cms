@@ -1,4 +1,7 @@
 from urllib.parse import urlparse, parse_qs
+from wtforms.fields import HiddenField
+from wtforms_components.fields import SelectField
+from wtforms.validators import ValidationError, InputRequired
 from flask import redirect, request, url_for, abort
 from flask_admin import expose
 from flask_admin.model.template import (
@@ -8,9 +11,7 @@ from flask_admin.model.template import (
     LinkRowAction,
 )
 from flask_admin.helpers import validate_form_on_submit
-from wtforms.fields import HiddenField
-from wtforms_components.fields import SelectField
-from wtforms.validators import ValidationError, InputRequired
+from flask_wtf import FlaskForm
 from oy.boot.sqla import db
 from oy.babel import gettext, lazy_gettext
 from oy.models.page import Page
@@ -41,7 +42,7 @@ class PageAdmin(DisplayableAdmin):
         parent_pk = request.args.get("parent_pk")
         if not parent_pk:
             return
-        parent = self.get_one(parent_pk)
+        parent = Page.query.filter(Page.id == int(parent_pk)).one_or_none()
         if not parent:
             abort(404)
         else:
@@ -120,26 +121,24 @@ class PageAdmin(DisplayableAdmin):
         return form
 
     def get_child_page_type_form(self):
-        class ChildPageTypeForm(self.form_base_class):
+        class ChildPageTypeForm(FlaskForm):
             parent_pk = HiddenField(validators=[InputRequired()])
-            url = HiddenField()
+            url = HiddenField(default=self.get_save_return_url(self.model))
             page_type = SelectField(
                 validators=[InputRequired()],
                 label=lazy_gettext("Child page type"),
+                default=self.endpoint,
                 choices=lambda: (
-                    (k, v.title()) for (k, v) in self._tablename_to_endpoint.values()
+                    (k, v[1].title()) for (k, v) in self._tablename_to_endpoint.items()
                 ),
             )
 
         return ChildPageTypeForm()
 
-    def get_preview_url(self, instance):
-        return f"/{instance.url}/"
-
-    @expose("/create-redirector", methods=("POST",))
+    @expose("/create-redirector/", methods=("POST",))
     def create_redirector(self):
         form = self.get_child_page_type_form()
-        if validate_form_on_submit(form):
+        if form.validate_on_submit():
             endpoint = self._tablename_to_endpoint[form.page_type.data][0]
             return redirect(
                 url_for(
@@ -148,3 +147,6 @@ class PageAdmin(DisplayableAdmin):
                     url=form.url.data,
                 )
             )
+
+    def get_preview_url(self, instance):
+        return f"/{instance.url}/"
