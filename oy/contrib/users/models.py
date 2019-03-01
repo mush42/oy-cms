@@ -14,7 +14,7 @@ from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.ext.associationproxy import association_proxy
 from oy.boot.sqla import db
 from oy.babel import lazy_gettext
-from oy.models.abstract import TimeStampped, ImmutableProxiedDictMixin, DynamicProp
+from oy.models.mixins import TimeStampped, ImmutableProxiedDictMixin, DynamicProp
 from oy.models import User
 
 

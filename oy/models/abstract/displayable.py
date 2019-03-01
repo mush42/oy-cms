@@ -15,11 +15,10 @@ from sqlalchemy.ext.declarative import declared_attr
 from flask import current_app
 from oy.boot.sqla import db
 from oy.babel import lazy_gettext
-
-from .slugged import Titled
-from .metadata import Metadata
-from .published import Published
-from .user_related import UserRelated
+from oy.models.mixins.slugged import Titled
+from oy.models.mixins.metadata import Metadata
+from oy.models.mixins.published import Published
+from oy.models.mixins.user_related import UserRelated
 
 
 class Displayable(db.Model, Titled, Metadata, Published, UserRelated):

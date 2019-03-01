@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """	
-    oy.models.abstract.metadata
+    oy.models.mixins.metadata
     ~~~~~~~~~~
 
     Provides content meta-data mixin classes

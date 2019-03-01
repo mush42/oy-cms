@@ -13,11 +13,11 @@ from itertools import chain
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_mptt.mixins import BaseNestedSets
 from oy.boot.sqla import db
+from oy.models.mixins import ScopedUniquelySlugged, NodeSpec
 from .displayable import Displayable
-from .slugged import ScopedUniquelySlugged
 
 
-class AbstractPage(Displayable, BaseNestedSets, ScopedUniquelySlugged):
+class AbstractPage(NodeSpec, Displayable, BaseNestedSets, ScopedUniquelySlugged):
     """Extends :class:`Displayable` with special fields"""
 
     __abstract__ = True

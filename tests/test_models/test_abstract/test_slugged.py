@@ -1,6 +1,6 @@
 import pytest
-from oy.models.abstract.slugged import Titled, Slugged, ScopedUniquelySlugged
-from oy.models.abstract.misc import SelfRelated
+from oy.models.mixins.slugged import Titled, Slugged, ScopedUniquelySlugged
+from oy.models.mixins.misc import SelfRelated
 
 
 def test_slugged(app, db, makemodel):

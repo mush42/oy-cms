@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """	
-    oy.models.abstract.misc
+    oy.models.mixins.misc
     ~~~~~~~~~~
 
     Provides complementary mixin classes

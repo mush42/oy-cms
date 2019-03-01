@@ -6,7 +6,7 @@ from flask_security import UserMixin, RoleMixin
 from oy.boot.sqla import db
 from oy.babel import lazy_gettext
 from oy.helpers import is_valid_email
-from oy.models.abstract import TimeStampped, SQLAEvent
+from oy.models.mixins import TimeStampped, SQLAEvent
 
 
 roles_users = db.Table(

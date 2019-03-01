@@ -13,7 +13,7 @@
 
 from functools import partial
 from oy.boot.sqla import db
-from oy.models.abstract import SQLAEvent
+from oy.models.mixins import SQLAEvent
 from oy.helpers import get_method_in_all_bases
 
 

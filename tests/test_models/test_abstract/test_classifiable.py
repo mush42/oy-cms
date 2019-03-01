@@ -1,5 +1,5 @@
 import pytest
-from oy.models.abstract import Tagged, Categorized
+from oy.models.mixins import Tagged, Categorized
 
 
 def test_tagged_basic(db, makemodel):

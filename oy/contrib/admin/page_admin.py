@@ -1,8 +1,8 @@
-from urllib.parse import urlparse, parse_qs
 from wtforms.fields import HiddenField
 from wtforms_components.fields import SelectField
 from wtforms.validators import ValidationError, InputRequired
-from flask import redirect, request, url_for, abort
+from flask import current_app, g, redirect, request, url_for, abort
+from flask.helpers import locked_cached_property
 from flask_admin import expose
 from flask_admin.model.template import (
     EndpointLinkRowAction,
@@ -10,11 +10,12 @@ from flask_admin.model.template import (
     EditRowAction,
     LinkRowAction,
 )
-from flask_admin.helpers import validate_form_on_submit
+from flask_admin.helpers import is_safe_url, validate_form_on_submit
 from flask_wtf import FlaskForm
 from oy.boot.sqla import db
 from oy.babel import gettext, lazy_gettext
 from oy.models.page import Page
+from oy.helpers import _missing
 from .displayable_admin import DisplayableAdmin, DISPLAYABEL_DEFAULTS
 
 
@@ -22,8 +23,7 @@ class PageAdmin(DisplayableAdmin):
     list_template = "admin/oy/page/list.html"
     form_columns = list(DISPLAYABEL_DEFAULTS["form_columns"])
     form_columns.insert(0, "title")
-    form_columns.insert(4, "parent")
-    form_columns.insert(5, "slug")
+    form_columns.insert(4, "slug")
     form_excluded_columns = DISPLAYABEL_DEFAULTS["form_excluded_columns"] + []
     column_list = ["title", "status", "updated"]
     column_editable_list = ["title"]
@@ -35,18 +35,22 @@ class PageAdmin(DisplayableAdmin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._tablename_to_endpoint.setdefault(
-            self.model.__tablename__, (self.endpoint, self.name)
+            self.model.__contenttype__, (self.endpoint, self.name)
         )
 
     def _get_parent_from_args(self):
+        args_parent = getattr(g, "__args_parent", _missing)
+        if args_parent is not _missing:
+            return g.__args_parent
         parent_pk = request.args.get("parent_pk")
         if not parent_pk:
+            g.__args_parent = None
             return
         parent = Page.query.filter(Page.id == int(parent_pk)).one_or_none()
-        if not parent:
-            abort(404)
-        else:
+        if parent:
+            g.__args_parent = parent
             return parent
+        return abort(404)
 
     def get_query(self):
         parent = self._get_parent_from_args()
@@ -69,15 +73,34 @@ class PageAdmin(DisplayableAdmin):
             )
         return db.session.execute(sel)
 
+    @property
+    def can_create(self):
+        rv = super().can_create
+        parent = self._get_parent_from_args()
+        if (
+            rv
+            and (request.endpoint == f"{self.endpoint}.index_view")
+            and parent
+        ):
+            return False
+        elif parent and not self.model.is_valid_child(parent):
+            if current_app.debug and request.endpoint == f"{self.endpoint}.create_view":
+                flash(gettext("Not a valid sub-page type."))
+            return False
+        return rv
+
+    def get_form(self):
+        form = super().get_form()
+        form.parent = HiddenField()
+        return form
+
     def create_form(self, obj=None):
         form = super().create_form(obj)
         parent = self._get_parent_from_args()
-        if parent is None and request.args.get("url"):
-            qs = parse_qs(urlparse(request.args["url"]).query)
-            if "parend_pk" in qs:
-                parent = self.get_one(qs["parent_pk"])
-        if parent:
+        if self.model.should_allow_parents() and parent:
             form.parent.data = parent
+        else:
+            del form.parent
         return form
 
     def get_list_row_actions(self):
@@ -108,7 +131,7 @@ class PageAdmin(DisplayableAdmin):
 
     def _get_edit_view_endpoint(self, act, row_id, row):
         args = {"id": row_id, "url": self.get_save_return_url(row)}
-        endpoint = self._tablename_to_endpoint[row.__tablename__][0]
+        endpoint = self._tablename_to_endpoint[row.contenttype][0]
         return url_for(f"{endpoint}.edit_view", **args)
 
     def init_actions(self):
@@ -117,7 +140,10 @@ class PageAdmin(DisplayableAdmin):
 
     def edit_form(self, obj):
         form = super().edit_form(obj)
-        form.parent.query_factory = lambda: Page.query.filter(Page.id != obj.id)
+        if self.model.should_allow_parents() and obj.parent:
+            form.parent.query_factory = lambda: Page.query.filter(Page.id != obj.id)
+        else:
+            del form.parent
         return form
 
     def get_child_page_type_form(self):
@@ -126,27 +152,58 @@ class PageAdmin(DisplayableAdmin):
             url = HiddenField(default=self.get_save_return_url(self.model))
             page_type = SelectField(
                 validators=[InputRequired()],
-                label=lazy_gettext("Child page type"),
-                default=self.endpoint,
-                choices=lambda: (
-                    (k, v[1].title()) for (k, v) in self._tablename_to_endpoint.items()
-                ),
+                label=lazy_gettext("Select the type of the child page "),
+                default="",
+                choices=self._get_pchild_form_choices
             )
 
         return ChildPageTypeForm()
 
-    @expose("/create-redirector/", methods=("POST",))
+    @expose("/redirect/new", methods=("POST",))
     def create_redirector(self):
         form = self.get_child_page_type_form()
+        url = form.url.data if is_safe_url(form.url.data) else url_for(".index_view")
         if form.validate_on_submit():
-            endpoint = self._tablename_to_endpoint[form.page_type.data][0]
-            return redirect(
-                url_for(
-                    f"{endpoint}.create_view",
+            return redirect(url_for(
+                    f"{form.page_type.data}.create_view",
                     parent_pk=form.parent_pk.data,
-                    url=form.url.data,
-                )
-            )
+                    url=url,
+                ))
+        else:
+            return redirect(url)
+
+    @locked_cached_property
+    def page_type_map(self):
+        rv = dict()
+        for entity in (m.class_ for m in Page.__mapper__.polymorphic_iterator()):
+            contype = entity.__contenttype__
+            if contype not in self._tablename_to_endpoint:
+                continue
+            rv[contype] = []
+            valid_children = entity.valid_child_node_types
+            if valid_children == self.model.ALL_NODE_TYPES:
+                for k, v in self._tablename_to_endpoint.items():
+                    rv[contype].append(
+                        {"endpoint": v[0], "title": v[1].title()}
+                    )
+                continue
+            for child in valid_children:
+                if child.__contenttype__ in self._tablename_to_endpoint:
+                    data = self._tablename_to_endpoint[child.__contenttype__]
+                    rv[contype].append({"endpoint": data[0], "title": data[1].title()})
+        return rv
+
+    def _get_pchild_form_choices(self):
+        if request.endpoint.endswith(".create_redirector"):
+            pk = self.get_child_page_type_form().parent_pk.data
+            obj = Page.query.filter(Page.id == int(pk)).one_or_none()
+            if obj:
+                endpoint = self._tablename_to_endpoint[obj.contenttype]
+                return [endpoint, (d.items() for d in self.page_type_map[endpoint])]
+        return [
+            (k, [(d["endpoint"], d["title"]) for d in data])
+            for (k, data) in self.page_type_map.items()
+        ]
 
     def get_preview_url(self, instance):
         return f"/{instance.url}/"

@@ -22,7 +22,9 @@
 {% endmacro %}
 
 {% macro add_child_row_action(view, page_id, page) %}
-<a href="#" class="icon add-child-btn" data-parent-pk="{{ page_id }}" title="{{ gettext("Add child") }}">
+{% if page.should_allow_children() %}
+<a href="#" class="icon add-child-btn" data-parent-pk="{{ page_id }}" title="{{ gettext("Add child") }}" data-type="{{ page.contenttype }}">
   <span class="fa fa-plus-circle"></span>
 </a>
+{% endif %}
 {% endmacro %}

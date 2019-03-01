@@ -1,16 +1,15 @@
 import types
-import re
 from importlib import import_module
 from pkgutil import iter_modules
 from datetime import datetime
 from slugify import slugify as original_slugify
 from flask import request, current_app
+from validators import email
 from oy.boot.sqla import db
 
 
-_email_re = re.compile(
-    r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b", flags=re.IGNORECASE
-)
+# A symbol indicating a missing value
+_missing = object()
 
 
 def slugify(string):
@@ -22,9 +21,9 @@ def page_url(page):
     return f"/{page.url}/"
 
 
-def is_valid_email(email):
+def is_valid_email(string):
     """Return True if the supplied argument is a valid email"""
-    return _email_re.match(email) is not None
+    return bool(email(string))
 
 
 def find_modules(basemodule, package_only=True):

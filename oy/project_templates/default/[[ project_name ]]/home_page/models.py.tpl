@@ -9,7 +9,7 @@
 
 from sqlalchemy.ext.associationproxy import association_proxy
 from oy.models import Page, db
-from oy.models.abstract import Ordered
+from oy.models.mixins import Ordered
 from oy.contrib.media import Image 
 
 

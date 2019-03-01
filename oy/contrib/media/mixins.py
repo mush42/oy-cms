@@ -17,7 +17,7 @@ from depot.fields.sqlalchemy import UploadedFileField
 from depot.io.utils import FileIntent
 from oy.babel import lazy_gettext
 from oy.models import db
-from oy.models.abstract import DynamicProp, Titled, TimeStampped, UserRelated, Tagged
+from oy.models.mixins import DynamicProp, Titled, TimeStampped, UserRelated, Tagged
 from oy.helpers import slugify
 from oy.contrib.demo_content.utils import (
     deserialize_instance as original_deserialize_instance,

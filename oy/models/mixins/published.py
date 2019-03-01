@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """	
-    oy.models.abstract.publishable
+    oy.models.mixins.publishable
     ~~~~~~~~~~
 
     Provides a mixin classe for publishable content 

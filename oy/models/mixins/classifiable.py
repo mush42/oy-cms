@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """	
-    oy.models.abstract.classifiable
+    oy.models.mixins.classifiable
     ~~~~~~~~~~
 
     Provides mixin classes for classifying content,

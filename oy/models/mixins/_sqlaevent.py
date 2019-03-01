@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """	
-    oy.models.abstract._sqlaevent
+    oy.models.mixins._sqlaevent
     ~~~~~~~~~~
 
     Provide a convenient mechanism to hook into sqlalchemy's

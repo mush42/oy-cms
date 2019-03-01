@@ -12,7 +12,7 @@
 from urllib.parse import urlparse
 from sqlalchemy.orm import validates
 from oy.models import Page, db
-from oy.models.abstract import SQLAEvent
+from oy.models.mixins import SQLAEvent
 from oy.babel import lazy_gettext
 
 

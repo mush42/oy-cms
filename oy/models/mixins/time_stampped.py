@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """	
-    oy.models.abstract.time_stampped
+    oy.models.mixins.time_stampped
     ~~~~~~~~~~
 
     Provides a mixin classe for models that need to track time 

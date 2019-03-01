@@ -1,5 +1,5 @@
 import pytest
-from oy.models.abstract.misc import SelfRelated, Ordered
+from oy.models.mixins.misc import SelfRelated, Ordered
 
 
 def test_self_related(db, makemodel):

@@ -60,6 +60,7 @@ exports.vendorMap = {
     "node_modules/metismenu/dist/*.js"
   ],
   "admin/lity": ["node_modules/lity/dist/**"],
+  "admin/sweetalert": ["node_modules/sweetalert/dist/**"],
   "admin/fields/tagsinput": ["node_modules/jquery.tagsinput-revisited/dist/**"],
   "admin/fields/ckeditor": [
     "node_modules/@ckeditor/ckeditor5-build-classic/build/**",

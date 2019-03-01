@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """	
-    oy.models.abstract.has_comments
+    oy.models.mixins.has_comments
     ~~~~~~~~~~
 
     Provides a mixin classe for comments.
@@ -11,6 +11,7 @@
 
 from sqlalchemy.ext.declarative import declared_attr
 from flask import request
+from validators import email
 from oy.boot.sqla import db
 from oy.helpers import _prepare_association_table
 from .misc import SelfRelated
@@ -18,8 +19,8 @@ from .time_stampped import TimeStampped
 
 
 class CommentMixin(SelfRelated):
-    visitor_name = db.Column(db.String(255), nullable=False)
-    visitor_email = db.Column(db.String(255), nullable=False)
+    author_name = db.Column(db.String(255), nullable=False)
+    author_email = db.Column(db.String(255), nullable=False)
     body = db.Column(db.Text)
     remote_addr = db.Column(
         db.String(255), nullable=False, default=lambda: request.remote_addr
@@ -30,8 +31,11 @@ class CommentMixin(SelfRelated):
 
     def __init__(self, author_name, author_email, body):
         self.author_name = author_name
-        self.author_email = author_email
         self.body = body
+        if email(author_email):
+            self.author_email = author_email
+        else:
+            raise ValueError(f"{author_email} is not a valid email address.")
 
 
 class HasComments:

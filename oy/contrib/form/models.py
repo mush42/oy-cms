@@ -15,7 +15,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.ext.hybrid import hybrid_property
 from flask import current_app
 from oy.models import db
-from oy.models.abstract import TimeStampped, ProxiedDictMixin, DynamicProp
+from oy.models.mixins import TimeStampped, ProxiedDictMixin, DynamicProp
 from oy.models.page import Page
 from oy.babel import lazy_gettext
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """	
-    oy.models.abstract.user_related
+    oy.models.mixins.user_related
     ~~~~~~~~~~
 
     Provides user related mixin class

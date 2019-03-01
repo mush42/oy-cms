@@ -16,7 +16,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.ext.associationproxy import association_proxy
 from flask import current_app
 from oy.boot.sqla import db
-from oy.models.abstract import SQLAEvent, ImmutableProxiedDictMixin, DynamicProp
+from oy.models.mixins import SQLAEvent, ImmutableProxiedDictMixin, DynamicProp
 from oy.dynamicform import Field
 from oy.helpers import get_owning_table
 

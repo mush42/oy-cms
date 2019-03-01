@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """	
-    oy.models.abstract.slugged
+    oy.models.mixins.slugged
     ~~~~~~~~~~
 
     Provide  mixin classes for slugged content.

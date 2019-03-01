@@ -1,6 +1,6 @@
 import pytest
 import time
-from oy.models.abstract import TimeStampped, Metadata, Titled
+from oy.models.mixins import TimeStampped, Metadata, Titled
 
 
 def test_timestammped(app, db, makemodel):

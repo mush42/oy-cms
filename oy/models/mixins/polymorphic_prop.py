@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """	
-    oy.models.abstract.polymorphic_prop
+    oy.models.mixins.polymorphic_prop
     ~~~~~~~~~~
 
     Provides helper mixin classes for special sqlalchemy models
@@ -127,7 +127,8 @@ class PolymorphicVerticalProperty(object):
 @event.listens_for(PolymorphicVerticalProperty, "mapper_configured", propagate=True)
 def on_new_class(mapper, cls_):
     """Look for Column objects with type info in them, and work up
-    a lookup table."""
+    a lookup table.
+    """
     info_dict = {}
     info_dict[type(None)] = (None, "none")
     info_dict["none"] = (None, "none")
