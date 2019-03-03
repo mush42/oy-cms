@@ -5,6 +5,7 @@ from flask import current_app, g, flash, redirect, request, url_for, abort
 from flask.helpers import locked_cached_property
 from flask_admin import expose
 from flask_admin.model.template import (
+    macro,
     EndpointLinkRowAction,
     TemplateLinkRowAction,
     EditRowAction,
@@ -20,13 +21,18 @@ from .wrappers import OyDeleteRowAction
 from .displayable_admin import DisplayableAdmin, DISPLAYABEL_DEFAULTS
 
 
+def _ptype_formatter(view, context, model, name):
+    ptype = getattr(model, name)
+    return view._tablename_to_endpoint[ptype][1].title()
+
+
 class PageAdmin(DisplayableAdmin):
     list_template = "admin/oy/page/list.html"
     form_columns = list(DISPLAYABEL_DEFAULTS["form_columns"])
     form_columns.insert(0, "title")
     form_columns.insert(4, "slug")
     form_excluded_columns = DISPLAYABEL_DEFAULTS["form_excluded_columns"] + []
-    column_list = ["title", "status", "updated"]
+    column_list = ["title", "contenttype", "status", "updated"]
     column_editable_list = ["title"]
     column_default_sort = ("tree_id", False)
 
@@ -43,6 +49,12 @@ class PageAdmin(DisplayableAdmin):
         """Disable bulk actions for pages."""
         self._actions = []
         self._actions_data = {}
+
+    @property
+    def column_formatters(self):
+        default = super().column_formatters
+        default["contenttype"] = _ptype_formatter
+        return default
 
     def _get_parent_from_args(self):
         """Extract a possible parent from a key in the
@@ -95,6 +107,7 @@ class PageAdmin(DisplayableAdmin):
         return rv
 
     def _handle_view(self, name, **kwargs):
+        """Do not show a list for creation and editing only views."""
         if name == "index_view" and not self.show_in_menu:
             return redirect(url_for("admin.index"))
         return super()._handle_view(name, **kwargs)
@@ -158,6 +171,14 @@ class PageAdmin(DisplayableAdmin):
             ]
         )
         return actions
+
+    def validate_form(self, form):
+        rv = super().validate_form(form)
+        if rv and ("parent_id" in form) and form.parent_id.data:
+            page = Page.query.get_or_404(form.parent_id.data)
+            if not self.model.is_valid_parent(page):
+                return False
+        return rv
 
     def _get_edit_view_endpoint(self, act, row_id, row):
         args = {"id": row_id, "url": self.get_save_return_url(row)}

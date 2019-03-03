@@ -31,7 +31,7 @@ class Displayable(db.Model, Titled, Metadata, Published, UserRelated):
 
     @declared_attr
     def contenttype(cls):
-        return db.Column(db.String(128))
+        return db.Column(db.String(128), info=dict(label="Type"))
 
     @declared_attr
     def show_in_menu(cls):
