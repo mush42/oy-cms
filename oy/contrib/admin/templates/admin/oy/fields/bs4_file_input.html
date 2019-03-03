@@ -19,6 +19,7 @@
 		display: block;
 	}
 </style>
+<div class="form-control">
 <label class="btn btn-info btn-file" role="button" tabindex="0">
     {{ gettext("Browse") }} <input style="display: none;" 
 	{% for k, v in kwargs.items() %}
@@ -28,4 +29,5 @@
 	{% endfor %}
 	/>
 </label>
+</div>
 <p id="{{ kwargs['id'] }}-info" class="help-block"></p>
