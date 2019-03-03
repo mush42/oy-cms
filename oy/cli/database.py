@@ -14,6 +14,9 @@ def create_db():
     click.echo("Creating database tables...")
     with current_app.app_context():
         db.create_all()
+        if not SettingsProfile.query.count():
+            db.session.add(SettingsProfile(name=current_app.name, is_active=True))
+            db.session.commit()
     click.secho("Database tables created.", fg="green", bold=True)
 
 

@@ -18,6 +18,7 @@ from flask_security.utils import hash_password, verify_password
 from flask_admin.form import rules
 from flask_admin import expose
 from oy.boot.sqla import db
+from oy.boot.security import user_datastore
 from oy.boot.flask_security_forms import OyRegisterForm
 from oy.babel import gettext, lazy_gettext
 from oy.models.user import User
@@ -40,12 +41,27 @@ class UserAdmin(OyModelView):
         if super().is_accessible():
             if current_user.has_role("admin"):
                 return True
+            elif request.endpoint.endswith(".edit_view") and ("id" in request.args):
+                user = self.get_one(request.args["id"])
+                if user is current_user._get_current_object():
+                    return True
         return False
 
+    def edit_form(self, obj):
+        form = super().edit_form(obj)
+        to_delete = ("roles", "active")
+        for d in to_delete:
+            if (d in form) and not current_user.has_role("admin"):
+                del form[d]
+        return form
+
     def validate_form(self, form):
+        user = self.get_one(request.args["id"])
+        if not form.active.data and user.id == current_user.id:
+            flash(gettext("You can not deactivate your own account."))
+            return False
         if not form["old_password"].data:
             return super().validate_form(form)
-        user = self.get_one(request.args["id"])
         if not user:
             flash(gettext("User does not exist."), category="error")
             return False
@@ -105,7 +121,6 @@ class UserAdmin(OyModelView):
         rv = [
             "user_name",
             "email",
-            "active",
             rules.NestedRule(
                 [
                     rules.HTML("<h4>" + lazy_gettext("Change Password") + "</h4>"),
@@ -118,8 +133,13 @@ class UserAdmin(OyModelView):
         ]
         for fn, _, __ in self.get_profile_fields():
             rv.append(_wrap_field(fn))
-        rv.append("roles")
+        if current_user.has_role("admin"):
+            rv.extend(["active", "roles"])
         return rv
+
+    def _handle_view(self, name, **kwargs):
+        if not self.is_accessible():
+            return redirect(url_for("admin.index"))
 
     def get_profile_fields(self):
         """Contribute the fields of profile extras"""
@@ -135,8 +155,12 @@ class UserAdmin(OyModelView):
                 register_user(**form.to_dict())
             else:
                 user_data = form.to_dict()
-                user_data["password"] = hash_password(user_data["password"])
-                db.session.add(User(**user_data))
+                user_datastore.create_user(
+                    user_name=user_data["user_name"],
+                    email=user_data["email"],
+                    password=hash_password(user_data["password"]),
+                    roles=user_data["roles"]
+                )
                 db.session.commit()
             flash(gettext("User created successfully."))
             return redirect(url_for(".index_view"))

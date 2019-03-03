@@ -5,10 +5,12 @@
     
     Admin module for the editable settings features
 """
+
 import math
 from itertools import chain
 from sqlalchemy.exc import SQLAlchemyError
 from flask import current_app, request, flash, url_for, redirect
+from flask_security import current_user
 from flask_admin import expose
 from flask_wtf import Form
 
@@ -28,18 +30,10 @@ def active_formatter(view, context, model, name):
 class SettingsProfileAdmin(OyModelView):
     """TODO: a potential for multi site installation of oy?"""
 
-    can_view_details = True
-    # Edit in a dialog not in a new page.
-    edit_modal = True
-    details_modal = True
-    # Enable CSRF protection.
-    form_excluded_columns = ["settings"]
-    # How many entries to display per page?
-    page_size = 5
-    # Column formatters.
-    column_formatters = {"is_active": active_formatter}
-    column_default_sort = ("is_active", True)
-    column_editable_list = ["name"]
+    can_view_details = False
+    can_create = False
+    can_edit = False
+    can_delete = False
 
 
 def make_settings_form_for_category(app, category):
@@ -66,6 +60,10 @@ def register_settings_admin(app, admin):
 
         class SettingsAdmin(OyBaseView):
             settings_category = category
+
+            def is_accessible(self):
+                return super().is_accessible() and current_user.has_role("admin")
+
 
             @expose("/", methods=["Get", "POST"])
             def index(self):

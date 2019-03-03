@@ -3,6 +3,8 @@
 {% import 'admin/static.html' as admin_static with context %}
 {% import "admin/oy/oy_macros.html" as oy with context %}
 {% import "admin/oy/form_fields_macros.html" as form_field_macros with context %}
+{# store the jinja2 context for form_rules rendering logic #}
+{% set render_ctx = h.resolve_ctx() %}
 <html>
 <head>
   {% block head %}
@@ -71,14 +73,7 @@
 
       <div class="navbar-custom-menu">
         <ul class="nav navbar-nav">
-        {% include "admin/oy/includes/notification_area.html" %}
-        <!-- Control Sidebar Toggle Button -->
-        <li>
-          <a href="#" data-toggle="control-sidebar" role="button" aria-expanded="false">
-            <span class="sr-only">Toggle Right side menu</span>
-            <i class="fa fa-gears"></i>
-          </a>
-        </li>
+        {% include "admin/oy/includes/notification_area.html" with context %}
         </ul>
       </div>
     </nav>
@@ -104,9 +99,6 @@
   </aside>
 
   {% block access_control %}{% endblock %}
-
-  {# store the jinja2 context for form_rules rendering logic #}
-  {% set render_ctx = h.resolve_ctx() %}
 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
@@ -139,7 +131,6 @@
 
   <!-- Control Sidebar -->
   <aside class="control-sidebar control-sidebar-dark" aria-hidden="true">
-  {% include "admin/oy/includes/secondary_sidebar.html" %}
   </aside>
   <!-- /.control-sidebar -->
   <!-- Add the sidebar's background. This div must be placed

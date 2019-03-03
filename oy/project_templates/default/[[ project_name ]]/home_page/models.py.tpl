@@ -1,10 +1,10 @@
 # -*-coding: utf-8-*-
 """
 
-    [[ project_name ]].models
+    [[ project_name ]].home_page.models
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    This file contains the project's database models
+    This file contains the home_page database models.
 """
 
 from sqlalchemy.ext.associationproxy import association_proxy

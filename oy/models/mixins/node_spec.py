@@ -20,7 +20,7 @@ class NodeSpec:
     @classmethod
     def configure_node_spec(cls):
         """Work up a tuple of types of ancestors
-        and descendants this page is allowed to have.
+        and descendants this node is allowed to have.
         """
         cls.valid_child_node_types = cls._normalize_type_values(
             getattr(cls, "__allowed_children__", cls.ALL_NODE_TYPES)
@@ -28,6 +28,24 @@ class NodeSpec:
         cls.valid_parent_node_types = cls._normalize_type_values(
             getattr(cls, "__allowed_parents__", cls.ALL_NODE_TYPES)
         )
+        for parent in cls.valid_parent_node_types:
+            if (parent != ...) and not parent.should_allow_children():
+                raise TypeError(
+                    f"""
+                    Model class `{parent.__name__}` is configured to not
+                    accept children, but it is listed as a possible
+                    parent for model class `{cls.__name__}`.
+                """
+                )
+            for child in cls.valid_child_node_types:
+                if (child != ...) and not child.should_allow_parents():
+                    raise TypeError(
+                        f"""
+                        Model class `{child.__name__}` is configured to not accept
+                        parents but it is listed as a possible
+                        child for model class `{cls.__name__}`.
+                    """
+                    )
 
     @classmethod
     def is_valid_child(cls, child):
@@ -59,14 +77,14 @@ class NodeSpec:
     def _before_setting_parent(cls, instance, value, oldvalue=None, initiator=None):
         if not db.inspect(instance).mapper.class_.is_valid_parent(value):
             raise ValueError(
-                f"{value.__class__.__name__} is not a valid parent for pages of type {cls.__name__}."
+                f"{cls.__name__} does not accept parents of type {value.__class__.__name__}."
             )
 
     @classmethod
     def _before_appending_nodes(cls, instance, value, initiator=None):
         if not db.inspect(instance).mapper.class_.is_valid_child(value):
             raise ValueError(
-                f"{value.__class__.__name__} is not a valid child type for pages of type {cls.__name__}."
+                f"{cls.__name__} does not accept children of type {value.__class__.__name__}."
             )
 
     @classmethod
@@ -74,16 +92,26 @@ class NodeSpec:
         if values == cls.ALL_NODE_TYPES:
             return cls.ALL_NODE_TYPES
         rv = []
+        accepted_models = {}
+        dbmodels = [
+            (k, v)
+            for (k, v) in db.Model._decl_class_registry.items()
+            if not k.startswith("_")
+        ]
+        for name, model in dbmodels:
+            if cls.__mapper__.common_parent(model.__mapper__):
+                accepted_models[name] = model
         for val in values:
-            if val in db.Model._decl_class_registry.values():
+            if val in accepted_models.values():
                 rv.append(val)
-            elif type(val) is str and val in cls._decl_class_registry:
-                rv.append(cls._decl_class_registry[val])
+            elif type(val) is str and val in accepted_models:
+                rv.append(accepted_models[val])
             else:
-                raise ValueError(
+                raise TypeError(
                     f"""
-                    Model class {val} was not found among current model classes.
-                    Maybe it has not been imported yet?
+                    Model class `{val.__name__}` could not be used in this tree.
+                    Either it has no common base class with `{cls.__name__}` or it 
+                    has not been imported yet.
                 """
                 )
         return rv
@@ -92,9 +120,7 @@ class NodeSpec:
 @db.event.listens_for(db.mapper, "after_configured")
 def configure_node_spec_listeners():
     dbmodels = [
-        v
-        for (k, v) in db.Model._decl_class_registry.items()
-        if k != "_sa_module_registry"
+        v for (k, v) in db.Model._decl_class_registry.items() if not k.startswith("_")
     ]
     node_classes = [c for c in dbmodels if issubclass(c, NodeSpec)]
     for cls in node_classes:

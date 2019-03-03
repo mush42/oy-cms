@@ -28,3 +28,9 @@
 </a>
 {% endif %}
 {% endmacro %}
+
+{% macro delete_row_action(view, row_id, row) %}
+  {% if view.can_delete %}
+  <a href="" class="icon" title="{{ gettext("Delete record") }}"><i class="fa fa-trash"></i></a>
+  {% endif %}
+{% endmacro %}

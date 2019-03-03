@@ -19,6 +19,7 @@
 {% macro menu(menu_root=None) %}
   {% if menu_root is none %}{% set menu_root = admin_view.admin.menu() %}{% endif %}
   {%- for item in menu_root %}
+  {% if item.is_accessible() %}
   {%- if item.is_category() -%}
   {% set children = item.get_children() %}
   {% else %}
@@ -43,6 +44,7 @@
   </ul>
   {% endif %}
   </li>
+  {% endif %}
   {% endfor %}
 {% endmacro %}
 

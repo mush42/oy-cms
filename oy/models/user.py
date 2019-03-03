@@ -1,3 +1,14 @@
+# -*- coding: utf-8 -*-
+"""	
+    oy.models.user
+    ~~~~~~~~~~
+
+    Provides the User model.
+
+    :copyright: (c) 2018 by Musharraf Omer.
+    :license: MIT, see LICENSE for more details.
+"""
+
 from sqlalchemy import inspect
 from sqlalchemy.orm import validates
 from sqlalchemy.orm.collections import attribute_mapped_collection

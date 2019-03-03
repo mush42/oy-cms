@@ -109,6 +109,10 @@ class OyAdmin(Admin):
             )
         ]
 
+    def _add_view_to_menu(self, view):
+        if getattr(view, "show_in_menu", True):
+            super()._add_view_to_menu(view)
+
     def finalization_tasks(self, sender):
         self._secure_admin_static_files()
         register_settings_admin(self.app, self)

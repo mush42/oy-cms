@@ -1,51 +1,21 @@
-<!-- Notifications -->
-<li class="dropdown notifications-menu">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false" role="button">
-    <i class="fa fa-bell-o"></i>
-    <span class="sr-only">Notifications</span>
-    {% if notifications %}
-    <span class="label label-warning">{{ notifications.count }}</span>
-    {% endif %}
-  </a>
-  <ul class="dropdown-menu">
-    {% if not notifications %}
-    <li class="header">{{ gettext("No notifications") }}</li>
-    {% else %}
-    <li class="header">You have new notifications</li>
-    {% endif %}
-    <li>
-      {% if notifications %}
-      <!-- inner menu: contains the actual data -->
-      <ul class="menu">
-        <li>
-          <a href="#">
-            <i class="fa fa-users text-aqua"></i> 5 new members joined today
-          </a>
-        </li>
-      </ul>
-      {% endif %}
-    </li>
-    <li class="footer"><a href="#">View all</a></li>
-  </ul>
-</li>
 <!-- User Account. -->
 <li class="dropdown user user-menu">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false" role="button">
     <span class="sr-only">User account</span>
-    <i class="fa fa-user"></i>
+    <i class="fa fa-user-circle fa-3x"></i>
   </a>
   <ul class="dropdown-menu">
-    <!-- User image -->
     <li class="user-header">
-      <p>{{ current_user.username }}</p>
+      <p>Logged in as: <b class="strong">{{ current_user.user_name }}</b></p>
     </li>
+    {% include config.USER_MENU_TEMPLATE ignore missing with context %}
     <!-- Menu Footer-->
     <li class="user-footer">
       <div class="pull-left">
-        <a href="#" class="btn btn-default btn-flat">Edit Profile</a>
+        <a href="{{ get_url("users.edit_view", id=current_user.id) }}" class="btn btn-default btn-flat"><i class="fa fa-edit"></i> {{ gettext("Edit Profile") }}</a>
       </div>
       <div class="pull-right">
-        <a href="{{ url_for("security.logout") }}" class="btn btn-default btn-flat">Sign out</a>
+        <a href="{{ url_for("security.logout") }}" class="btn btn-default btn-flat"><i class="fa fa-power-off"></i> {{ gettext("Sign out") }}</a>
       </div>
     </li>
   </ul>

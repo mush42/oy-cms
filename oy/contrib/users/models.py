@@ -29,8 +29,7 @@ class Profile(ImmutableProxiedDictMixin, db.Model, TimeStampped):
     )
     user = db.relationship(
         User,
-        backref=backref("profile", uselist=False),
-        cascade="delete, delete-orphan",
+        backref=backref("profile", uselist=False, cascade="all, delete-orphan"),
         single_parent=True,
         info=dict(label=lazy_gettext("User"), description=lazy_gettext("")),
     )

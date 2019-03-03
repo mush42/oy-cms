@@ -10,7 +10,7 @@
 <h3 class="text-red">Are you sure you want to delete this {{ admin_view.name }}?</h3>
 <p class="h4"><i class="fa fa-warning text-red"></i> This can not be undone.</p>
 <p>
-<a href="{{ get_url(".delete_executor", pk=pk) }}" class="btn btn-lg btn-danger">Yes, I'm sure</a>
+<a href="{{ get_url(".delete_executor", pk=pk, url=return_url) }}" class="btn btn-lg btn-danger">Yes, I'm sure</a>
 <a href="{{ return_url }}" class="btn btn-lg btn-default">No, go back</a>
 </p>
 {% endblock %}

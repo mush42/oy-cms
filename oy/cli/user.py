@@ -4,7 +4,7 @@ from flask.cli import with_appcontext
 from flask_security.utils import hash_password
 from oy.boot.sqla import db
 from oy.helpers import is_valid_email
-from oy.models.user import User, Role
+from oy.models.user import User
 from . import oy_group
 
 
@@ -67,19 +67,19 @@ def createuser(noinput, superuser):
         if user_datastore.find_user(user_name=user_name):
             click.secho("User already exists.", fg="red")
             return
+    superuser = superuser or click.confirm("Would you like this user to be a superuser?", default=False)
+    roles = [user_datastore.find_or_create_role("staff")]
     if superuser:
-        role = user_datastore.find_or_create_role("admin")
-    else:
-        role = user_datastore.find_or_create_role("staff")
+        roles.append(user_datastore.find_or_create_role("admin"))
     user_datastore.create_user(
-        user_name=user_name, email=email, password=hash_password(password), roles=[role]
+        user_name=user_name, email=email, password=hash_password(password), roles=roles
     )
     db.session.commit()
     click.echo()
     click.secho(f"{usertype} User created successfully.", fg="green", bold=True)
     click.secho("^" * 12, fg="red")
     click.secho(
-        f"User account details: username={user_name}, password={password}",
+        f"User account details: the username is: {user_name} and the password is the chosen password",
         fg="red",
         bold=True,
     )
