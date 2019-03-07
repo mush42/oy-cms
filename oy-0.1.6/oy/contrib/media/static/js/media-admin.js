@@ -1,5 +1,0 @@
-/*!
-* oy cms frontend assets
-* (c) 2019 Musharraf and oy contributers
- */
-$(document).ready(function(){$(".media-clear-btn").click(function(e){var i=$(this).data("input-id");$("#"+i).val(""),$("#selected-media-preview-"+i).addClass("visually-hidden"),$("#nothing-selected-"+i).removeClass("visually-hidden"),$("#selected-media-preview-"+i).attr("aria-hidden","true"),$("#nothing-selected-"+i).attr("aria-hidden","false")}),$(".media-popup-openner").click(function(){window.current_popup=lity($(this).data("popup-target")),window.current_popup.input_id=$(this).data("input-id")}),$(document).on("lity:close",function(e,i){var t=i.returned_data,d=i.input_id;$("#"+d).val(t.id),$("#selected-media-preview-"+d).removeClass("visually-hidden"),$("#nothing-selected-"+d).addClass("visually-hidden"),$("#selected-media-preview-"+d).attr("aria-hidden","false"),$("#nothing-selected-"+d).attr("aria-hidden","true"),$("#"+d+"_preview").attr("src",t.src),$("#"+d+"_preview").attr("alt",t.title)})});
