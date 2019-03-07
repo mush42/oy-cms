@@ -1,0 +1,29 @@
+{% extends 'admin/model/list.html' %}
+{% import 'admin/lib.html' as lib with context %}
+
+
+{% block tail %}
+  {{ super() }}
+
+  <div class="hide">
+  <form action="{{ url_for(".create_redirector") }}" method="POST" role="form" id="page-type-select-form">
+    {{ lib.render_form_fields(admin_view.get_child_page_type_form()) }}
+  </form>
+  </div>
+
+  <script id="page-metadata" type="application/json">
+    {{ admin_view.page_type_map|tojson  }}
+  </script>
+
+  <script type="text/javascript">
+    $(function() {
+      window.PTYPE_CANCEL_TXT = "{{ gettext("Cancel") }}";
+      window.PTYPE_CREATE_TXT = "{{ gettext("Create Page") }}";
+      window.PTYPE_MSG_TXT = "{{ gettext("Child Page Type") }}";
+    });
+  </script>
+
+  <script type="text/javascript" src="{{ oy_admin_static("vendor/sweetalert/sweetalert.min.js") }}"></script>
+  <!-- Custom js  -->
+<script src="{{ oy_admin_static("js/page-admin.min.js") }}"></script>
+{% endblock %}

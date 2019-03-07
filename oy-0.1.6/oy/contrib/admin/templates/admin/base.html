@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+{% import 'admin/layout.html' as layout with context -%}
+{% import 'admin/static.html' as admin_static with context %}
+{% import "admin/oy/oy_macros.html" as oy with context %}
+{% import "admin/oy/form_fields_macros.html" as form_field_macros with context %}
+{# store the jinja2 context for form_rules rendering logic #}
+{% set render_ctx = h.resolve_ctx() %}
+<html>
+<head>
+  {% block head %}
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <title>
+  {% block title %}
+  {{ oy.get_title() }}
+  {% endblock %}
+  </title>
+
+  {% block head_meta %}{% endblock %}
+
+  {% block head_css %}
+  <!-- Bootstrap 3.3.7 -->
+  <link rel="stylesheet" href="{{ oy_admin_static("vendor/bootstrap/css/bootstrap.min.css") }}">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="{{ oy_admin_static("vendor/font-awesome/css/font-awesome.min.css") }}">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{{ oy_admin_static("vendor/admin-lte/AdminLTE-without-plugins.min.css") }}">
+  <!-- AdminLTE Skin. -->
+  <link rel="stylesheet" href="{{ oy_admin_static("vendor/admin-lte/skin-black.min.css") }}">
+  <!-- Metesmenu. -->
+  <link rel="stylesheet" href="{{ oy_admin_static("vendor/metisMenu/metisMenu.min.css") }}">
+  <!-- Lity lightbox. -->
+  <link rel="stylesheet" href="{{ oy_admin_static("vendor/lity/lity.min.css") }}">
+  <!-- toastr notifications. -->
+  <link rel="stylesheet" href="{{ oy_admin_static("vendor/toastr/toastr.min.css") }}">
+  <!-- Custom css -->
+  <link rel="stylesheet" href="{{ oy_admin_static("css/oyadmin.min.css") }}">
+  {% endblock head_css %}
+
+  {% block admin_view_extra_css %}
+  {% if admin_view.extra_css %}
+  {% for css_url in admin_view.extra_css %}
+  <link href="{{ css_url }}" rel="stylesheet">
+  {% endfor %}
+  {% endif %}
+  {% endblock %}
+
+  {% block form_fields_css %}
+  {{ form_field_macros.render_form_css() }}
+  {% endblock %}
+
+  {% block head_tail %}{% endblock %}
+  {% endblock %}
+</head>
+<body class="hold-transition skin-black sidebar-mini">
+<!-- Site wrapper -->
+<div class="wrapper">
+
+  <header class="main-header">
+    {% block brand %}
+    {% endblock brand %}
+
+    <!-- Header Navbar. -->
+    <nav class="navbar navbar-static-top">
+      <!-- Sidebar toggle button-->
+      <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+
+      <div class="navbar-custom-menu">
+        <ul class="nav navbar-nav">
+        {% include "admin/oy/includes/notification_area.html" with context %}
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Left side column. contains the sidebar -->
+  <aside class="main-sidebar">
+    <!-- sidebar. -->
+    <section class="sidebar">
+      {% block side_menu %}
+      <!-- sidebar menu. -->
+      <ul class="sidebar-menu" data-widget="tree">
+        <li class="header" role="heading">{{ gettext("Main Menu") }}</li>
+        {{ layout.menu() }}
+        {% block menu_links %}
+        <li class="header" role="heading">{{ gettext("Other Links") }}</li>
+        {{ layout.menu_links() }}
+        {% endblock menu_links %}
+      </ul>
+      {% endblock side_menu %}
+    </section>
+    <!-- /.sidebar -->
+  </aside>
+
+  {% block access_control %}{% endblock %}
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      {% block page_header %}
+      <div class="page-header">
+      <h1>{{ (admin_view["verbose_name"] or admin_view.name)|capitalize }}</h1>
+      </div>
+      {% endblock page_header %}
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+    <div class="row">
+    <div class="page_body_wrapper col-md-offset-1">
+    {% block body %}{% endblock %}
+    </div>
+    </div>
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+
+  <footer class="main-footer">
+    <div class="pull-right hidden-xs">
+      <b>Oy Content Management System</b>
+    </div>
+  </footer>
+
+  <!-- Control Sidebar -->
+  <aside class="control-sidebar control-sidebar-dark" aria-hidden="true">
+  </aside>
+  <!-- /.control-sidebar -->
+  <!-- Add the sidebar's background. This div must be placed
+       immediately after the control sidebar -->
+  <div class="control-sidebar-bg"></div>
+</div>
+<!-- ./wrapper -->
+
+{% block tail_js %}
+<!-- jQuery 3 -->
+<script src="{{ oy_admin_static("vendor/jquery/jquery.min.js") }}"></script>
+<!-- Bootstrap 3.3.7 -->
+<script src="{{ oy_admin_static("vendor/bootstrap/js/bootstrap.min.js") }}"></script>
+<!-- AdminLTE App -->
+<script src="{{ oy_admin_static("vendor/admin-lte/adminlte.min.js") }}"></script>
+<!-- metestmenu -->
+<script src="{{ oy_admin_static("vendor/metisMenu/metisMenu.min.js") }}"></script>
+<!-- Lity lightbox -->
+<script src="{{ oy_admin_static("vendor/lity/lity.min.js") }}"></script>
+<!-- toastr notifications. -->
+<script src="{{ oy_admin_static("vendor/toastr/toastr.min.js") }}"></script>
+
+<script>
+  $(document).ready(function () {
+    $('.sidebar-menu').tree()
+  });
+</script>
+{% endblock %}
+
+{% block messages %}
+{{ layout.messages() }}
+{% endblock %}
+
+{% block admin_view_extra_js %}
+{% if admin_view.extra_js %}
+{% for js_url in admin_view.extra_js %}
+<script src="{{ js_url }}" type="text/javascript"></script>
+{% endfor %}
+{% endif %}
+{% endblock %}
+
+{% block form_fields_js %}
+{{ form_field_macros.render_form_js() }}
+{% endblock %}
+{% block tail %}{% endblock %}
+</body>
+</html>

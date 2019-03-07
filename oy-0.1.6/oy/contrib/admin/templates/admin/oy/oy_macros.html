@@ -1,0 +1,36 @@
+{% macro get_title(name=None, prefix="", suffix="") %}
+  {% if prefix %}
+  {{ prefix ~ " - " }}
+  {% endif %}
+  {% if admin_view.category %}
+  {{ admin_view.category|title ~ " - " }}
+  {% endif %}
+  {{ (name or admin_view.name)|title ~ " - " }}{{ admin_view.admin.name }}
+  {% if suffix %}
+  {{ " - " ~ suffix }}
+  {% endif %}
+{% endmacro %}
+
+{% macro add_child_row_action(view, page_id, page) %}
+{% if page.should_allow_children() %}
+<a href="#" class="icon add-child-btn" data-parent-pk="{{ page_id }}" title="{{ gettext("Add child") }}" data-type="{{ page.contenttype }}">
+  <span class="fa fa-plus-circle"></span>
+</a>
+{% endif %}
+{% endmacro %}
+
+{% macro delete_row_action(view, row_id, row) %}
+  {% if view.can_delete %}
+  <a href="" class="icon" title="{{ gettext("Delete record") }}"><i class="fa fa-trash"></i></a>
+  {% endif %}
+{% endmacro %}
+
+{% macro children_row_action(view, page_id, page) %}
+  {% set child_count = page.children.count() %}
+  {% if  child_count %}
+  <a href="{{ get_url(".index_view", parent_pk=page_id) }}">
+  {{ gettext("Children") }} 
+  <span class="badge badge-info">{{ child_count }}</span>
+  </a>
+  {% endif %}
+{% endmacro %}

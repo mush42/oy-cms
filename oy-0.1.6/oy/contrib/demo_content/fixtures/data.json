@@ -1,0 +1,8 @@
+{
+  "oy.models:SettingsProfile": [
+    {
+      "name": "Default Settings",
+      "is_active": true
+    }
+  ]
+}

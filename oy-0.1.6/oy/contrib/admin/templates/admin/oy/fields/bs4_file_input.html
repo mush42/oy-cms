@@ -1,0 +1,33 @@
+<style>
+	.btn-file {
+		position: relative;
+		overflow: hidden;
+	}
+	.btn-file input[type=file] {
+		position: absolute;
+		top: 0;
+		right: 0;
+		min-width: 100%;
+		min-height: 100%;
+		font-size: 100px;
+		text-align: right;
+		filter: alpha(opacity=0);
+		opacity: 0;
+		outline: none;
+		background: white;
+		cursor: inherit;
+		display: block;
+	}
+</style>
+<div class="form-control">
+<label class="btn btn-info btn-file" role="button" tabindex="0">
+    {{ gettext("Browse") }} <input style="display: none;" 
+	{% for k, v in kwargs.items() %}
+	{% if v %}
+	{{k}}="{{v}}"
+	{% endif %}
+	{% endfor %}
+	/>
+</label>
+</div>
+<p id="{{ kwargs['id'] }}-info" class="help-block"></p>

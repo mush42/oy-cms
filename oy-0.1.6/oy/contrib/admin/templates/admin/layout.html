@@ -1,0 +1,88 @@
+{% macro menu_icon(item) -%}
+{% set icon_type = item.get_icon_type() %}
+{%- if icon_type %}
+  {% set icon_value = item.get_icon_value() %}
+  {% if icon_type == 'glyph' %}
+    <i class="glyphicon {{ icon_value }}"></i>
+  {% elif icon_type == 'fa' %}
+    <i class="fa {{ icon_value }}"></i>
+  {% elif icon_type == 'image' %}
+    <img src="{{ url_for('static', filename=icon_value) }}" alt="menu image">
+  {% elif icon_type == 'image-url' %}
+    <img src="{{ icon_value }}" alt="menu image">
+  {% endif %}
+  {% else %}
+  <i class="fa fa-circle-o"></i>
+{% endif %}
+{%- endmacro %}
+
+{% macro menu(menu_root=None) %}
+  {% if menu_root is none %}{% set menu_root = admin_view.admin.menu() %}{% endif %}
+  {%- for item in menu_root %}
+  {% if item.is_accessible() %}
+  {%- if item.is_category() -%}
+  {% set children = item.get_children() %}
+  {% else %}
+  {% set children = None %} 
+  {% endif %}
+  <li class="{% if children %}treeview{%endif%} {% if item.is_active(admin_view) %}active{%endif%}">
+  <a href="{{ item.get_url() or "#" }}" {% if children %}aria-haspopup="true"{% endif %}>
+  {% if item.class_name %}
+  <i class="{{ item.class_name }}"></i>
+  {% else %}
+  {{ menu_icon(item) }}
+  {% endif %}
+  {% if item._view and item._view.verbose_name %}
+  {{ item._view.verbose_name.title() }}
+  {% else %}
+  {{ item.name.title() }}
+  {% endif %}
+  </a>
+  {% if children %}
+  <ul class="treeview-menu">
+  {{ menu(children) }}
+  </ul>
+  {% endif %}
+  </li>
+  {% endif %}
+  {% endfor %}
+{% endmacro %}
+
+{% macro menu_links(links=None) %}
+  {% if links is none %}{% set links = admin_view.admin.menu_links() %}{% endif %}
+  {% for item in links %}
+    {% set class_name = item.get_class_name() %}
+    {% if item.is_accessible() and item.is_visible() %}
+      <li{% if class_name %} class="{{ class_name }}"{% endif %}>
+        <a href="{{ item.get_url() }}">
+        {{ item.name.title() }}
+        </a>
+      </li>
+    {% endif %}
+  {% endfor %}
+{% endmacro %}
+
+{% macro messages() %}
+<script type="text/javascript">
+  $(function () {
+  toastr.options = {
+    closeButton: true,
+    positionClass: "toast-bottom-center",
+    timeOut: 0,
+    extendedTimeOut: 0,
+    showEasing: "swing",
+    hideEasing: "swing",
+    tapToDismiss: true,
+    onclick: null
+  };
+  {% with messages = get_flashed_messages(with_categories=True) %}
+  {% if messages %}
+  {% for category, msg in messages %}
+  {% set category="info" if category=="message" else category %}
+  toastr.{{ category }}("{{ msg }}");
+  {% endfor %}
+  {% endif %}
+  {% endwith %}
+  });
+</script>
+{% endmacro %}

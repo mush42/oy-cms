@@ -1,0 +1,15 @@
+{% macro render_form_css() %}
+  {% for css_url in get_form_css() %}
+    <link href="{{ css_url }}" rel="stylesheet">
+  {% endfor %}
+{% endmacro %}
+
+{% macro render_form_js() %}
+	{% set js = get_form_js() %}
+    {% for js_url in js["urls"] %}
+    <script src="{{ js_url }}" type="text/javascript"></script>
+    {% endfor %}
+    {% for markup in js["markup"] %}
+      {{ markup }}
+    {% endfor %}
+{% endmacro %}

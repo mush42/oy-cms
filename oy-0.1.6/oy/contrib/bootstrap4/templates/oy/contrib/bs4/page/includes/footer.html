@@ -1,0 +1,8 @@
+{% import 'oy/contrib/bs4/page/page_macros.html' as macros with context %}
+
+<!-- Footer -->
+<footer class="my-10 bg-dark">
+      {{ macros.render_footer_tree(pages) }}
+    <p class="m-0 text-center text-white">Copyright &copy;{{ '2018 ' ~ settings.title }} </p>
+  <!-- /.container -->
+</footer>
