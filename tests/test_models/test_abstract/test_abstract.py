@@ -20,16 +20,22 @@ def test_timestammped(app, db, makemodel):
 
 def test_metadata(app, db, makemodel):
     class Content(Titled):
-        __keywordscolumn__ = "title"
-        __metatitle_column__ = "title"
-        __metadescription_column__ = "body"
         body = db.Column(db.UnicodeText)
 
+        def __get_meta_title__(self):
+            return "A Post"
+
+        def __get_meta_description__(self):
+            return "The best post in the known universe"
+
+        def __get_keywords__(self):
+            return "post, article, great"
+
     metadata = makemodel("MetadataModel", (Content, Metadata))
-    m = metadata(title=u"A Post", body=u"The best post in the known universe")
-    assert m.should_auto_generate == True
+    m = metadata(title="A Post", body="The best post in the known universe")
     db.session.add(m)
     db.session.commit()
-    assert m.keywords == "A Post"
+    assert m.should_auto_generate == True
+    assert m.keywords == "post, article, great"
     assert m.meta_title == m.title
     assert m.meta_description == m.body

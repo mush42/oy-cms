@@ -19,7 +19,7 @@ class BaseStorage:
     Concrete storages must implement the run() method.
     """
 
-    # A human readable name to describing this storage
+    # A human readable name to describe this storage
     name = None
 
     def __init__(self, app, destdir, verbose):
@@ -30,7 +30,7 @@ class BaseStorage:
     def run(self):
         raise NotImplementedError
 
-    def __iter__(self, src=None, dest=None):
+    def __iter__(self):
         to_copy = set()
         to_process = set()
         if self.app.has_static_folder:

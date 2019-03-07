@@ -67,7 +67,9 @@ def createuser(noinput, superuser):
         if user_datastore.find_user(user_name=user_name):
             click.secho("User already exists.", fg="red")
             return
-    superuser = superuser or click.confirm("Would you like this user to be a superuser?", default=False)
+    superuser = superuser or click.confirm(
+        "Would you like this user to be a superuser?", default=False
+    )
     roles = [user_datastore.find_or_create_role("staff")]
     if superuser:
         roles.append(user_datastore.find_or_create_role("admin"))

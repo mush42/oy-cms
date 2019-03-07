@@ -11,7 +11,11 @@ from flask_admin.model.template import (
     EditRowAction,
     LinkRowAction,
 )
-from flask_admin.helpers import is_safe_url, validate_form_on_submit, get_redirect_target
+from flask_admin.helpers import (
+    is_safe_url,
+    validate_form_on_submit,
+    get_redirect_target,
+)
 from flask_wtf import FlaskForm
 from oy.boot.sqla import db
 from oy.babel import gettext, lazy_gettext
@@ -192,6 +196,7 @@ class PageAdmin(DisplayableAdmin):
 
     def get_child_page_type_form(self):
         """The form used in the popup when creating a child page."""
+
         class ChildPageTypeForm(FlaskForm):
             parent_pk = HiddenField(validators=[InputRequired()])
             url = HiddenField(default=self.get_save_return_url(self.model))

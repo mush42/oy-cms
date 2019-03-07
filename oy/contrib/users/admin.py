@@ -57,7 +57,7 @@ class UserAdmin(OyModelView):
 
     def validate_form(self, form):
         user = self.get_one(request.args["id"])
-        if not form.active.data and user.id == current_user.id:
+        if "active" in form and user.id == current_user.id and not form.active.data:
             flash(gettext("You can not deactivate your own account."))
             return False
         if not form["old_password"].data:
@@ -159,7 +159,7 @@ class UserAdmin(OyModelView):
                     user_name=user_data["user_name"],
                     email=user_data["email"],
                     password=hash_password(user_data["password"]),
-                    roles=user_data["roles"]
+                    roles=user_data["roles"],
                 )
                 db.session.commit()
             flash(gettext("User created successfully."))

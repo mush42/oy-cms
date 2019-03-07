@@ -64,7 +64,6 @@ def register_settings_admin(app, admin):
             def is_accessible(self):
                 return super().is_accessible() and current_user.has_role("admin")
 
-
             @expose("/", methods=["Get", "POST"])
             def index(self):
                 form = make_settings_form_for_category(

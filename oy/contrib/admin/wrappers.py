@@ -7,7 +7,7 @@ from flask_admin.helpers import get_redirect_target
 from flask_admin.model.template import (
     DeleteRowAction,
     LinkRowAction,
-    EndpointLinkRowAction
+    EndpointLinkRowAction,
 )
 from flask_admin.contrib.sqla import ModelView, form
 from flask_security import current_user
@@ -33,13 +33,12 @@ class AuthenticationViewMixin:
 
 
 class OyDeleteRowAction(EndpointLinkRowAction):
-
     def __init__(self):
         super().__init__(
             "fa fa-trash",
             ".delete_confirm",
             title=lazy_gettext("Delete record"),
-            id_arg="pk"
+            id_arg="pk",
         )
 
 
@@ -126,7 +125,6 @@ class OyIndexView(AuthenticationViewMixin, AdminIndexView):
 
 
 class OyBaseView(BaseView, AuthenticationViewMixin):
-
     def __init__(self, *args, **kwargs):
         self.verbose_name = kwargs.pop("verbose_name", kwargs.get("name"))
         self.show_in_menu = kwargs.pop("show_in_menu", True)

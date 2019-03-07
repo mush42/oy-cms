@@ -4,7 +4,7 @@
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     Collect static files to be served in production.
-    This code is heavenly inspired by the excellent `flask-collect` extension.
+    This code is heavily inspired by the excellent `flask-collect` extension.
 
     :copyright: (c) 2019 by Musharraf Omer.
     :license: MIT, see LICENSE for more details.

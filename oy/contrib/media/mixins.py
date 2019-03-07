@@ -25,7 +25,7 @@ from oy.contrib.demo_content.utils import (
 from .utils import FileTypeCheckFilter
 
 
-# Number of random bytes of the file_id value.
+# Number of random bytes generated for the file_id value.
 NUMBYTES = 16
 
 

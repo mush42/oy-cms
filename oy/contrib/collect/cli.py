@@ -3,7 +3,7 @@
     oy.contrib.collect.cli
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
-    The click command for the collect extension.
+    The click cli for the collect extension.
 
     :copyright: (c) 2019 by Musharraf Omer.
     :license: MIT, see LICENSE for more details.
